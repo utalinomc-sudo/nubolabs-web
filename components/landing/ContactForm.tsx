@@ -48,6 +48,9 @@ export function ContactForm() {
           <li>✓&nbsp; Entregable inicial con oportunidades priorizadas</li>
           <li>✓&nbsp; Respuesta en menos de 24 horas</li>
         </ul>
+        <a href="/diagnostico" className="mt-6 inline-flex text-sm font-semibold text-brand hover:underline">
+          ¿Prefieres estimar tu ahorro primero? Prueba el diagnóstico interactivo →
+        </a>
       </div>
 
       <div className="rounded-[20px] border border-line bg-white p-8 shadow-[0_20px_50px_rgba(11,29,58,.08)]">

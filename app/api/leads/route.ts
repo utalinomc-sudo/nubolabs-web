@@ -26,15 +26,20 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "El email no es válido." }, { status: 400 });
   }
 
-  const lead = {
+  const lead: Record<string, unknown> = {
     name,
     email,
     company: body.company?.trim() || "",
     message: body.message?.trim() || "",
-    source: "landing",
+    source: body.source?.trim() || "landing",
     status: "new",
     createdAt: new Date().toISOString(),
   };
+
+  // Adjunta el detalle estructurado (ej. procesos y totales del diagnóstico).
+  if (body.meta && typeof body.meta === "object") {
+    lead.meta = body.meta;
+  }
 
   // Si Firebase Admin no está configurado (ej. desarrollo local sin credenciales),
   // registramos en consola y respondemos OK igual, para no bloquear el flujo.

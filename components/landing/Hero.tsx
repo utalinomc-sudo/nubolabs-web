@@ -14,7 +14,7 @@ export function Hero() {
           construimos flujos, reportes y agentes que ahorran horas y reducen errores.
         </p>
         <div className="flex flex-wrap items-center gap-3.5">
-          <a href="#contacto" className="btn-primary">
+          <a href="/diagnostico" className="btn-primary">
             Solicitar diagnóstico →
           </a>
           <a href="#servicios" className="btn-ghost">

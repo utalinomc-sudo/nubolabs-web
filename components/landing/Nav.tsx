@@ -28,7 +28,7 @@ export function Nav() {
               {item.label}
             </a>
           ))}
-          <a href="#contacto" className="rounded-full bg-brand px-5 py-[11px] text-sm text-white transition hover:brightness-95">
+          <a href="/diagnostico" className="rounded-full bg-brand px-5 py-[11px] text-sm text-white transition hover:brightness-95">
             Agendar diagnóstico →
           </a>
         </nav>
@@ -59,7 +59,7 @@ export function Nav() {
               </a>
             ))}
             <a
-              href="#contacto"
+              href="/diagnostico"
               onClick={() => setOpen(false)}
               className="mt-1 rounded-lg bg-brand px-3 py-3 text-center text-sm font-semibold text-white"
             >
