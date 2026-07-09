@@ -1,10 +1,10 @@
 // Contenido de la landing centralizado — un solo lugar para editar textos.
 
 export const nav = [
-  { label: "Inicio", href: "#inicio" },
-  { label: "Servicios", href: "#servicios" },
-  { label: "Cómo trabajamos", href: "#modelo" },
-  { label: "Casos de uso", href: "#casos" },
+  { label: "Inicio", href: "/#inicio" },
+  { label: "Servicios", href: "/#servicios" },
+  { label: "Cómo trabajamos", href: "/#modelo" },
+  { label: "Casos de uso", href: "/#casos" },
 ];
 
 export const heroTags = [

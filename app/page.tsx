@@ -7,19 +7,24 @@ import { Process } from "@/components/landing/Process";
 import { UseCases } from "@/components/landing/UseCases";
 import { ContactForm } from "@/components/landing/ContactForm";
 import { Footer } from "@/components/landing/Footer";
+import { getSiteConfig } from "@/lib/site";
 
-export default function HomePage() {
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const { visible, content } = await getSiteConfig();
+
   return (
     <>
-      <Nav />
+      <Nav showEquipo={visible.equipo} />
       <main>
-        <Hero />
-        <Problem />
-        <Approach />
-        <Services />
-        <Process />
-        <UseCases />
-        <ContactForm />
+        {visible.hero && <Hero content={content.hero} />}
+        {visible.problema && <Problem />}
+        {visible.enfoque && <Approach />}
+        {visible.servicios && <Services content={content.servicios} />}
+        {visible.proceso && <Process />}
+        {visible.casos && <UseCases content={content.casos} />}
+        {visible.contacto && <ContactForm />}
       </main>
       <Footer />
     </>

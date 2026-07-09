@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { Logo } from "@/components/Logo";
-import { nav } from "@/lib/content";
+import { nav as baseNav } from "@/lib/content";
 
-export function Nav() {
+export function Nav({ showEquipo = true }: { showEquipo?: boolean }) {
   const [open, setOpen] = useState(false);
+  const nav = showEquipo ? [...baseNav, { label: "Equipo", href: "/equipo" }] : baseNav;
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#EEF2F8] bg-white/90 backdrop-blur">

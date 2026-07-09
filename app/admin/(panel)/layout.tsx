@@ -9,8 +9,8 @@ export const dynamic = "force-dynamic";
 const items = [
   { label: "Dashboard", href: "/admin" },
   { label: "Leads", href: "/admin/leads" },
-  { label: "Servicios", href: "/admin/servicios" },
-  { label: "Configuración", href: "/admin/config" },
+  { label: "Contenido", href: "/admin/config" },
+  { label: "Nuestro equipo", href: "/admin/equipo" },
 ];
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
