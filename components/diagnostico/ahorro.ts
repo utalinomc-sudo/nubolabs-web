@@ -45,7 +45,9 @@ export function blank(abierto = true): Proceso {
 
 export function calc(p: Proceso) {
   const errBump = p.errores === "alto" ? 1.15 : p.errores === "medio" ? 1.05 : 1;
-  const horasMes = (Number(p.horas) || 0) * 4.33;
+  // p.horas = horas que dedica CADA persona por semana → total = horas × personas.
+  const personas = Math.max(1, Number(p.personas) || 1);
+  const horasMes = (Number(p.horas) || 0) * personas * 4.33;
   const ahorroHoras = horasMes * (Number(p.repetitivo) / 100) * CONFIG.factorAutomatizacion;
   const costoHora = (Number(p.sueldo) || 0) / CONFIG.horasMesJornada;
   const ahorroMes = ahorroHoras * costoHora * errBump;
@@ -60,5 +62,10 @@ export function calcTotals(procesos: Proceso[]) {
     horas += c.ahorroHoras;
     mes += c.ahorroMes;
   });
-  return { horas: Math.round(horas), mes: Math.round(mes), anual: Math.round(mes * 12) };
+  return {
+    horas: Math.round(horas),
+    semana: Math.round(mes / 4.33),
+    mes: Math.round(mes),
+    anual: Math.round(mes * 12),
+  };
 }

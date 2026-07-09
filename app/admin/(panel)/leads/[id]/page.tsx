@@ -14,7 +14,7 @@ interface AreaMeta {
   respuestas: { pregunta: string; valor: number | null }[];
 }
 interface AhorroMeta {
-  totales?: { horas: number; mes: number; anual: number };
+  totales?: { horas: number; semana?: number; mes: number; anual: number };
   procesos?: {
     nombre: string;
     herramientas?: string;
@@ -160,6 +160,12 @@ export default async function LeadDetail({ params }: { params: { id: string } })
         <div className="mt-6 card p-5">
           <h2 className="mb-1 font-bold">Estimación de ahorro (paso opcional)</h2>
           <div className="mb-4 flex flex-wrap gap-6">
+            {ahorro.totales.semana != null && (
+              <div>
+                <div className="text-2xl font-extrabold">{clp.format(ahorro.totales.semana)}</div>
+                <div className="text-xs text-ink-muted">a la semana</div>
+              </div>
+            )}
             <div>
               <div className="text-2xl font-extrabold text-brand">{clp.format(ahorro.totales.mes)}</div>
               <div className="text-xs text-ink-muted">al mes</div>

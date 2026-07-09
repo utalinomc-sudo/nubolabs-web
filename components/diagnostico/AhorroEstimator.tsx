@@ -97,7 +97,7 @@ function ProcesoCard({
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 15.5, fontWeight: 700 }}>{p.nombre || "Proceso sin nombre"}</div>
           <div style={{ fontSize: 12.5, color: C.muted }}>
-            {p.personas} persona(s) · {p.horas} h/semana · {p.repetitivo}% repetitivo
+            {p.personas} persona(s) · {p.horas} h/sem c/u · {p.repetitivo}% repetitivo
           </div>
         </div>
         <div style={{ textAlign: "right" }}>
@@ -159,9 +159,9 @@ function ProcesoCard({
               <input type="number" min={1} style={field} value={p.personas} onChange={(e) => onChange(i, "personas", Number(e.target.value))} />
             </div>
             <div>
-              <label style={lbl}>Horas / semana</label>
+              <label style={lbl}>Horas por persona / semana</label>
               <input type="number" min={0} style={field} value={p.horas} onChange={(e) => onChange(i, "horas", Number(e.target.value))} />
-              <div style={hint}>Sumando a todas las personas</div>
+              <div style={hint}>Que cada persona dedica al proceso</div>
             </div>
             <div>
               <label style={lbl}>Sueldo prom. mensual (CLP)</label>

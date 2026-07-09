@@ -332,9 +332,25 @@ export function DiagnosticoFlow() {
 
             {ahorroActivo && (
               <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.14)" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "1.5px", color: "#5A7699", marginBottom: 8 }}>AHORRO ESTIMADO (OPCIONAL)</div>
-                <div style={{ fontSize: 26, fontWeight: 800, color: C.cyan, lineHeight: 1 }}>{fmtCLP.format(ahorroTotals.mes)}</div>
-                <div style={{ fontSize: 12, color: C.faint, marginTop: 3 }}>al mes · {ahorroTotals.horas} h/mes automatizables</div>
+                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "1.5px", color: "#5A7699" }}>AHORRO ESTIMADO (TOTAL)</span>
+                  <span className="font-mono" style={{ fontSize: 10.5, color: "#5A7699" }}>
+                    {procesos.length} {procesos.length === 1 ? "PROCESO" : "PROCESOS"}
+                  </span>
+                </div>
+                <div style={{ fontSize: 28, fontWeight: 800, color: C.cyan, lineHeight: 1 }}>{fmtCLP.format(ahorroTotals.mes)}</div>
+                <div style={{ fontSize: 12, color: C.faint, marginTop: 3 }}>ahorro estimado mensual</div>
+                <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 800 }}>{fmtCLP.format(ahorroTotals.semana)}</div>
+                    <div style={{ fontSize: 11, color: C.faint }}>a la semana</div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color: C.orange }}>{fmtCLP.format(ahorroTotals.anual)}</div>
+                    <div style={{ fontSize: 11, color: C.faint }}>proyección anual</div>
+                  </div>
+                </div>
+                <div style={{ fontSize: 12, color: C.faint, marginTop: 10 }}>{ahorroTotals.horas} h/mes automatizables</div>
               </div>
             )}
 
