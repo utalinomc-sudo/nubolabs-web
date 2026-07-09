@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { DiagnosticoTool } from "@/components/diagnostico/DiagnosticoTool";
+import { DiagnosticoFlow } from "@/components/diagnostico/DiagnosticoFlow";
 
 export const metadata: Metadata = {
-  title: "Diagnóstico de ahorro — Nubolabs",
+  title: "Diagnóstico operativo — Nubolabs",
   description:
-    "Estima cuánto podría ahorrar tu empresa automatizando sus procesos con IA. Diagnóstico de alto nivel de Nubolabs.",
+    "Identifica en 3 minutos dónde está la mayor fricción operativa de tu empresa y, opcionalmente, estima cuánto podrías ahorrar automatizando. Diagnóstico gratuito de Nubolabs.",
 };
 
 export default function DiagnosticoPage() {
-  return <DiagnosticoTool />;
+  return <DiagnosticoFlow />;
 }
