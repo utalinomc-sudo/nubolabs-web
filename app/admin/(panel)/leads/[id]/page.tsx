@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb } from "@/lib/firebaseAdmin";
+import { DeleteLeadButton } from "@/components/admin/DeleteLeadButton";
 
 export const dynamic = "force-dynamic";
 
@@ -83,9 +84,12 @@ export default async function LeadDetail({ params }: { params: { id: string } })
 
   return (
     <div className="max-w-3xl">
-      <Link href="/admin/leads" className="text-sm font-semibold text-brand hover:underline">
-        ← Volver a leads
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link href="/admin/leads" className="text-sm font-semibold text-brand hover:underline">
+          ← Volver a leads
+        </Link>
+        <DeleteLeadButton id={params.id} name={String(lead.name || "")} />
+      </div>
 
       {/* Contacto */}
       <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2">
