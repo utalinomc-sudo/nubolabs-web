@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<title>Nubolabs — Mejoras propuestas</title>
+<style>
+  :root {
+    --navy: #0B1D3A;
+    --brand: #1565FF;
+    --cyan: #00C2FF;
+    --accent: #FF6B5E;
+    --ink: #0B1D3A;
+    --muted: #5A6B85;
+    --soft: #93A5C4;
+    --line: #E6EAF1;
+    --bg-soft: #F5F8FC;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  @page { size: A4; margin: 16mm 14mm; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body {
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ink);
+    font-size: 10.6px;
+    line-height: 1.5;
+  }
+  .cover {
+    background: linear-gradient(135deg, #0B1D3A 0%, #123166 55%, #1565FF 100%);
+    color: #fff;
+    border-radius: 18px;
+    padding: 34px 34px 30px;
+    margin-bottom: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::after {
+    content: "";
+    position: absolute; right: -60px; top: -60px;
+    width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,194,255,.55), transparent 65%);
+  }
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 22px; }
+  .logo-dot { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(135deg, var(--cyan), var(--brand)); position: relative; }
+  .logo-dot::after { content:""; position:absolute; right:-4px; bottom:-4px; width:9px; height:9px; border-radius:50%; background: var(--accent); }
+  .logo-text { font-weight: 800; font-size: 16px; letter-spacing: -.3px; }
+  .logo-text span { color: var(--cyan); }
+  .eyebrow { font-size: 9.5px; font-weight: 700; letter-spacing: 2.4px; color: var(--cyan); margin-bottom: 10px; }
+  .cover h1 { font-size: 27px; line-height: 1.12; letter-spacing: -.8px; font-weight: 800; max-width: 90%; }
+  .cover p { margin-top: 12px; color: #C7D4EA; font-size: 11px; max-width: 84%; }
+  .cover .meta { margin-top: 18px; font-size: 9.5px; color: #9FB2D4; }
+
+  .intro { display: flex; gap: 12px; margin-bottom: 20px; }
+  .intro .box { flex: 1; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--bg-soft); }
+  .intro .box h4 { font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--brand); margin-bottom: 5px; }
+  .intro .box p { font-size: 10px; color: var(--muted); }
+
+  .section-title { font-size: 13px; font-weight: 800; letter-spacing: -.3px; margin: 4px 0 14px; }
+
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 13px;
+    page-break-inside: avoid;
+    position: relative;
+  }
+  .card .head { display: flex; align-items: flex-start; gap: 13px; }
+  .rank {
+    flex: none;
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--brand), var(--cyan));
+    color: #fff; font-weight: 800; font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card.a1 .rank { background: linear-gradient(135deg, #FF6B5E, #FF9776); }
+  .titles { flex: 1; }
+  .titles h3 { font-size: 13.5px; font-weight: 800; letter-spacing: -.2px; }
+  .titles .sub { font-size: 9.8px; color: var(--muted); margin-top: 2px; }
+  .impact {
+    flex: none; text-align: right;
+  }
+  .badge {
+    display: inline-block; font-size: 8.4px; font-weight: 800; letter-spacing: .4px;
+    padding: 3px 8px; border-radius: 20px; text-transform: uppercase;
+  }
+  .badge.vhigh { background: #FFE9E6; color: #E8483A; }
+  .badge.high { background: #E4EDFF; color: var(--brand); }
+  .badge.mid { background: #E7F9FF; color: #0091B8; }
+  .body { margin-top: 11px; font-size: 10.2px; color: #2A3A55; }
+  .body strong { color: var(--ink); }
+  .grid { display: flex; gap: 14px; margin-top: 11px; }
+  .grid .col { flex: 1; }
+  .grid h5 { font-size: 8.6px; text-transform: uppercase; letter-spacing: 1px; color: var(--soft); margin-bottom: 4px; }
+  ul { list-style: none; }
+  ul li { font-size: 9.8px; color: #2A3A55; padding-left: 13px; position: relative; margin-bottom: 3px; }
+  ul li::before { content: "→"; position: absolute; left: 0; color: var(--brand); font-weight: 700; }
+  .metaline { margin-top: 11px; padding-top: 10px; border-top: 1px solid var(--line); display: flex; gap: 20px; font-size: 9.2px; }
+  .metaline b { color: var(--ink); }
+  .metaline .k { color: var(--soft); text-transform: uppercase; letter-spacing: .6px; font-size: 8px; display:block; margin-bottom:1px; }
+
+  .footer { margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; font-size: 8.8px; color: var(--soft); }
+  .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+
+  <div class="cover">
+    <div class="logo-row">
+      <div class="logo-dot"></div>
+      <div class="logo-text">Nubo<span>labs</span></div>
+    </div>
+    <div class="eyebrow">ROADMAP · OPORTUNIDADES DE PRODUCTO</div>
+    <h1>5 mejoras para convertir el sitio en una máquina de captación</h1>
+    <p>Análisis del estado actual de nubolabs.cl y propuestas priorizadas por impacto de negocio: más leads, mejor conversión y una operación que se gestiona sola.</p>
+    <div class="meta">Preparado para Nubolabs · nubolabs.cl · Next.js 14 + Firebase + Vercel</div>
+  </div>
+
+  <div class="intro">
+    <div class="box">
+      <h4>Qué ya existe</h4>
+      <p>Landing viva, diagnóstico interactivo con estimador de ahorro, captura de leads en Firestore, panel admin con login, contenido editable y aviso por correo.</p>
+    </div>
+    <div class="box">
+      <h4>Dónde está la oportunidad</h4>
+      <p>Hoy se <em>capturan</em> leads, pero no se <em>gestionan</em> ni se <em>miden</em>; no hay tráfico orgánico medible ni entregable automático que acelere el cierre.</p>
+    </div>
+    <div class="box">
+      <h4>Cómo leer este documento</h4>
+      <p>Ordenado de mayor a menor impacto. Cada ficha trae el valor de negocio, qué incluye, esfuerzo estimado y las piezas técnicas.</p>
+    </div>
+  </div>
+
+  <div class="section-title">Propuestas priorizadas por impacto</div>
+
+  <!-- 1 -->
+  <div class="card a1">
+    <div class="head">
+      <div class="rank">1</div>
+      <div class="titles">
+        <h3>Pipeline de leads (mini-CRM) en el admin</h3>
+        <div class="sub">Convertir la lista de leads en un embudo gestionable con estados, notas y métricas de conversión.</div>
+      </div>
+      <div class="impact"><span class="badge vhigh">Impacto muy alto</span></div>
+    </div>
+    <div class="body">
+      Hoy los leads se ven en una tabla y se guardan con un campo <strong>status</strong> que nunca se usa. El mayor retorno no está en captar más, sino en <strong>no perder los que ya llegan</strong>: seguirlos, priorizarlos y saber cuántos cierran.
+    </div>
+    <div class="grid">
+      <div class="col">
+        <h5>Qué incluye</h5>
+        <ul>
+          <li>Estados: Nuevo → Contactado → Propuesta → Ganado / Perdido</li>
+          <li>Notas internas y fecha de próximo seguimiento por lead</li>
+          <li>Tablero embudo (arrastrar entre columnas) o filtros por estado</li>
+          <li>Dashboard con tasa de conversión y ahorro total del pipeline</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>Por qué primero</h5>
+        <ul>
+          <li>Impacta ingresos directamente, sin depender de más tráfico</li>
+          <li>Usa datos que ya se capturan (fricción, ahorro estimado)</li>
+          <li>Base sobre la que se apoyan el resto de mejoras</li>
+        </ul>
+      </div>
+    </div>
+    <div class="metaline">
+      <div><span class="k">Esfuerzo</span><b>Medio</b> · 1–2 días</div>
+      <div><span class="k">Piezas</span>Campos en Firestore · vistas admin · API de actualización</div>
+      <div><span class="k">Depende de</span>Nada (listo para partir)</div>
+    </div>
+  </div>
+
+  <!-- 2 -->
+  <div class="card">
+    <div class="head">
+      <div class="rank">2</div>
+      <div class="titles">
+        <h3>Informe de diagnóstico automático + respuesta al cliente</h3>
+        <div class="sub">Al terminar el diagnóstico, el cliente recibe al instante su informe en PDF con índice de fricción y ahorro estimado.</div>
+      </div>
+      <div class="impact"><span class="badge vhigh">Impacto muy alto</span></div>
+    </div>
+    <div class="body">
+      Es el <strong>entregable tangible</strong> que promete la propuesta de valor ("un entregable desde la primera sesión"), pero automatizado. Un cliente que recibe su informe en 30 segundos entra a la conversación comercial ya convencido — y es <em>dogfooding</em>: la agencia de automatización se automatiza a sí misma.
+    </div>
+    <div class="grid">
+      <div class="col">
+        <h5>Qué incluye</h5>
+        <ul>
+          <li>Correo de confirmación automático al cliente al enviar el diagnóstico</li>
+          <li>PDF de marca con su índice de fricción, áreas críticas y ahorro anual</li>
+          <li>Llamado a la acción para agendar la sesión</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>Efecto esperado</h5>
+        <ul>
+          <li>Mayor tasa de cierre y percepción de profesionalismo</li>
+          <li>Respuesta inmediata (refuerza el "&lt;24 h")</li>
+          <li>Material que el cliente comparte internamente</li>
+        </ul>
+      </div>
+    </div>
+    <div class="metaline">
+      <div><span class="k">Esfuerzo</span><b>Medio</b> · 1–2 días</div>
+      <div><span class="k">Piezas</span>Generación de PDF · Resend (ya configurado)</div>
+      <div><span class="k">Depende de</span>Verificar dominio en Resend (recomendado)</div>
+    </div>
+  </div>
+
+  <!-- 3 -->
+  <div class="card">
+    <div class="head">
+      <div class="rank">3</div>
+      <div class="titles">
+        <h3>SEO, analítica y medición de conversión</h3>
+        <div class="sub">Hacer que el sitio sea encontrable en Google y que cada acción del usuario sea medible.</div>
+      </div>
+      <div class="impact"><span class="badge high">Impacto alto</span></div>
+    </div>
+    <div class="body">
+      Hoy <strong>no hay sitemap, robots, imagen para redes ni analítica</strong>. Sin esto, el sitio no crece en tráfico orgánico y no se sabe qué funciona. Es la base para tomar decisiones con datos en vez de intuición.
+    </div>
+    <div class="grid">
+      <div class="col">
+        <h5>Qué incluye</h5>
+        <ul>
+          <li>Metadatos + Open Graph (vista previa al compartir en WhatsApp/LinkedIn)</li>
+          <li>sitemap.xml, robots.txt y datos estructurados de la empresa</li>
+          <li>Analítica (Vercel Analytics o GA4) con eventos: envío de lead, inicio de diagnóstico, scroll</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>Efecto esperado</h5>
+        <ul>
+          <li>Más visitas orgánicas a mediano plazo</li>
+          <li>Saber qué canal y qué sección convierten</li>
+          <li>Optimizar con evidencia (embudo real)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="metaline">
+      <div><span class="k">Esfuerzo</span><b>Bajo-Medio</b> · ~1 día</div>
+      <div><span class="k">Piezas</span>Rutas SEO de Next · script de analítica · eventos</div>
+      <div><span class="k">Depende de</span>Nada</div>
+    </div>
+  </div>
+
+  <!-- 4 -->
+  <div class="card">
+    <div class="head">
+      <div class="rank">4</div>
+      <div class="titles">
+        <h3>Aviso por WhatsApp + blindaje anti-spam del formulario</h3>
+        <div class="sub">Notificación instantánea al equipo y protección contra bots y abuso.</div>
+      </div>
+      <div class="impact"><span class="badge high">Impacto alto</span></div>
+    </div>
+    <div class="body">
+      El correo ya avisa, pero un <strong>WhatsApp instantáneo</strong> al equipo acorta aún más el tiempo de respuesta. En paralelo, los formularios y el login <strong>no tienen protección</strong>: conviene blindarlos antes de recibir tráfico real.
+    </div>
+    <div class="grid">
+      <div class="col">
+        <h5>Qué incluye</h5>
+        <ul>
+          <li>Aviso de nuevo lead por WhatsApp (Twilio / WhatsApp Cloud API)</li>
+          <li>Honeypot + captcha invisible (Cloudflare Turnstile) en formularios</li>
+          <li>Rate-limiting en login y en /api/leads</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>Efecto esperado</h5>
+        <ul>
+          <li>Contacto casi en tiempo real con el prospecto</li>
+          <li>Menos leads basura y menor riesgo de abuso</li>
+          <li>Panel y datos más seguros</li>
+        </ul>
+      </div>
+    </div>
+    <div class="metaline">
+      <div><span class="k">Esfuerzo</span><b>Medio</b> · 1–2 días</div>
+      <div><span class="k">Piezas</span>API de WhatsApp · Turnstile · límite por IP</div>
+      <div><span class="k">Depende de</span>Cuenta de WhatsApp Business API</div>
+    </div>
+  </div>
+
+  <!-- 5 -->
+  <div class="card">
+    <div class="head">
+      <div class="rank">5</div>
+      <div class="titles">
+        <h3>Blog / casos de éxito administrable</h3>
+        <div class="sub">Motor de contenidos para posicionamiento orgánico y prueba social, editable desde el admin.</div>
+      </div>
+      <div class="impact"><span class="badge mid">Impacto medio · mediano plazo</span></div>
+    </div>
+    <div class="body">
+      Reutiliza el CMS ya construido para publicar <strong>artículos y casos reales</strong> ("cómo automatizamos las cobranzas de X, ahorrando 40 h/mes"). Alimenta el SEO del punto 3 y genera confianza — clave para cerrar clientes que aún no conocen la marca.
+    </div>
+    <div class="grid">
+      <div class="col">
+        <h5>Qué incluye</h5>
+        <ul>
+          <li>Sección de artículos / casos con editor en el admin</li>
+          <li>Página de detalle por caso con resultados medibles</li>
+          <li>Ligado a servicios y al formulario de contacto</li>
+        </ul>
+      </div>
+      <div class="col">
+        <h5>Efecto esperado</h5>
+        <ul>
+          <li>Tráfico orgánico sostenido y autoridad de marca</li>
+          <li>Prueba social que respalda el discurso comercial</li>
+          <li>Material para redes y email</li>
+        </ul>
+      </div>
+    </div>
+    <div class="metaline">
+      <div><span class="k">Esfuerzo</span><b>Medio-Alto</b> · 2–3 días</div>
+      <div><span class="k">Piezas</span>Colección en Firestore · CMS (patrón existente) · rutas públicas</div>
+      <div><span class="k">Depende de</span>Ideal después del punto 3 (SEO)</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Nubolabs — Propuestas de mejora · Documento de trabajo</span>
+    <span>nubolabs.cl</span>
+  </div>
+
+</body>
+</html>
