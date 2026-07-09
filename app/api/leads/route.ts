@@ -1,9 +1,47 @@
 import { NextResponse } from "next/server";
 import { getDb, isAdminConfigured } from "@/lib/firebaseAdmin";
-import { sendLeadNotification } from "@/lib/email";
+import { sendLeadNotification, sendClientReport } from "@/lib/email";
+import { buildReportPdf, reportDataFromLead } from "@/lib/report";
 import type { LeadInput } from "@/types/lead";
 
 export const runtime = "nodejs";
+
+/**
+ * Genera el informe en PDF y lo envía por correo al cliente.
+ * Solo aplica a leads de diagnóstico con índice de fricción. No bloquea ni lanza:
+ * cualquier error se registra y se ignora (el lead ya quedó guardado).
+ */
+async function maybeSendClientReport(lead: Record<string, unknown>) {
+  if (lead.source !== "diagnostico") return;
+  const email = typeof lead.email === "string" ? lead.email : "";
+  if (!email) return;
+
+  const data = reportDataFromLead({
+    name: typeof lead.name === "string" ? lead.name : "",
+    company: typeof lead.company === "string" ? lead.company : "",
+    meta: (lead.meta as Record<string, unknown>) ?? null,
+  });
+  if (!data) return; // sin índice de fricción → no hay informe
+
+  try {
+    const pdf = await buildReportPdf(data);
+    const result = await sendClientReport(
+      {
+        name: data.name,
+        email,
+        company: data.company,
+        indice: data.indice,
+        nivel: data.nivel,
+        ahorroMes: data.ahorro?.mes ?? null,
+      },
+      pdf,
+    );
+    if (result.ok) console.log("[report] informe enviado al cliente:", email);
+    else if (!result.skipped) console.error("[report] Resend rechazó el informe:", result.status, result.body);
+  } catch (err) {
+    console.error("[report] no se pudo generar/enviar el informe:", err);
+  }
+}
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -48,13 +86,19 @@ export async function POST(req: Request) {
   const db = getDb();
   if (!db || !isAdminConfigured) {
     console.warn("[leads] Firebase Admin no configurado. Lead recibido (no persistido):", lead);
-    await sendLeadNotification(lead as Parameters<typeof sendLeadNotification>[0]);
+    await Promise.all([
+      sendLeadNotification(lead as Parameters<typeof sendLeadNotification>[0]),
+      maybeSendClientReport(lead),
+    ]);
     return NextResponse.json({ ok: true, persisted: false });
   }
 
   try {
     const ref = await db.collection("leads").add(lead);
-    await sendLeadNotification({ ...(lead as Parameters<typeof sendLeadNotification>[0]), id: ref.id });
+    await Promise.all([
+      sendLeadNotification({ ...(lead as Parameters<typeof sendLeadNotification>[0]), id: ref.id }),
+      maybeSendClientReport(lead),
+    ]);
     return NextResponse.json({ ok: true, persisted: true, id: ref.id });
   } catch (err) {
     console.error("[leads] Error escribiendo en Firestore:", err);

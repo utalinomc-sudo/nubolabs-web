@@ -31,6 +31,9 @@ export function DiagnosticoFlow() {
   const [status, setStatus] = useState<"idle" | "loading" | "ok">("idle");
   const [error, setError] = useState("");
   const [firstName, setFirstName] = useState("");
+  // Payload enviado (para poder descargar el informe en PDF después del envío).
+  const [submitted, setSubmitted] = useState<{ name: string; company: string; meta: Record<string, unknown> } | null>(null);
+  const [dlStatus, setDlStatus] = useState<"idle" | "loading" | "error">("idle");
 
   // ── Derivados ──────────────────────────────────────────────────────────
   const contestadas = useMemo(
@@ -127,6 +130,16 @@ export function DiagnosticoFlow() {
       (topArea?.pct != null ? ` Área más crítica: ${topArea.corto} (${topArea.pct}).` : "") +
       (ahorro ? ` + Estimación de ahorro: ${fmtCLP.format(ahorro.totales.mes)}/mes (${ahorro.procesos.length} procesos).` : " Sin estimación de ahorro.");
 
+    const empresa = contact.empresa.trim();
+    const meta = {
+      rubro: contact.rubro.trim(),
+      indiceFriccion: indice,
+      nivelFriccion: nivel?.txt,
+      areas,
+      abiertas: abiertasArr,
+      ahorro,
+    };
+
     try {
       await fetch("/api/leads", {
         method: "POST",
@@ -135,25 +148,44 @@ export function DiagnosticoFlow() {
           name: nombre,
           email,
           phone: contact.telefono.trim(),
-          company: contact.empresa.trim(),
+          company: empresa,
           message,
           source: "diagnostico",
-          meta: {
-            rubro: contact.rubro.trim(),
-            indiceFriccion: indice,
-            nivelFriccion: nivel?.txt,
-            areas,
-            abiertas: abiertasArr,
-            ahorro,
-          },
+          meta,
         }),
       });
     } catch {
       // no bloqueamos la confirmación si el backend falla
     }
 
+    setSubmitted({ name: nombre, company: empresa, meta });
     setFirstName(nombre.split(" ")[0] || "");
     setStatus("ok");
+  }
+
+  async function descargarInforme() {
+    if (!submitted || dlStatus === "loading") return;
+    setDlStatus("loading");
+    try {
+      const res = await fetch("/api/diagnostico/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(submitted),
+      });
+      if (!res.ok) throw new Error("bad response");
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Informe-diagnostico-Nubolabs.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setDlStatus("idle");
+    } catch {
+      setDlStatus("error");
+    }
   }
 
   // ── Render ─────────────────────────────────────────────────────────────
@@ -370,11 +402,24 @@ export function DiagnosticoFlow() {
               <span style={{ width: 44, height: 44, borderRadius: "50%", background: "#E8FBF1", color: "#18A45C", fontSize: 20, fontWeight: 800, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>
                 ✓
               </span>
-              <div style={{ fontSize: 16, fontWeight: 800, margin: "14px 0 6px" }}>¡Recibido, {firstName}!</div>
+              <div style={{ fontSize: 16, fontWeight: 800, margin: "14px 0 6px" }}>¡Listo, {firstName}!</div>
               <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>
-                Te contactaremos en menos de 24 horas con el análisis de tus respuestas
-                {ahorroActivo ? " y tu estimación de ahorro" : ""}.
+                Tu <b style={{ color: C.navy }}>informe en PDF</b> está listo, con tu índice de fricción
+                {ahorroActivo ? " y tu estimación de ahorro" : ""}. Descárgalo aquí. Además te contactaremos en menos
+                de 24 horas.
               </div>
+              <button
+                onClick={descargarInforme}
+                disabled={dlStatus === "loading"}
+                style={{ ...btn, marginTop: 18, opacity: dlStatus === "loading" ? 0.7 : 1 }}
+              >
+                {dlStatus === "loading" ? "Generando tu informe…" : "Descargar mi informe (PDF) ↓"}
+              </button>
+              {dlStatus === "error" && (
+                <div style={{ fontSize: 11.5, color: "#F04438", marginTop: 8 }}>
+                  No pudimos generar el PDF. Intenta de nuevo en unos segundos.
+                </div>
+              )}
             </div>
           ) : (
             <div style={contactCard}>
