@@ -106,11 +106,14 @@ export function DiagnosticoFlow() {
             const c = calc(p);
             return {
               nombre: p.nombre || "Proceso sin nombre",
+              descripcion: p.descripcion,
               herramientas: p.herramientas,
               personas: p.personas,
-              horasSemana: p.horas,
+              horasSemanaPorPersona: p.horas,
+              sueldo: p.sueldo,
               repetitivo: p.repetitivo,
               errores: p.errores,
+              horasMes: Math.round(c.horasMes),
               ahorroHorasMes: Math.round(c.ahorroHoras),
               ahorroCLPMes: Math.round(c.ahorroMes),
             };

@@ -13,18 +13,25 @@ interface AreaMeta {
   friccion: number | null;
   respuestas: { pregunta: string; valor: number | null }[];
 }
+interface AhorroProceso {
+  nombre: string;
+  descripcion?: string;
+  herramientas?: string;
+  personas: number;
+  horasSemanaPorPersona?: number;
+  horasSemana?: number; // compat leads antiguos
+  sueldo?: number;
+  repetitivo: number;
+  errores?: string;
+  horasMes?: number;
+  ahorroHorasMes: number;
+  ahorroCLPMes: number;
+}
 interface AhorroMeta {
   totales?: { horas: number; semana?: number; mes: number; anual: number };
-  procesos?: {
-    nombre: string;
-    herramientas?: string;
-    personas: number;
-    horasSemana: number;
-    repetitivo: number;
-    ahorroHorasMes: number;
-    ahorroCLPMes: number;
-  }[];
+  procesos?: AhorroProceso[];
 }
+const ERRORES_LBL: Record<string, string> = { bajo: "Pocas veces", medio: "A veces", alto: "Con frecuencia" };
 
 async function getLead(id: string) {
   const db = getDb();
@@ -32,6 +39,17 @@ async function getLead(id: string) {
   const doc = await db.collection("leads").doc(id).get();
   if (!doc.exists) return { configured: true, lead: null };
   return { configured: true, lead: { id: doc.id, ...doc.data() } as Record<string, unknown> };
+}
+
+function Campo({ k, v, accent }: { k: string; v: string; accent?: string }) {
+  return (
+    <div>
+      <dt className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">{k}</dt>
+      <dd className="mt-0.5 font-semibold" style={accent ? { color: accent } : undefined}>
+        {v}
+      </dd>
+    </div>
+  );
 }
 
 function Barra({ pct }: { pct: number | null }) {
@@ -179,32 +197,43 @@ export default async function LeadDetail({ params }: { params: { id: string } })
               <div className="text-xs text-ink-muted">automatizables/mes</div>
             </div>
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-line text-[11px] uppercase tracking-wide text-ink-muted">
-                <tr>
-                  <th className="py-2 pr-3 font-semibold">Proceso</th>
-                  <th className="py-2 pr-3 font-semibold">Pers.</th>
-                  <th className="py-2 pr-3 font-semibold">h/sem</th>
-                  <th className="py-2 pr-3 font-semibold">% rep.</th>
-                  <th className="py-2 pr-3 font-semibold">Ahorro/mes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(ahorro.procesos ?? []).map((p, i) => (
-                  <tr key={i} className="border-b border-line/60 last:border-0">
-                    <td className="py-2 pr-3 font-medium">
+          <div className="mb-3 text-xs text-ink-muted">
+            {(ahorro.procesos ?? []).length} proceso(s) · haz clic en cada uno para ver el detalle completo.
+          </div>
+          <div className="space-y-2">
+            {(ahorro.procesos ?? []).map((p, i) => {
+              const hsem = p.horasSemanaPorPersona ?? p.horasSemana;
+              return (
+                <details key={i} className="group rounded-xl border border-line bg-white [&_summary]:list-none">
+                  <summary className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3">
+                    <span className="flex items-center gap-2 font-semibold">
+                      <span className="text-ink-muted transition group-open:rotate-90">▸</span>
                       {p.nombre}
-                      {p.herramientas ? <span className="text-ink-muted"> · {p.herramientas}</span> : null}
-                    </td>
-                    <td className="py-2 pr-3 text-ink-soft">{p.personas}</td>
-                    <td className="py-2 pr-3 text-ink-soft">{p.horasSemana}</td>
-                    <td className="py-2 pr-3 text-ink-soft">{p.repetitivo}%</td>
-                    <td className="py-2 pr-3 font-semibold text-brand">{clp.format(p.ahorroCLPMes)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </span>
+                    <span className="text-sm font-bold text-brand">{clp.format(p.ahorroCLPMes)}/mes</span>
+                  </summary>
+                  <div className="border-t border-line px-4 py-4">
+                    {p.descripcion ? (
+                      <p className="mb-4 text-sm text-ink-soft">
+                        <span className="font-semibold text-ink">Descripción: </span>
+                        {p.descripcion}
+                      </p>
+                    ) : null}
+                    <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
+                      <Campo k="Herramientas" v={p.herramientas || "—"} />
+                      <Campo k="Personas" v={String(p.personas)} />
+                      <Campo k="Horas/sem por persona" v={hsem != null ? `${hsem} h` : "—"} />
+                      <Campo k="Sueldo prom. mensual" v={p.sueldo != null ? clp.format(p.sueldo) : "—"} />
+                      <Campo k="% repetitivo / manual" v={`${p.repetitivo}%`} />
+                      <Campo k="Errores / retrabajo" v={p.errores ? ERRORES_LBL[p.errores] ?? p.errores : "—"} />
+                      <Campo k="Horas totales / mes" v={p.horasMes != null ? `${p.horasMes} h` : "—"} />
+                      <Campo k="Horas automatizables / mes" v={`${p.ahorroHorasMes} h`} accent="#1565FF" />
+                      <Campo k="Ahorro estimado / mes" v={clp.format(p.ahorroCLPMes)} accent="#FF6B5E" />
+                    </dl>
+                  </div>
+                </details>
+              );
+            })}
           </div>
         </div>
       ) : lead.source === "diagnostico" ? (
