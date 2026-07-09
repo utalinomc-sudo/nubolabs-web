@@ -14,13 +14,24 @@ function escapeHtml(s: string) {
   return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] as string);
 }
 
+export interface EmailResult {
+  skipped?: boolean;
+  ok?: boolean;
+  status?: number;
+  body?: string;
+  from?: string;
+  to?: string[];
+  error?: string;
+}
+
 /**
  * Notifica por email un nuevo lead. Usa la API REST de Resend.
  * No-op si RESEND_API_KEY no está configurado (no bloquea el guardado del lead).
+ * Devuelve el resultado para diagnóstico (sin exponer la API key).
  */
-export async function sendLeadNotification(lead: LeadEmail) {
+export async function sendLeadNotification(lead: LeadEmail): Promise<EmailResult> {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return;
+  if (!apiKey) return { skipped: true, error: "RESEND_API_KEY no está configurada." };
 
   const to = (process.env.NOTIFY_EMAIL || "mauricio.nubolabs@gmail.com").split(",").map((s) => s.trim());
   const from = process.env.NOTIFY_FROM || "Nubolabs <onboarding@resend.dev>";
@@ -61,8 +72,11 @@ export async function sendLeadNotification(lead: LeadEmail) {
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ from, to, subject, html }),
     });
-    if (!res.ok) console.error("[email] Resend error:", await res.text());
+    const text = await res.text();
+    if (!res.ok) console.error("[email] Resend error:", res.status, text);
+    return { ok: res.ok, status: res.status, body: text.slice(0, 500), from, to };
   } catch (err) {
     console.error("[email] envío fallido:", err);
+    return { ok: false, error: err instanceof Error ? err.message : "fetch failed", from, to };
   }
 }
