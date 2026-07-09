@@ -23,13 +23,21 @@ export default function AdminLogin() {
     const auth = getFirebaseAuth();
     if (!auth) {
       setStatus("error");
-      setError("Firebase no está configurado. Completa .env.local para habilitar el login.");
+      setError("Firebase no está configurado. Completa las variables NEXT_PUBLIC_FIREBASE_* para habilitar el login.");
       return;
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await cred.user.getIdToken();
+      const res = await fetch("/api/admin/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+      });
+      if (!res.ok) throw new Error("session");
       router.push("/admin");
+      router.refresh();
     } catch {
       setStatus("error");
       setError("Credenciales incorrectas.");
@@ -60,7 +68,7 @@ export default function AdminLogin() {
 
         {!isFirebaseConfigured && (
           <p className="mt-4 text-center text-[11px] text-ink-muted">
-            Firebase aún no configurado — completa <code>.env.local</code>.
+            Firebase (cliente) aún no configurado — faltan las variables <code>NEXT_PUBLIC_FIREBASE_*</code>.
           </p>
         )}
       </div>
