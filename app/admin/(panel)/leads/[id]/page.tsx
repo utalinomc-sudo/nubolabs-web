@@ -77,7 +77,9 @@ export default async function LeadDetail({ params }: { params: { id: string } })
   const abiertas = (meta.abiertas as { pregunta: string; respuesta: string }[] | undefined) ?? [];
   const ahorro = meta.ahorro as AhorroMeta | null | undefined;
   const indice = typeof meta.indiceFriccion === "number" ? meta.indiceFriccion : null;
-  const createdAt = lead.createdAt ? new Date(String(lead.createdAt)).toLocaleString("es-CL") : "—";
+  const createdAt = lead.createdAt
+    ? new Date(String(lead.createdAt)).toLocaleString("es-CL", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Santiago" })
+    : "—";
 
   return (
     <div className="max-w-3xl">

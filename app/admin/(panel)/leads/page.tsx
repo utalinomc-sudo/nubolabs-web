@@ -39,7 +39,13 @@ async function getLeads(): Promise<{ configured: boolean; leads: LeadRow[] }> {
 
 function fmtDate(iso: string) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleString("es-CL", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleString("es-CL", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Santiago",
+  });
 }
 const clp = new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
 
