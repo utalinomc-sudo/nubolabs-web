@@ -76,7 +76,10 @@ export function ContactForm() {
               <input name="name" required placeholder="Nombre" className="field" />
               <input name="email" type="email" required placeholder="Email corporativo" className="field" />
             </div>
-            <input name="company" placeholder="Empresa" className="field mb-3.5" />
+            <div className="mb-3.5 grid gap-3.5 sm:grid-cols-2">
+              <input name="phone" type="tel" placeholder="Teléfono" className="field" />
+              <input name="company" placeholder="Empresa" className="field" />
+            </div>
             <textarea
               name="message"
               rows={3}

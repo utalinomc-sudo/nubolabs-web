@@ -25,7 +25,7 @@ type Resp = (number | null)[][];
 export function DiagnosticoFlow() {
   const [resp, setResp] = useState<Resp>(() => AREAS.map((a) => a.preguntas.map(() => null)));
   const [abiertas, setAbiertas] = useState({ mayorProblema: "", solucionMagica: "" });
-  const [contact, setContact] = useState({ nombre: "", email: "", empresa: "", rubro: "" });
+  const [contact, setContact] = useState({ nombre: "", email: "", telefono: "", empresa: "", rubro: "" });
   const [ahorroActivo, setAhorroActivo] = useState(false);
   const [procesos, setProcesos] = useState<Proceso[]>(() => [blank()]);
   const [status, setStatus] = useState<"idle" | "loading" | "ok">("idle");
@@ -134,6 +134,7 @@ export function DiagnosticoFlow() {
         body: JSON.stringify({
           name: nombre,
           email,
+          phone: contact.telefono.trim(),
           company: contact.empresa.trim(),
           message,
           source: "diagnostico",
@@ -384,6 +385,7 @@ export function DiagnosticoFlow() {
               <div className="flex flex-col gap-2.5">
                 <input style={field} placeholder="Nombre" value={contact.nombre} onChange={(e) => setContact({ ...contact, nombre: e.target.value })} />
                 <input style={field} type="email" placeholder="Email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
+                <input style={field} type="tel" placeholder="Teléfono (opcional)" value={contact.telefono} onChange={(e) => setContact({ ...contact, telefono: e.target.value })} />
                 <input style={field} placeholder="Empresa (opcional)" value={contact.empresa} onChange={(e) => setContact({ ...contact, empresa: e.target.value })} />
                 <input style={field} placeholder="Rubro o industria (opcional)" value={contact.rubro} onChange={(e) => setContact({ ...contact, rubro: e.target.value })} />
                 <button onClick={enviar} disabled={status === "loading"} style={btn}>

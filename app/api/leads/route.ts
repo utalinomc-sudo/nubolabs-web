@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb, isAdminConfigured } from "@/lib/firebaseAdmin";
+import { sendLeadNotification } from "@/lib/email";
 import type { LeadInput } from "@/types/lead";
 
 export const runtime = "nodejs";
@@ -29,6 +30,7 @@ export async function POST(req: Request) {
   const lead: Record<string, unknown> = {
     name,
     email,
+    phone: body.phone?.trim() || "",
     company: body.company?.trim() || "",
     message: body.message?.trim() || "",
     source: body.source?.trim() || "landing",
@@ -46,11 +48,13 @@ export async function POST(req: Request) {
   const db = getDb();
   if (!db || !isAdminConfigured) {
     console.warn("[leads] Firebase Admin no configurado. Lead recibido (no persistido):", lead);
+    await sendLeadNotification(lead as Parameters<typeof sendLeadNotification>[0]);
     return NextResponse.json({ ok: true, persisted: false });
   }
 
   try {
     const ref = await db.collection("leads").add(lead);
+    await sendLeadNotification({ ...(lead as Parameters<typeof sendLeadNotification>[0]), id: ref.id });
     return NextResponse.json({ ok: true, persisted: true, id: ref.id });
   } catch (err) {
     console.error("[leads] Error escribiendo en Firestore:", err);

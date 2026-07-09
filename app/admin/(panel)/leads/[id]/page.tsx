@@ -106,6 +106,11 @@ export default async function LeadDetail({ params }: { params: { id: string } })
         <span>
           <a href={`mailto:${lead.email}`} className="text-brand hover:underline">{String(lead.email ?? "")}</a>
         </span>
+        {lead.phone ? (
+          <span>
+            <a href={`tel:${lead.phone}`} className="text-brand hover:underline">{String(lead.phone)}</a>
+          </span>
+        ) : null}
         {lead.company ? <span>{String(lead.company)}</span> : null}
         {meta.rubro ? <span>{String(meta.rubro)}</span> : null}
         <span className="text-ink-muted">{createdAt}</span>
