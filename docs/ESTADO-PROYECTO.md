@@ -23,7 +23,7 @@ Los secretos (`FIREBASE_PRIVATE_KEY`, `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`)
 - **Admin protegido:** login `/admin/login` (Firebase Auth) → cookie de sesión verificada (`lib/adminAuth.ts`, `app/api/admin/session`). Rutas guardadas en `app/admin/(panel)/`.
 - **Panel admin:**
   - Dashboard (`/admin`) con KPIs de leads.
-  - Leads (`/admin/leads`) lista + detalle (`/admin/leads/[id]`) con procesos **expandibles** y **fechas en hora de Chile** (`America/Santiago`).
+  - Leads (`/admin/leads`) lista + detalle (`/admin/leads/[id]`) con procesos **expandibles** y **fechas en hora de Chile** (`America/Santiago`). Botón **Exportar PDF**: ficha interna completa (contacto, índice, todas las preguntas/respuestas, abiertas y montos por proceso) vía `GET /api/admin/leads/[id]/pdf` → `lib/leadReport.ts`.
   - **Eliminar lead**: botón con modal que exige escribir "eliminar" (`components/admin/DeleteLeadButton.tsx`, `DELETE /api/admin/leads/[id]`).
   - **Contenido** (`/admin/config`): editor CMS.
   - **Nuestro equipo** (`/admin/equipo`): historia + integrantes.
