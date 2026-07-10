@@ -2,6 +2,49 @@
 
 import { useState, useRef } from "react";
 
+/**
+ * Reduce una imagen en el navegador y la devuelve como data URL JPEG.
+ * Mantiene la proporción, limita el lado mayor a `maxDim` y comprime a `quality`.
+ * Sirve para fotos de perfil: el resultado pesa unas decenas de KB.
+ */
+async function downscaleToJpeg(file: File, maxDim = 512, quality = 0.82): Promise<string> {
+  const srcUrl = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error("read failed"));
+    reader.readAsDataURL(file);
+  });
+
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const im = new Image();
+    im.onload = () => resolve(im);
+    im.onerror = () => reject(new Error("decode failed"));
+    im.src = srcUrl;
+  });
+
+  let { width, height } = img;
+  if (width > maxDim || height > maxDim) {
+    if (width >= height) {
+      height = Math.round((height * maxDim) / width);
+      width = maxDim;
+    } else {
+      width = Math.round((width * maxDim) / height);
+      height = maxDim;
+    }
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("no canvas context");
+  // Fondo blanco: evita que un PNG con transparencia quede con fondo negro en JPEG.
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, width, height);
+  ctx.drawImage(img, 0, 0, width, height);
+  return canvas.toDataURL("image/jpeg", quality);
+}
+
 interface Equipo {
   eyebrow: string;
   title: string;
@@ -55,12 +98,36 @@ export function TeamEditor({ initialEquipo, initialMembers }: Props) {
   async function uploadPhoto(idx: number, file: File) {
     setBusy(`up-${idx}`);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "");
-      updateMember(idx, { fotoUrl: json.url });
+      if (!file.type.startsWith("image/")) throw new Error("El archivo no es una imagen.");
+
+      // 1) Reducimos la imagen en el navegador (foto pequeña de perfil): más liviana y rápida.
+      let dataUrl: string;
+      try {
+        dataUrl = await downscaleToJpeg(file);
+      } catch {
+        throw new Error("No se pudo procesar la imagen.");
+      }
+
+      // 2) Si Vercel Blob está configurado, subimos ahí y servimos desde el CDN.
+      try {
+        const blob = await (await fetch(dataUrl)).blob();
+        const fd = new FormData();
+        fd.append("file", new File([blob], "foto.jpg", { type: "image/jpeg" }));
+        const res = await fetch("/api/admin/upload", { method: "POST", body: fd });
+        if (res.ok) {
+          const json = await res.json();
+          updateMember(idx, { fotoUrl: json.url });
+          return;
+        }
+      } catch {
+        // Sin Blob o error de red → usamos el fallback embebido.
+      }
+
+      // 3) Fallback sin Blob: incrustamos la imagen (data URL) directo en el registro.
+      if (dataUrl.length > 900_000) {
+        throw new Error("La imagen es muy pesada. Prueba con una más liviana o de menor resolución.");
+      }
+      updateMember(idx, { fotoUrl: dataUrl });
     } catch (e) {
       alert(e instanceof Error && e.message ? e.message : "No se pudo subir la imagen.");
     } finally {

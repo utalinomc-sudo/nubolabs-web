@@ -52,7 +52,7 @@ Los secretos (`FIREBASE_PRIVATE_KEY`, `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`)
 - Plantilla completa en `.env.local.example`.
 
 ## Pendientes / próximos pasos
-1. **Crear el Blob store en Vercel** (Storage → Create → Blob) para habilitar la subida de fotos del equipo (`BLOB_READ_WRITE_TOKEN`). Sin él sale inicial de color en vez de foto.
+1. ~~**Crear el Blob store en Vercel** para subir fotos del equipo~~ **Ya no bloquea:** si falta `BLOB_READ_WRITE_TOKEN`, la foto se reduce en el navegador (JPEG ≤512px) y se **incrusta como data URL** en Firestore (`components/admin/TeamEditor.tsx`). *Opcional:* crear el Blob store (Storage → Create → Blob) para servir las fotos desde CDN en vez de incrustarlas; si el token existe, se usa automáticamente.
 2. **Hacer editables por texto** las 3 secciones que hoy solo se muestran/ocultan: **Problemas, Enfoque, Proceso** (sus textos siguen en `lib/content.ts`).
 3. **Verificar dominio `nubolabs.cl` en Resend** para enviar desde `informe@nubolabs.cl` y evitar spam. **Bloquea la entrega del informe en PDF al cliente** (mejora #2): sin dominio verificado, Resend solo entrega al dueño de la cuenta. Tras verificar, setear `REPORT_FROM="Nubolabs <informe@nubolabs.cl>"` en Vercel.
 4. **Limpiar leads de prueba** en Firestore (Prueba Detalle, Prueba Cuestionario, mau, ff, etc.).
