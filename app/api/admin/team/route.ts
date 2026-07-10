@@ -22,6 +22,10 @@ export async function POST(req: Request) {
   const nombre = String(body.nombre ?? "").trim();
   if (!nombre) return NextResponse.json({ error: "El nombre es obligatorio." }, { status: 400 });
 
+  // Normaliza el link de LinkedIn: si viene sin protocolo, le anteponemos https://
+  let linkedin = String(body.linkedin ?? "").trim();
+  if (linkedin && !/^https?:\/\//i.test(linkedin)) linkedin = `https://${linkedin}`;
+
   const data = {
     nombre,
     cargo: String(body.cargo ?? "").trim(),
@@ -29,6 +33,7 @@ export async function POST(req: Request) {
       ? (body.habilidades as unknown[]).map((h) => String(h).trim()).filter(Boolean)
       : [],
     fotoUrl: String(body.fotoUrl ?? "").trim(),
+    linkedin,
     orden: typeof body.orden === "number" ? body.orden : 0,
     updatedAt: new Date().toISOString(),
   };

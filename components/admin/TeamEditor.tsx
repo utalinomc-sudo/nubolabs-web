@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { LinkedInIcon } from "@/components/LinkedInIcon";
 
 /**
  * Reduce una imagen en el navegador y la devuelve como data URL JPEG.
@@ -56,11 +57,20 @@ interface Member {
   cargo: string;
   habilidadesText: string;
   fotoUrl: string;
+  linkedin: string;
   orden: number;
 }
 interface Props {
   initialEquipo: Equipo;
-  initialMembers: { id: string; nombre: string; cargo: string; habilidades: string[]; fotoUrl: string; orden: number }[];
+  initialMembers: {
+    id: string;
+    nombre: string;
+    cargo: string;
+    habilidades: string[];
+    fotoUrl: string;
+    linkedin: string;
+    orden: number;
+  }[];
 }
 
 export function TeamEditor({ initialEquipo, initialMembers }: Props) {
@@ -92,7 +102,10 @@ export function TeamEditor({ initialEquipo, initialMembers }: Props) {
   }
 
   function addMember() {
-    setMembers((ms) => [...ms, { id: "", nombre: "", cargo: "", habilidadesText: "", fotoUrl: "", orden: ms.length }]);
+    setMembers((ms) => [
+      ...ms,
+      { id: "", nombre: "", cargo: "", habilidadesText: "", fotoUrl: "", linkedin: "", orden: ms.length },
+    ]);
   }
 
   async function uploadPhoto(idx: number, file: File) {
@@ -152,6 +165,7 @@ export function TeamEditor({ initialEquipo, initialMembers }: Props) {
           cargo: m.cargo,
           habilidades: m.habilidadesText.split(",").map((s) => s.trim()).filter(Boolean),
           fotoUrl: m.fotoUrl,
+          linkedin: m.linkedin.trim(),
           orden: m.orden,
         }),
       });
@@ -316,6 +330,17 @@ function MemberCard({
             value={m.habilidadesText}
             onChange={(e) => onChange({ habilidadesText: e.target.value })}
           />
+          <div className="relative">
+            <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#0A66C2]">
+              <LinkedInIcon size={18} />
+            </span>
+            <input
+              className="field pl-10"
+              placeholder="LinkedIn (ej: linkedin.com/in/usuario)"
+              value={m.linkedin}
+              onChange={(e) => onChange({ linkedin: e.target.value })}
+            />
+          </div>
           <div className="flex items-center gap-3">
             <label className="flex items-center gap-2 text-[12px] text-ink-muted">
               Orden

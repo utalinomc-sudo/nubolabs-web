@@ -111,6 +111,7 @@ export interface TeamMember {
   cargo: string;
   habilidades: string[];
   fotoUrl: string;
+  linkedin: string;
   orden: number;
 }
 
@@ -127,6 +128,7 @@ export async function getTeamMembers(): Promise<TeamMember[]> {
         cargo: x.cargo ?? "",
         habilidades: Array.isArray(x.habilidades) ? x.habilidades : [],
         fotoUrl: x.fotoUrl ?? "",
+        linkedin: x.linkedin ?? "",
         orden: typeof x.orden === "number" ? x.orden : 0,
       };
     });

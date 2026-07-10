@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Nav } from "@/components/landing/Nav";
 import { Footer } from "@/components/landing/Footer";
+import { LinkedInIcon } from "@/components/LinkedInIcon";
 import { getSiteConfig, getTeamMembers } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +52,20 @@ export default async function EquipoPage() {
                       <Inicial nombre={m.nombre} />
                     )}
                   </div>
-                  <div className="text-lg font-extrabold">{m.nombre}</div>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-lg font-extrabold">{m.nombre}</div>
+                    {m.linkedin ? (
+                      <a
+                        href={m.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`LinkedIn de ${m.nombre}`}
+                        className="flex-none text-[#0A66C2] transition hover:opacity-70"
+                      >
+                        <LinkedInIcon size={22} />
+                      </a>
+                    ) : null}
+                  </div>
                   {m.cargo ? <div className="mt-0.5 text-sm font-semibold text-brand">{m.cargo}</div> : null}
                   {m.habilidades.length > 0 ? (
                     <div className="mt-3 flex flex-wrap gap-2">
