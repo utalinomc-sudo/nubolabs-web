@@ -30,7 +30,7 @@ export default async function EquipoPage() {
 
   return (
     <>
-      <Nav showEquipo />
+      <Nav showEquipo showMision={visible.nosotros} />
       <main>
         <section className="container-page py-16 md:py-20">
           <div className="mb-3 text-xs font-bold tracking-[2.5px] text-brand">{equipo.eyebrow}</div>

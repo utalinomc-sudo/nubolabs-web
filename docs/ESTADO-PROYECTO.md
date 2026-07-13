@@ -30,6 +30,7 @@ Los secretos (`FIREBASE_PRIVATE_KEY`, `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`)
 - **CMS ("MVP práctico"):** `lib/site.ts` lee `config/site` en Firestore (merge sobre defaults en el código).
   - Editable desde admin: **visibilidad por sección** + **Hero** (título con `**resalte**` azul) + **Servicios** (lista) + **Casos de uso** (lista) + **Equipo** (historia).
   - Página pública **`/equipo`**; integrantes (foto, cargo, habilidades, **LinkedIn**, orden) en colección `team`. El link de LinkedIn se edita en el admin y sale como ícono junto al nombre (`components/LinkedInIcon.tsx`).
+  - Menú **"Nosotros"** (dropdown en `components/landing/Nav.tsx`, después de "Casos de uso") con dos sub-páginas: **Misión y visión** (`/mision-vision`) y **Equipo** (`/equipo`). Misión, visión y objetivos son editables desde el CMS (`content.nosotros`, sección "Misión y visión" en `ConfigEditor`), con toggle de visibilidad `nosotros`. El logo del nav enlaza a `/#inicio`.
   - Fotos suben a **Vercel Blob** (`/api/admin/upload`). APIs admin: `/api/admin/config`, `/api/admin/team[/id]`, `/api/admin/upload` (todas protegidas).
 - **Email de leads (Resend):** `lib/email.ts` envía por cada lead vía API REST de Resend.
   - Asunto: `Nuevo LEAD - nombre - empresa - teléfono`. Destino: `mauricio.nubolabs@gmail.com`. From: `onboarding@resend.dev`.

@@ -16,6 +16,7 @@ export interface SiteContent {
   hero: { eyebrow: string; title: string; subtitle: string; ctaPrimary: string; ctaSecondary: string };
   servicios: { eyebrow: string; title: string; items: ServiceItem[] };
   casos: { eyebrow: string; title: string; subtitle: string; items: CaseItem[] };
+  nosotros: { eyebrow: string; title: string; mision: string; vision: string; objetivos: string[] };
   equipo: { eyebrow: string; title: string; historia: string };
 }
 export interface SiteConfig {
@@ -31,6 +32,7 @@ export const SECTIONS: { key: string; label: string; hint: string }[] = [
   { key: "servicios", label: "Servicios", hint: "Qué ofrecemos" },
   { key: "proceso", label: "Proceso", hint: "Pasos de trabajo" },
   { key: "casos", label: "Casos de uso", hint: "Ejemplos concretos" },
+  { key: "nosotros", label: "Nosotros — Misión y visión (página)", hint: "Página /mision-vision y su link en el menú" },
   { key: "equipo", label: "Nuestro equipo (página)", hint: "Página /equipo y su link en el menú" },
   { key: "contacto", label: "Contacto", hint: "Formulario de contacto del home" },
 ];
@@ -59,6 +61,21 @@ export function defaultSiteConfig(): SiteConfig {
         subtitle: "Ejemplos que implementamos con n8n, Make, APIs e IA.",
         items: defaultUseCases.map((c) => ({ title: c.title, body: c.body })),
       },
+      nosotros: {
+        eyebrow: "NOSOTROS",
+        title: "Misión, visión y objetivos",
+        mision:
+          "Ayudar a las empresas a operar en piloto automático: rediseñamos sus procesos y los convertimos en automatizaciones con inteligencia artificial que ahorran horas, reducen errores y liberan al equipo para lo que realmente importa.",
+        vision:
+          "Ser el socio de automatización de referencia en Chile y Latinoamérica: que operar con procesos automatizados e IA deje de ser un lujo y se vuelva el estándar de cualquier organización que quiere crecer.",
+        objetivos: [
+          "Entregar un diagnóstico claro y accionable desde la primera sesión.",
+          "Automatizar solo lo que genera retorno real, tras simplificar el proceso.",
+          "Reducir tareas manuales y errores con soluciones a la medida.",
+          "Medir el impacto en horas ahorradas y trazabilidad.",
+          "Acompañar a cada cliente en la mejora continua y la escala.",
+        ],
+      },
       equipo: {
         eyebrow: "NUESTRO EQUIPO",
         title: "Las personas detrás de Nubolabs",
@@ -84,6 +101,11 @@ function mergeConfig(base: SiteConfig, data: Record<string, unknown>): SiteConfi
         ...base.content.casos,
         ...(c.casos ?? {}),
         items: c.casos?.items ?? base.content.casos.items,
+      },
+      nosotros: {
+        ...base.content.nosotros,
+        ...(c.nosotros ?? {}),
+        objetivos: c.nosotros?.objetivos ?? base.content.nosotros.objetivos,
       },
       equipo: { ...base.content.equipo, ...(c.equipo ?? {}) },
     },

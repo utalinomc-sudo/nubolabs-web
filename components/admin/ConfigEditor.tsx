@@ -15,6 +15,7 @@ interface Content {
   hero: { eyebrow: string; title: string; subtitle: string; ctaPrimary: string; ctaSecondary: string };
   servicios: { eyebrow: string; title: string; items: ServiceItem[] };
   casos: { eyebrow: string; title: string; subtitle: string; items: CaseItem[] };
+  nosotros: { eyebrow: string; title: string; mision: string; vision: string; objetivos: string[] };
 }
 interface Props {
   sections: { key: string; label: string; hint: string }[];
@@ -68,6 +69,18 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
       const items = c.casos.items.map((it, idx) => (idx === i ? { ...it, [k]: v } : it));
       return { ...c, casos: { ...c.casos, items } };
     });
+  }
+  function setNosotros(k: "eyebrow" | "title" | "mision" | "vision", v: string) {
+    setContent((c) => ({ ...c, nosotros: { ...c.nosotros, [k]: v } }));
+  }
+  function setObjetivo(i: number, v: string) {
+    setContent((c) => ({ ...c, nosotros: { ...c.nosotros, objetivos: c.nosotros.objetivos.map((o, idx) => (idx === i ? v : o)) } }));
+  }
+  function addObjetivo() {
+    setContent((c) => ({ ...c, nosotros: { ...c.nosotros, objetivos: [...c.nosotros.objetivos, ""] } }));
+  }
+  function removeObjetivo(i: number) {
+    setContent((c) => ({ ...c, nosotros: { ...c.nosotros, objetivos: c.nosotros.objetivos.filter((_, idx) => idx !== i) } }));
   }
 
   async function save() {
@@ -221,6 +234,41 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
           >
             + Agregar caso
           </button>
+        </div>
+      </section>
+
+      {/* Misión y visión (página /mision-vision) */}
+      <section className="card p-6">
+        <h2 className="font-extrabold">Misión y visión</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          Se muestra en la página <b>/mision-vision</b> (menú “Nosotros”).
+        </p>
+        <div className="mt-4 space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Etiqueta" value={content.nosotros.eyebrow} onChange={(v) => setNosotros("eyebrow", v)} />
+            <Field label="Título" value={content.nosotros.title} onChange={(v) => setNosotros("title", v)} />
+          </div>
+          <Field label="Misión" value={content.nosotros.mision} onChange={(v) => setNosotros("mision", v)} textarea />
+          <Field label="Visión" value={content.nosotros.vision} onChange={(v) => setNosotros("vision", v)} textarea />
+          <div>
+            <span className="text-[13px] font-semibold text-ink-soft">Objetivos</span>
+            <div className="mt-2 space-y-2">
+              {content.nosotros.objetivos.map((o, i) => (
+                <div key={i} className="flex items-center gap-2">
+                  <span className="flex h-7 w-7 flex-none items-center justify-center rounded-md bg-surface-soft text-xs font-bold text-ink-muted">
+                    {i + 1}
+                  </span>
+                  <input className="field flex-1" value={o} onChange={(e) => setObjetivo(i, e.target.value)} placeholder={`Objetivo ${i + 1}`} />
+                  <button onClick={() => removeObjetivo(i)} className="px-2 text-[12px] font-semibold text-accent hover:underline">
+                    Quitar
+                  </button>
+                </div>
+              ))}
+              <button onClick={addObjetivo} className="text-sm font-semibold text-brand hover:underline">
+                + Agregar objetivo
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
