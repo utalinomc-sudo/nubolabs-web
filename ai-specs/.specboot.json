@@ -1,0 +1,29 @@
+{
+  "template": "nubolabs-specboot",
+  "version": "0.1.0",
+  "installedAt": "2026-09-08T22:01:30.381Z",
+  "linkMode": "copy",
+  "tools": [
+    "claude"
+  ],
+  "agents": [
+    "backend-developer.md",
+    "frontend-developer.md",
+    "integration-developer.md",
+    "product-strategy-analyst.md"
+  ],
+  "skills": [
+    "adversarial-review",
+    "bootstrap-project",
+    "code-auditing",
+    "commit",
+    "enrich-us",
+    "explain",
+    "meta-prompt",
+    "show-spec-working",
+    "sync-agent-symlinks",
+    "update-docs",
+    "using-git-worktrees",
+    "writing-skills"
+  ]
+}

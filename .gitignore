@@ -35,3 +35,9 @@ serviceAccount*.json
 
 # dev server log local
 .devserver.log
+
+# specboot / claude code (locales)
+.claude/doc/
+.claude/sessions/
+.claude/settings.local.json
+.worktrees/

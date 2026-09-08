@@ -1,0 +1,61 @@
+schema: spec-driven
+
+context: |
+  Language: es
+  All artifacts must be written in es.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Proyecto: sitio web y panel de administración de Nubolabs (agencia de IA & automatización, https://nubolabs.cl).
+  Capta leads con un diagnóstico operativo (/diagnostico), entrega un informe PDF y permite administrar
+  contenido (CMS), equipo y leads desde /admin.
+  Stack: Next.js 14 App Router + React 18 + TypeScript strict + Tailwind 3 (tokens de marca) ·
+  Route Handlers en app/api/** (Node runtime) · Firestore vía Firebase Admin (leads, team, config/site) ·
+  Firebase Auth con cookie de sesión para /admin · Resend por REST (correos e informe PDF) · Vercel Blob (fotos) ·
+  pdf-lib (PDFs) · deploy automático en Vercel al hacer push a main.
+  Dominio: lead, diagnóstico, índice de fricción, área, proceso, ahorro estimado, informe, CMS/sección, integrante, admin
+  (glosario en docs/project-profile.md §8).
+  Idiomas: identificadores nuevos en inglés (respetar campos persistidos en español), comentarios/UI/docs/specs/commits en español.
+
+  Fuente única de verdad: docs/project-profile.md (status FILLED). Antes de crear cualquier artefacto leer
+  docs/base-standards.md (reglas base, §0 gate, §8 verificación, §9 seguridad).
+  Documentos por capa (todas aplican en este proyecto):
+  - docs/frontend-standards.md — App Router, server vs client components, CMS (lib/site.ts), tokens Tailwind, E2E con Playwright MCP
+  - docs/backend-standards.md — Route Handlers, forma de errores { error }, validación, Firestore (getDb puede ser null), getAdminSession(), efectos no bloqueantes
+  - docs/integration-standards.md — Firebase, Resend, Vercel Blob; degradación controlada; patrón para webhooks futuros
+  - docs/api-spec.yml — contrato OpenAPI de los 11 endpoints bajo /api
+  - docs/data-model.md — colecciones leads, team, config/site y forma del meta del diagnóstico
+  - docs/documentation-standards.md — mapa de documentos; docs/ESTADO-PROYECTO.md es el documento vivo del proyecto
+  - docs/openspec-tasks-mandatory-steps.md — estructura obligatoria de tasks.md y reglas de ejecución
+  Planificación: adoptar ai-specs/agents/backend-developer.md, frontend-developer.md o integration-developer.md según la capa
+  (proponen un plan en .claude/doc/<cambio>/, no implementan). Las skills de ai-specs/skills/ guían el flujo
+  (/enrich-us → /opsx:ff → /opsx:apply → /opsx:verify → /adversarial-review → /opsx:archive → /commit).
+  Verificación obligatoria que el agente debe ejecutar antes de marcar una tarea: npm run lint · npx tsc --noEmit · npm run build,
+  más curl contra npm run dev si el cambio toca app/api/** y E2E con Playwright MCP si toca un flujo de UI.
+  Todavía no hay runner de tests unitarios (docs/project-profile.md §11): no crear tareas de tests unitarios hasta que exista.
+
+rules:
+  _global:
+    - Leer docs/base-standards.md y docs/project-profile.md antes de crear cualquier artefacto; si el perfil está en TEMPLATE, detenerse y pedir /bootstrap-project.
+    - Para artefactos de frontend leer docs/frontend-standards.md; de backend docs/backend-standards.md; de integraciones docs/integration-standards.md.
+    - Mantener docs/api-spec.yml y docs/data-model.md consistentes con specs y tasks (mismo cambio).
+    - Nunca escribir valores de credenciales; nombrar variables de entorno y agregarlas a .env.local.example.
+  proposal:
+    - Incluir una sección "Non-goals" y los criterios de aceptación como escenarios.
+    - Indicar qué documentos de docs/documentation-standards.md §3 deberán actualizarse.
+  design:
+    - Citar los archivos reales del repo que se reutilizan (helpers de lib/, componentes, SECTIONS del CMS).
+    - Explicitar cómo degrada el cambio si falta Firebase, Resend o Blob.
+  tasks:
+    - Seguir docs/openspec-tasks-mandatory-steps.md (paso 0 rama feature/<cambio>; pasos finales obligatorios; el agente ejecuta las pruebas).
+    - Toda tarea que toque app/api/** incluye su prueba curl; toda tarea que toque UI incluye su escenario E2E.
+
+operations:
+  apply:
+    guidance:
+      - Ejecutar npm run lint, npx tsc --noEmit y npm run build antes de marcar cada tarea de código como hecha; reportar la salida si falla.
+      - Restaurar cualquier dato de prueba creado en Firestore y dejar constancia en openspec/changes/<cambio>/reports/.
+      - Si aparece un pedido nuevo durante apply, actualizar primero los artefactos del cambio (base-standards §7).
+  archive:
+    guidance:
+      - Actualizar docs/ESTADO-PROYECTO.md (fecha, qué funciona, pendientes) y los demás documentos afectados según docs/documentation-standards.md §3 antes de archivar.
+      - Resumir el resultado del archivado y los TBD del perfil que el cambio haya resuelto.

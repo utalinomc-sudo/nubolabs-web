@@ -1,6 +1,6 @@
 # Estado del proyecto — Nubolabs
 
-> Documento de contexto para retomar el trabajo (incluso desde una conversación nueva o después de mover la carpeta). Última actualización: **2026-07-09**.
+> Documento de contexto para retomar el trabajo (incluso desde una conversación nueva o después de mover la carpeta). Última actualización: **2026-09-08**.
 
 ## Resumen
 Sitio de agencia de IA & automatización. **En producción: https://nubolabs.cl** (apex 308 → www, HTTPS de Vercel).
@@ -64,3 +64,14 @@ Los secretos (`FIREBASE_PRIVATE_KEY`, `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`)
 3. **SEO + analítica** (hoy NO hay sitemap/robots/OpenGraph/analytics).
 4. **Aviso por WhatsApp + anti-spam/rate-limiting** (formularios y login hoy sin protección).
 5. **Blog / casos de éxito administrable** (reusa el patrón CMS).
+
+
+## Flujo de trabajo con IA (specboot + OpenSpec) — desde 2026-09-08
+El repo tiene instalada la plantilla **nubolabs-specboot** (copia local en `C:\dev\nubolabs-specboot`, tag `v0.1.0`; aún sin subir a GitHub) y **OpenSpec 1.12** (perfil `custom`).
+
+- **Fuente única de datos del proyecto:** `docs/project-profile.md` (`status: FILLED`). Reglas base en `docs/base-standards.md` (`CLAUDE.md` apunta ahí). Estándares por capa: `frontend-standards.md`, `backend-standards.md`, `integration-standards.md`; contrato en `docs/api-spec.yml`; colecciones en `docs/data-model.md`.
+- **Agentes** (planifican, no implementan): `backend-developer`, `frontend-developer`, `integration-developer`, `product-strategy-analyst` en `ai-specs/agents/`, copiados a `.claude/agents/`.
+- **Skills** en `ai-specs/skills/` (copias en `.claude/skills/`): `bootstrap-project`, `enrich-us`, `commit`, `adversarial-review`, `code-auditing`, `sync-agent-symlinks`, `update-docs`, `using-git-worktrees`, `writing-skills`, `explain`, `meta-prompt`, `show-spec-working`. Instalación en **modo copia** (Windows sin symlinks): tras editar `ai-specs/` correr `/sync-agent-symlinks`.
+- **Flujo por feature:** `/enrich-us` → `/opsx:ff` (o `/opsx:propose`) → `/opsx:apply` → `/opsx:verify` → `/adversarial-review` → `/opsx:archive` → `/commit`. Comandos OpenSpec en `.claude/commands/opsx/`; specs y cambios en `openspec/`.
+- **Verificación obligatoria por tarea:** `npm run lint` · `npx tsc --noEmit` · `npm run build` (+ `curl` si toca `app/api/**`, + E2E con Playwright MCP si toca UI). No hay runner de tests unitarios todavía (TBD en el perfil §11).
+- Pendientes detectados en el bootstrap (perfil §11): elegir runner de tests, anotar versión de Node en Vercel, confirmar idioma de identificadores y política de PRs, verificar dominio en Resend, y corregir `metadataBase` (`nubolabs.ai` → `nubolabs.cl`) en `app/layout.tsx`.

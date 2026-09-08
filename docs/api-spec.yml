@@ -1,0 +1,438 @@
+# Contrato de la API propia del sitio de Nubolabs (Next.js Route Handlers bajo /api).
+# Se actualiza en el mismo cambio que agrega o modifica un endpoint (documentation-standards.md §3).
+# Convenciones: éxito → { ok: true, ... }; error → { error: "<mensaje en español>" } con el status HTTP correspondiente.
+openapi: 3.0.3
+info:
+  title: Nubolabs Web API
+  version: 1.0.0
+  description: |
+    Endpoints públicos para captar leads y generar el informe de diagnóstico, y endpoints
+    protegidos del panel de administración (sesión, CMS, equipo, leads, subida de fotos).
+    Los endpoints protegidos exigen la cookie `admin_session` creada en `POST /api/admin/session`.
+servers:
+  - url: https://www.nubolabs.cl
+    description: Producción (Vercel)
+  - url: http://localhost:3000
+    description: Local (`npm run dev`; sin credenciales de Firebase no se persiste y `/admin` queda abierto)
+
+tags:
+  - name: público
+  - name: admin
+
+paths:
+  /api/leads:
+    post:
+      tags: [público]
+      summary: Registra un lead (formulario de contacto o diagnóstico)
+      description: |
+        Guarda el lead en Firestore (`leads`), envía el aviso por correo al equipo (Resend) y, si
+        `source` es `diagnostico` y `meta` trae `indiceFriccion`, genera y envía el informe PDF al cliente.
+        Correo e informe no bloquean la respuesta. Sin Firebase Admin configurado responde `persisted: false`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LeadInput"
+      responses:
+        "200":
+          description: Lead recibido
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean, example: true }
+                  persisted: { type: boolean, description: "false si Firebase Admin no está configurado" }
+                  id: { type: string, description: "Id del documento en Firestore (solo si persisted)" }
+        "400":
+          description: JSON inválido, faltan nombre/email o email inválido
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "500":
+          description: No se pudo guardar en Firestore
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /api/diagnostico/report:
+    post:
+      tags: [público]
+      summary: Genera el informe de diagnóstico en PDF para descarga directa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: { type: string }
+                company: { type: string }
+                meta: { $ref: "#/components/schemas/DiagnosticoMeta" }
+              required: [meta]
+      responses:
+        "200":
+          description: 'PDF (Content-Disposition: attachment; filename="Informe-diagnostico-Nubolabs.pdf")'
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+        "400":
+          description: JSON inválido o `meta` sin `indiceFriccion`
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "500":
+          description: No se pudo generar el PDF
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /api/admin/session:
+    post:
+      tags: [admin]
+      summary: Inicia sesión — cambia un ID token de Firebase por la cookie de sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idToken: { type: string, description: "ID token obtenido con `signInWithEmailAndPassword` en el cliente" }
+              required: [idToken]
+      responses:
+        "200":
+          description: Sesión creada. Setea cookie `admin_session` (httpOnly, secure, sameSite=lax, 5 días)
+          headers:
+            Set-Cookie:
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+        "400":
+          description: Solicitud inválida o falta el token
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "401":
+          description: No se pudo crear la sesión (token inválido)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "500":
+          description: Firebase Admin no configurado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+    delete:
+      tags: [admin]
+      summary: Cierra sesión — borra la cookie
+      responses:
+        "200":
+          description: Cookie eliminada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
+  /api/admin/config:
+    post:
+      tags: [admin]
+      summary: Guarda (merge) la configuración del sitio — visibilidad y/o contenido del CMS
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Al menos uno de `visible` o `content`
+              properties:
+                visible:
+                  type: object
+                  additionalProperties: { type: boolean }
+                  example: { hero: true, problema: false }
+                content:
+                  $ref: "#/components/schemas/SiteContentPartial"
+      responses:
+        "200": { description: Guardado, content: { application/json: { schema: { $ref: "#/components/schemas/Ok" } } } }
+        "400": { description: JSON inválido o nada que guardar, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/DbUnavailable" }
+
+  /api/admin/team:
+    post:
+      tags: [admin]
+      summary: Crea (sin `id`) o actualiza (con `id`) un integrante del equipo
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: "#/components/schemas/TeamMemberInput"
+                - type: object
+                  properties:
+                    id: { type: string, description: "Si viene, actualiza ese documento (merge)" }
+      responses:
+        "200":
+          description: Guardado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  id: { type: string }
+        "400": { description: JSON inválido o falta `nombre`, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/DbUnavailable" }
+
+  /api/admin/team/{id}:
+    delete:
+      tags: [admin]
+      summary: Elimina un integrante del equipo
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Eliminado, content: { application/json: { schema: { $ref: "#/components/schemas/Ok" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/DbUnavailable" }
+
+  /api/admin/leads/{id}:
+    delete:
+      tags: [admin]
+      summary: Elimina un lead
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Eliminado, content: { application/json: { schema: { $ref: "#/components/schemas/Ok" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { $ref: "#/components/responses/DbUnavailable" }
+
+  /api/admin/leads/{id}/pdf:
+    get:
+      tags: [admin]
+      summary: Exporta la ficha completa de un lead a PDF
+      security: [{ adminSession: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 'PDF (Content-Disposition: attachment; filename="lead-<slug>.pdf"; Cache-Control: no-store)'
+          content:
+            application/pdf:
+              schema: { type: string, format: binary }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { description: Lead no encontrado, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "500": { description: Base no configurada o error al generar el PDF, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+
+  /api/admin/upload:
+    post:
+      tags: [admin]
+      summary: Sube una imagen a Vercel Blob y devuelve su URL pública
+      security: [{ adminSession: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file: { type: string, format: binary, description: "Imagen ≤ 5 MB" }
+              required: [file]
+      responses:
+        "200":
+          description: Subida
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  url: { type: string, format: uri }
+        "400": { description: Sin archivo o supera 5 MB, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "500": { description: Falta `BLOB_READ_WRITE_TOKEN` o falló la subida, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+
+  /api/admin/test-email:
+    get:
+      tags: [admin]
+      summary: Diagnóstico — envía un correo de prueba y devuelve la respuesta de Resend sin exponer la clave
+      security: [{ adminSession: [] }]
+      responses:
+        "200":
+          description: Resultado del envío
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  resendKeyPresent: { type: boolean }
+                  notifyEmail: { type: string }
+                  notifyFrom: { type: string }
+                  result: { $ref: "#/components/schemas/EmailResult" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+components:
+  securitySchemes:
+    adminSession:
+      type: apiKey
+      in: cookie
+      name: admin_session
+      description: Cookie de sesión de Firebase verificada en servidor por `getAdminSession()` (`lib/adminAuth.ts`)
+
+  responses:
+    Unauthorized:
+      description: Sin sesión de admin válida
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { error: "No autorizado." }
+    DbUnavailable:
+      description: Firebase Admin no configurado o error de Firestore
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+          example: { error: "Base de datos no configurada." }
+
+  schemas:
+    Ok:
+      type: object
+      properties:
+        ok: { type: boolean, example: true }
+    Error:
+      type: object
+      properties:
+        error: { type: string, description: "Mensaje en español apto para mostrar al usuario" }
+      required: [error]
+
+    LeadInput:
+      type: object
+      description: Definido en `types/lead.ts`
+      properties:
+        name: { type: string }
+        email: { type: string, format: email }
+        phone: { type: string }
+        company: { type: string }
+        message: { type: string }
+        source: { type: string, description: "`landing` (default) o `diagnostico`", example: landing }
+        meta: { $ref: "#/components/schemas/DiagnosticoMeta" }
+      required: [name, email]
+
+    DiagnosticoMeta:
+      type: object
+      description: Detalle estructurado del diagnóstico. Lo arma `components/diagnostico/DiagnosticoFlow.tsx`; lo lee `lib/report.ts`.
+      properties:
+        rubro: { type: string }
+        indiceFriccion: { type: number, description: "Requerido para generar el informe" }
+        nivelFriccion: { type: string }
+        areas:
+          type: array
+          items:
+            type: object
+            properties:
+              area: { type: string }
+              corto: { type: string }
+              friccion: { type: number }
+              pct: { type: string }
+        abiertas:
+          type: array
+          items:
+            type: object
+            properties:
+              pregunta: { type: string }
+              respuesta: { type: string }
+        ahorro:
+          nullable: true
+          type: object
+          properties:
+            totales:
+              type: object
+              properties:
+                horas: { type: number }
+                semana: { type: number }
+                mes: { type: number }
+                anual: { type: number }
+            procesos:
+              type: array
+              items:
+                type: object
+                properties:
+                  nombre: { type: string }
+                  ahorroCLPMes: { type: number }
+
+    TeamMemberInput:
+      type: object
+      description: Campos en español por consistencia con la colección `team`
+      properties:
+        nombre: { type: string }
+        cargo: { type: string }
+        habilidades: { type: array, items: { type: string } }
+        fotoUrl: { type: string, description: "URL de Vercel Blob o data URL" }
+        linkedin: { type: string, description: "Se antepone https:// si viene sin protocolo" }
+        orden: { type: integer }
+      required: [nombre]
+
+    SiteContentPartial:
+      type: object
+      description: Subconjunto de `SiteContent` (`lib/site.ts`); se mezcla sobre los defaults
+      properties:
+        hero:
+          type: object
+          properties:
+            eyebrow: { type: string }
+            title: { type: string, description: "Admite **resalte** para texto en azul" }
+            subtitle: { type: string }
+            ctaPrimary: { type: string }
+            ctaSecondary: { type: string }
+        servicios:
+          type: object
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            items:
+              type: array
+              items:
+                type: object
+                properties: { title: { type: string }, body: { type: string }, result: { type: string } }
+        casos:
+          type: object
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            subtitle: { type: string }
+            items:
+              type: array
+              items:
+                type: object
+                properties: { title: { type: string }, body: { type: string } }
+        nosotros:
+          type: object
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            mision: { type: string }
+            vision: { type: string }
+            objetivos: { type: array, items: { type: string } }
+        equipo:
+          type: object
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            historia: { type: string }
+
+    EmailResult:
+      type: object
+      description: Devuelto por `lib/email.ts`; nunca incluye la API key
+      properties:
+        skipped: { type: boolean }
+        ok: { type: boolean }
+        status: { type: integer }
+        body: { type: string, description: "Primeros 500 caracteres de la respuesta de Resend" }
+        from: { type: string }
+        to: { type: array, items: { type: string } }
+        error: { type: string }
