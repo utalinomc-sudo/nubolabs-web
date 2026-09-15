@@ -76,7 +76,7 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 
 | Artefacto | Idioma |
 |---|---|
-| Código (identificadores) | Inglés para identificadores **nuevos**. Se respetan tal cual los campos ya persistidos en Firestore en español (`nombre`, `cargo`, `habilidades`, `orden`, `mision`, `vision`…) y los nombres de dominio ya existentes (`ahorro`, `cuestionario`): **no renombrar** |
+| Código (identificadores) | Inglés para identificadores **nuevos** (confirmado el 2026-09-15). Se respetan tal cual los campos ya persistidos en Firestore en español (`nombre`, `cargo`, `habilidades`, `orden`, `mision`, `vision`…) y los nombres de dominio ya existentes (`ahorro`, `cuestionario`): **no renombrar** |
 | Comentarios en código | Español |
 | UI (textos visibles) | Español de Chile (`lang="es"`, `es-CL` en fechas y CLP) |
 | Documentación técnica | Español |
@@ -90,7 +90,7 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 |---|---|
 | Ramas | `main` = producción. Cambios spec-driven en `feature/<nombre-del-cambio>`. Fixes pequeños directo a `main` permitidos (equipo de una persona) |
 | Commits | Español, imperativo o descriptivo, prefijo de área opcional como en el historial (`Admin:`, `Fix:`, `docs:`, `Equipo:`) |
-| Pull requests | Opcionales, sin protección de rama. `/commit` pregunta antes de crear uno |
+| Pull requests | `/commit` solo hace push de la rama; el PR se crea únicamente cuando el usuario lo pide después (decisión del 2026-09-15). Sin protección de rama |
 | Deploy | Push a `main` → Vercel. Secretos solo en Vercel; nunca en el chat ni en commits |
 
 ## 8. Glosario del dominio
@@ -132,8 +132,6 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 | Campo | Por qué falta | Cómo resolverlo |
 |---|---|---|
 | Runner de tests unitarios | No hay ningún test ni runner en el repo | Decidir (recomendado Vitest + Testing Library), instalar, escribir el primer test para `components/diagnostico/ahorro.ts` y correr `/bootstrap-project --update` |
-| Regla de idioma de identificadores | El código mezcla inglés (`name`, `email`) y español (`nombre`, `cargo`) | Confirmar la regla propuesta en §6 |
-| Política de PRs | Un solo desarrollador, sin PRs hasta ahora | Confirmar si `/commit` debe crear PR o solo push |
 | `metadataBase` del sitio | `app/layout.tsx` usa `https://nubolabs.ai` pero producción es `https://nubolabs.cl` (afecta Open Graph / SEO) | Confirmar el dominio canónico y corregirlo en un cambio OpenSpec |
 
 ## 12. Estructura del repositorio (resumen)
