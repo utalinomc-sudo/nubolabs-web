@@ -68,7 +68,7 @@ Los secretos (`FIREBASE_PRIVATE_KEY`, `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`)
 
 
 ## Flujo de trabajo con IA (specboot + OpenSpec) — desde 2026-09-08
-El repo tiene instalada la plantilla **nubolabs-specboot** (copia local en `C:\dev\nubolabs-specboot`, tag `v0.1.0`; aún sin subir a GitHub) y **OpenSpec 1.12** (perfil `custom`).
+El repo tiene instalada la plantilla **nubolabs-specboot** (repo privado `utalinomc-sudo/nubolabs-specboot`, tag `v0.1.0`; copia local en `C:\dev\nubolabs-specboot`; se instala con `npx github:utalinomc-sudo/nubolabs-specboot . --copy --tools claude`) y **OpenSpec 1.12** (perfil `custom`).
 
 - **Fuente única de datos del proyecto:** `docs/project-profile.md` (`status: FILLED`). Reglas base en `docs/base-standards.md` (`CLAUDE.md` apunta ahí). Estándares por capa: `frontend-standards.md`, `backend-standards.md`, `integration-standards.md`; contrato en `docs/api-spec.yml`; colecciones en `docs/data-model.md`.
 - **Agentes** (planifican, no implementan): `backend-developer`, `frontend-developer`, `integration-developer`, `product-strategy-analyst` en `ai-specs/agents/`, copiados a `.claude/agents/`.
