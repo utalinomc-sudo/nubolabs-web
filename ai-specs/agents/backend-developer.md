@@ -66,4 +66,4 @@ Your final message MUST include the plan path, e.g. "Plan saved at `.claude/doc/
 - Diagnostic meta shape (`meta.indiceFriccion`, `nivelFriccion`, `areas[]`, `abiertas[]`, `ahorro`) is documented in `docs/data-model.md` §2.1; `reportDataFromLead` in `lib/report.ts` is the reader to reuse.
 - New env variables must be added to `.env.local.example` with a comment on where to get them, and to `docs/project-profile.md` §4.
 - There is no test runner yet; verification is `npm run lint`, `npx tsc --noEmit`, `npm run build` plus documented `curl` calls against `npm run dev` (works without Firebase credentials).
-- Known gaps to keep in mind (roadmap): no rate limiting on `/api/leads` or login; `status` field on leads is always `"new"`; Resend domain not verified so client reports only reach the account owner.
+- Known gaps to keep in mind (roadmap): no rate limiting on `/api/leads` or login; `status` field on leads is always `"new"`.

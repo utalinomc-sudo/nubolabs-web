@@ -55,7 +55,7 @@ Sin ejemplo en el repo todavía; al agregar uno:
 ### Correo / notificaciones
 Referencia: `sendLeadNotification` y `sendClientReport` en `lib/email.ts`.
 - HTML inline con la paleta de marca (`#0B1D3A`, `#1565FF`, `#00C2FF`), `escapeHtml` para todo texto del usuario, `replyTo` al correo del proyecto, adjuntos en base64.
-- `from` configurable (`NOTIFY_FROM` / `REPORT_FROM`); con `onboarding@resend.dev` Resend **solo entrega al dueño de la cuenta**: para clientes hace falta dominio verificado.
+- `from` configurable: `NOTIFY_FROM` = `Nubolabs <avisos@nubolabs.cl>`, `REPORT_FROM` = `Nubolabs <informe@nubolabs.cl>`. El dominio `nubolabs.cl` está verificado en Resend (cuenta `utalinomc@gmail.com`) desde el 2026-09-15. Un remitente fuera de un dominio verificado (por ejemplo `onboarding@resend.dev`) hace que Resend **solo entregue al dueño de la cuenta**.
 - Llamar siempre desde el servidor, después de persistir, sin bloquear.
 
 ### Almacenamiento de archivos

@@ -57,7 +57,7 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 |---|---|---|---|
 | Firebase Admin (Firestore + Auth) | Persistir leads, equipo y config; verificar la cookie de sesión del admin | `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` | Activa en producción |
 | Firebase cliente (Auth) | Login del admin en el navegador | `NEXT_PUBLIC_FIREBASE_API_KEY`, `..._AUTH_DOMAIN`, `..._PROJECT_ID`, `..._STORAGE_BUCKET`, `..._MESSAGING_SENDER_ID`, `..._APP_ID` (públicas) | Activa |
-| Resend (API REST, sin SDK) | Aviso por correo de cada lead nuevo; envío del informe PDF al cliente | `RESEND_API_KEY`; opcionales `NOTIFY_EMAIL`, `NOTIFY_FROM`, `REPORT_FROM` | Avisos activos. Informe al cliente **bloqueado** hasta verificar el dominio `nubolabs.cl` en Resend (ver §11) |
+| Resend (API REST, sin SDK) | Aviso por correo de cada lead nuevo; envío del informe PDF al cliente | `RESEND_API_KEY`; opcionales `NOTIFY_EMAIL`, `NOTIFY_FROM`, `REPORT_FROM` | Activa: avisos desde `avisos@nubolabs.cl` e informe desde `informe@nubolabs.cl`. Dominio verificado el 2026-09-15; la key pertenece a la cuenta Resend `utalinomc@gmail.com` |
 | Vercel Blob | Fotos de integrantes del equipo | `BLOB_READ_WRITE_TOKEN` | Opcional: sin token, la foto se reduce en el navegador y se incrusta como data URL en Firestore |
 | Agenda (Calendly, WhatsApp u otro) | Destino del botón "Agendar mi sesión" del informe | `SCHEDULE_URL` | Opcional (default `https://www.nubolabs.cl`) |
 
@@ -135,7 +135,6 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 | Versión de Node en Vercel | No consta en el repo (no hay `engines` en `package.json`) | Vercel → Settings → General → Node.js Version; anotar aquí y en `package.json` `engines` |
 | Regla de idioma de identificadores | El código mezcla inglés (`name`, `email`) y español (`nombre`, `cargo`) | Confirmar la regla propuesta en §6 |
 | Política de PRs | Un solo desarrollador, sin PRs hasta ahora | Confirmar si `/commit` debe crear PR o solo push |
-| Dominio en Resend | Bloquea la entrega del informe PDF al cliente (Resend solo entrega al dueño de la cuenta con `onboarding@resend.dev`) | Verificar `nubolabs.cl` en Resend y setear `REPORT_FROM="Nubolabs <informe@nubolabs.cl>"` en Vercel |
 | `metadataBase` del sitio | `app/layout.tsx` usa `https://nubolabs.ai` pero producción es `https://nubolabs.cl` (afecta Open Graph / SEO) | Confirmar el dominio canónico y corregirlo en un cambio OpenSpec |
 
 ## 12. Estructura del repositorio (resumen)

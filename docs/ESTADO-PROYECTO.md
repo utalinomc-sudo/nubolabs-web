@@ -1,6 +1,6 @@
 # Estado del proyecto — Nubolabs
 
-> Documento de contexto para retomar el trabajo (incluso desde una conversación nueva o después de mover la carpeta). Última actualización: **2026-09-08**.
+> Documento de contexto para retomar el trabajo (incluso desde una conversación nueva o después de mover la carpeta). Última actualización: **2026-09-15**.
 
 ## Resumen
 Sitio de agencia de IA & automatización. **En producción: https://nubolabs.cl** (apex 308 → www, HTTPS de Vercel).
@@ -9,7 +9,7 @@ Sitio de agencia de IA & automatización. **En producción: https://nubolabs.cl*
 - **Diseño:** dirección "1b claro & azul". Paleta: navy `#0B1D3A`, brand `#1565FF`, cian `#00C2FF`, acento naranjo `#FF6B5E`. Fuentes Plus Jakarta Sans + IBM Plex Mono.
 - **Repo:** GitHub `utalinomc-sudo/nubolabs-web`, rama `main`. Cada push a `main` → auto-deploy en Vercel (~15–30 s).
 - **Vercel:** proyecto `nubolabs-web`, equipo **ConCar** (Hobby). Dominio en NIC Chile delegado a nameservers de Vercel.
-- **Correo del proyecto (Google/Firebase/Resend):** `mauricio.nubolabs@gmail.com`.
+- **Correo del proyecto (Google/Firebase):** `mauricio.nubolabs@gmail.com`. **Cuenta de Resend:** `utalinomc@gmail.com` (dominio `nubolabs.cl` verificado el 2026-09-15; la `RESEND_API_KEY` de Vercel pertenece a esta cuenta).
 
 ## ⚠️ Regla de seguridad
 Los secretos (`FIREBASE_PRIVATE_KEY`, `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`) van **directo en Vercel → Settings → Environment Variables**, **nunca** pegados en el chat. Los `NEXT_PUBLIC_FIREBASE_*` sí son públicos.
@@ -33,8 +33,8 @@ Los secretos (`FIREBASE_PRIVATE_KEY`, `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`)
   - Menú **"Nosotros"** (dropdown en `components/landing/Nav.tsx`, después de "Casos de uso") con dos sub-páginas: **Misión y visión** (`/mision-vision`) y **Equipo** (`/equipo`). Misión, visión y objetivos son editables desde el CMS (`content.nosotros`, sección "Misión y visión" en `ConfigEditor`), con toggle de visibilidad `nosotros`. El logo del nav enlaza a `/#inicio`.
   - Fotos suben a **Vercel Blob** (`/api/admin/upload`). APIs admin: `/api/admin/config`, `/api/admin/team[/id]`, `/api/admin/upload` (todas protegidas).
 - **Email de leads (Resend):** `lib/email.ts` envía por cada lead vía API REST de Resend.
-  - Asunto: `Nuevo LEAD - nombre - empresa - teléfono`. Destino: `mauricio.nubolabs@gmail.com`. From: `onboarding@resend.dev`.
-  - `RESEND_API_KEY` **ya cargada en Vercel y probada** (status 200). Campo **Teléfono** agregado a los dos formularios.
+  - Asunto: `Nuevo LEAD - nombre - empresa - teléfono`. Destino: `mauricio.nubolabs@gmail.com` (`NOTIFY_EMAIL`). From: `Nubolabs <avisos@nubolabs.cl>` (`NOTIFY_FROM`).
+  - `RESEND_API_KEY` cargada en Vercel (rotada el 2026-09-15 a la cuenta con el dominio verificado) y probada (status 200). Campo **Teléfono** agregado a los dos formularios.
   - Diagnóstico: `GET /api/admin/test-email` (protegido) devuelve la respuesta de Resend sin exponer la key.
 - **Informe automático en PDF (mejora #2):** PDF de marca generado con `pdf-lib` (`lib/report.ts`). Incluye
   índice de fricción, barras por área, áreas críticas, "en tus palabras" y ahorro estimado. Dos vías:
@@ -42,25 +42,26 @@ Los secretos (`FIREBASE_PRIVATE_KEY`, `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`)
     que hace `POST /api/diagnostico/report` y baja el PDF. No depende de Resend.
   - **Envío por correo al cliente:** `POST /api/leads` también llama a `sendClientReport` (`lib/email.ts`) con el
     PDF adjunto + CTA para agendar. Todo no-bloqueante (si falla, el lead igual se guarda).
-    ⚠️ **Requiere dominio verificado en Resend** para llegar a correos de clientes: con `onboarding@resend.dev`
-    Resend SOLO entrega al dueño de la cuenta. Vars nuevas (opcionales): `REPORT_FROM`, `SCHEDULE_URL`.
+    ✅ **Operativo desde el 2026-09-15:** dominio `nubolabs.cl` verificado en Resend; el informe sale desde
+    `Nubolabs <informe@nubolabs.cl>` (`REPORT_FROM`) y llega a cualquier correo (probado con un diagnóstico real).
+    Var opcional: `SCHEDULE_URL` (destino del botón "Agendar mi sesión").
 
 ## Variables de entorno en Vercel (referencia; valores solo en Vercel)
 - `NEXT_PUBLIC_FIREBASE_*` (6, públicas) — config cliente.
 - `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, `FIREBASE_PRIVATE_KEY` — Admin SDK (secreto).
-- `RESEND_API_KEY` — envío de correo (secreto). Opcionales: `NOTIFY_EMAIL`, `NOTIFY_FROM`, `REPORT_FROM`, `SCHEDULE_URL`.
+- `RESEND_API_KEY` — envío de correo (secreto). `NOTIFY_FROM` y `REPORT_FROM` **ya cargadas** (`avisos@nubolabs.cl` / `informe@nubolabs.cl`). Opcionales: `NOTIFY_EMAIL`, `SCHEDULE_URL`.
 - `BLOB_READ_WRITE_TOKEN` — **falta crearla** (crear Blob store en Vercel → Storage).
 - Plantilla completa en `.env.local.example`.
 
 ## Pendientes / próximos pasos
 1. ~~**Crear el Blob store en Vercel** para subir fotos del equipo~~ **Ya no bloquea:** si falta `BLOB_READ_WRITE_TOKEN`, la foto se reduce en el navegador (JPEG ≤512px) y se **incrusta como data URL** en Firestore (`components/admin/TeamEditor.tsx`). *Opcional:* crear el Blob store (Storage → Create → Blob) para servir las fotos desde CDN en vez de incrustarlas; si el token existe, se usa automáticamente.
 2. **Hacer editables por texto** las 3 secciones que hoy solo se muestran/ocultan: **Problemas, Enfoque, Proceso** (sus textos siguen en `lib/content.ts`).
-3. **Verificar dominio `nubolabs.cl` en Resend** para enviar desde `informe@nubolabs.cl` y evitar spam. **Bloquea la entrega del informe en PDF al cliente** (mejora #2): sin dominio verificado, Resend solo entrega al dueño de la cuenta. Tras verificar, setear `REPORT_FROM="Nubolabs <informe@nubolabs.cl>"` en Vercel.
-4. **Limpiar leads de prueba** en Firestore (Prueba Detalle, Prueba Cuestionario, mau, ff, etc.).
+3. ~~**Verificar dominio `nubolabs.cl` en Resend**~~ ✅ **Hecho el 2026-09-15:** registros DKIM, SPF, MX y DMARC agregados en Vercel DNS, dominio verificado, `NOTIFY_FROM` y `REPORT_FROM` cargadas en Vercel, `RESEND_API_KEY` rotada a la cuenta correcta, informe al cliente probado de punta a punta.
+4. **Limpiar leads de prueba** en Firestore (Prueba Detalle, Prueba Cuestionario, mau, ff, y el lead "mau / nada" del 2026-09-15).
 
 ## Roadmap propuesto (ver `docs/Mejoras-Nubolabs.pdf`, ordenado por impacto)
 1. **Pipeline / mini-CRM de leads** (estados + notas + tasa de conversión; el campo `status` ya se guarda pero no se usa) — *siguiente recomendado*.
-2. ~~**Informe de diagnóstico en PDF + respuesta automática al cliente**~~. ✅ **Implementado** (falta verificar dominio en Resend para que llegue al cliente — ver Pendientes #3).
+2. ~~**Informe de diagnóstico en PDF + respuesta automática al cliente**~~. ✅ **Implementado y operativo** (dominio verificado en Resend el 2026-09-15).
 3. **SEO + analítica** (hoy NO hay sitemap/robots/OpenGraph/analytics).
 4. **Aviso por WhatsApp + anti-spam/rate-limiting** (formularios y login hoy sin protección).
 5. **Blog / casos de éxito administrable** (reusa el patrón CMS).
@@ -74,4 +75,4 @@ El repo tiene instalada la plantilla **nubolabs-specboot** (copia local en `C:\d
 - **Skills** en `ai-specs/skills/` (copias en `.claude/skills/`): `bootstrap-project`, `enrich-us`, `commit`, `adversarial-review`, `code-auditing`, `sync-agent-symlinks`, `update-docs`, `using-git-worktrees`, `writing-skills`, `explain`, `meta-prompt`, `show-spec-working`. Instalación en **modo copia** (Windows sin symlinks): tras editar `ai-specs/` correr `/sync-agent-symlinks`.
 - **Flujo por feature:** `/enrich-us` → `/opsx:ff` (o `/opsx:propose`) → `/opsx:apply` → `/opsx:verify` → `/adversarial-review` → `/opsx:archive` → `/commit`. Comandos OpenSpec en `.claude/commands/opsx/`; specs y cambios en `openspec/`.
 - **Verificación obligatoria por tarea:** `npm run lint` · `npx tsc --noEmit` · `npm run build` (+ `curl` si toca `app/api/**`, + E2E con Playwright MCP si toca UI). No hay runner de tests unitarios todavía (TBD en el perfil §11).
-- Pendientes detectados en el bootstrap (perfil §11): elegir runner de tests, anotar versión de Node en Vercel, confirmar idioma de identificadores y política de PRs, verificar dominio en Resend, y corregir `metadataBase` (`nubolabs.ai` → `nubolabs.cl`) en `app/layout.tsx`.
+- Pendientes detectados en el bootstrap (perfil §11): elegir runner de tests, anotar versión de Node en Vercel, confirmar idioma de identificadores y política de PRs, y corregir `metadataBase` (`nubolabs.ai` → `nubolabs.cl`) en `app/layout.tsx`.
