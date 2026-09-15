@@ -36,7 +36,7 @@ last_bootstrap: 2026-09-08
 | Auth | Firebase Auth (email/password) + cookie de sesión httpOnly verificada en servidor | firebase 10 / firebase-admin 12 | Solo para `/admin` |
 | Hosting / deploy | Vercel | — | Cada push a `main` despliega automáticamente (~30 s) |
 | Gestor de paquetes | npm | 11 | `package-lock.json` versionado |
-| Runtime | Node.js | local 24.16 · Vercel: TBD | Ver §11 |
+| Runtime | Node.js | 24.x en Vercel (Settings → Build and Deployment) · local 24.16 | Declarado en `package.json` → `engines.node` |
 | Otras librerías | `pdf-lib` 1.17 (PDFs), `@vercel/blob` 2.6 (fotos) | | |
 
 ## 3. Capas activas
@@ -132,7 +132,6 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 | Campo | Por qué falta | Cómo resolverlo |
 |---|---|---|
 | Runner de tests unitarios | No hay ningún test ni runner en el repo | Decidir (recomendado Vitest + Testing Library), instalar, escribir el primer test para `components/diagnostico/ahorro.ts` y correr `/bootstrap-project --update` |
-| Versión de Node en Vercel | No consta en el repo (no hay `engines` en `package.json`) | Vercel → Settings → General → Node.js Version; anotar aquí y en `package.json` `engines` |
 | Regla de idioma de identificadores | El código mezcla inglés (`name`, `email`) y español (`nombre`, `cargo`) | Confirmar la regla propuesta en §6 |
 | Política de PRs | Un solo desarrollador, sin PRs hasta ahora | Confirmar si `/commit` debe crear PR o solo push |
 | `metadataBase` del sitio | `app/layout.tsx` usa `https://nubolabs.ai` pero producción es `https://nubolabs.cl` (afecta Open Graph / SEO) | Confirmar el dominio canónico y corregirlo en un cambio OpenSpec |
