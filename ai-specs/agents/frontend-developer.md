@@ -64,4 +64,4 @@ Your final message MUST include the plan path, e.g. "Plan saved at `.claude/doc/
 - Images: remote hosts allowed in `next.config.js` are `**.public.blob.vercel-storage.com`; team photos may also be data URLs.
 - Never import `lib/firebaseAdmin.ts`, `lib/site.ts`, `lib/email.ts`, `lib/report.ts` in client code (`server-only`). Client Firebase (`lib/firebase.ts`) is only for the admin login.
 - There is no test runner yet; verification is `npm run lint`, `npx tsc --noEmit`, `npm run build` plus an E2E pass with Playwright MCP against `npm run dev` (works without Firebase credentials: leads are not persisted, `/admin` opens with a dev session).
-- Known gaps (roadmap): no sitemap/robots/analytics; `metadataBase` in `app/layout.tsx` points to `nubolabs.ai` while production is `nubolabs.cl`; Problemas/Enfoque/Proceso texts are not CMS-editable yet.
+- Known gaps (roadmap): no sitemap/robots/analytics (`metadataBase` in `app/layout.tsx` is already `https://www.nubolabs.cl`); Problemas/Enfoque/Proceso texts are not CMS-editable yet.

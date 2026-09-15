@@ -132,7 +132,6 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 | Campo | Por qué falta | Cómo resolverlo |
 |---|---|---|
 | Runner de tests unitarios | No hay ningún test ni runner en el repo | Decidir (recomendado Vitest + Testing Library), instalar, escribir el primer test para `components/diagnostico/ahorro.ts` y correr `/bootstrap-project --update` |
-| `metadataBase` del sitio | `app/layout.tsx` usa `https://nubolabs.ai` pero producción es `https://nubolabs.cl` (afecta Open Graph / SEO) | Confirmar el dominio canónico y corregirlo en un cambio OpenSpec |
 
 ## 12. Estructura del repositorio (resumen)
 

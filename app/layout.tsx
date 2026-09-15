@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: "Nubolabs — AI & Automation Agency",
   description:
     "Rediseñamos procesos y los convertimos en automatizaciones con IA que trabajan en la nube. Menos horas manuales, menos errores, más escala.",
-  metadataBase: new URL("https://nubolabs.ai"),
+  metadataBase: new URL("https://www.nubolabs.cl"),
   openGraph: {
     title: "Nubolabs — AI & Automation Agency",
     description:
