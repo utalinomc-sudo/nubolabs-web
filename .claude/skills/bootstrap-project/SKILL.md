@@ -119,14 +119,20 @@ context: |
   Verification commands (agent must run): <profile §5>.
 
 rules:
-  _global:
-    - Read docs/base-standards.md and docs/project-profile.md before creating any artifact.
-    - For frontend artifacts read docs/frontend-standards.md; for backend docs/backend-standards.md; for integrations docs/integration-standards.md.
-    - Keep docs/api-spec.yml and docs/data-model.md consistent with specs and tasks.
+  # OpenSpec 1.12 only accepts artifact ids as keys (proposal, specs, design, tasks); there is no _global.
   proposal:
+    - Read docs/base-standards.md and docs/project-profile.md before writing; stop and ask for /bootstrap-project if the profile is TEMPLATE.
     - Include a "Non-goals" section and the acceptance criteria as scenarios.
+    - Never write credential values; name environment variables and add them to the env example file.
+  specs:
+    - Keep OpenSpec structural headings and SHALL/MUST in English; write the rest in the specs language of the profile.
+    - Keep docs/api-spec.yml and docs/data-model.md consistent with the requirements; say so when a requirement changes them.
+  design:
+    - For frontend read docs/frontend-standards.md; for backend docs/backend-standards.md; for integrations docs/integration-standards.md.
+    - Cite the real files of the repo that are reused.
   tasks:
     - Follow docs/openspec-tasks-mandatory-steps.md (step 0 branch; final mandatory steps; agent executes tests).
+    - Include the task to update docs/api-spec.yml and docs/data-model.md when endpoints or fields change, and the env example when variables are added.
 
 operations:
   apply:

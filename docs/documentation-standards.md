@@ -27,6 +27,7 @@ La documentación técnica se escribe en **español** (perfil §6). Los comentar
 | `.env.local.example` | Todas las variables de entorno con comentario de origen | Se agrega o cambia una variable |
 | `docs/mejoras-nubolabs.html` / `docs/Mejoras-Nubolabs.pdf` | Roadmap de mejoras priorizado | Cambia la priorización (regenerar ambos formatos) |
 | `openspec/specs/**` | Specs principales por capacidad | Al archivar cambios (`/opsx:archive`, `/opsx:sync`) |
+| `docs/backlog/*.md` | Historias de usuario enriquecidas (`/enrich-us`) que esperan su `/opsx:ff` | Al refinar una historia nueva; se elimina o marca como "en curso" al crear el cambio OpenSpec |
 
 ## 4. Proceso antes de cada commit
 
