@@ -19,7 +19,7 @@ Tres superficies: la **landing** (`/`) compuesta por secciones de `components/la
 | Fuentes | Plus Jakarta Sans (`--font-jakarta`, `font-sans`) e IBM Plex Mono (`--font-mono`) vía `next/font/google` en `app/layout.tsx` |
 | Estado / datos | Estado local con hooks; datos de servidor por props; mutaciones con `fetch("/api/...")` |
 | Imágenes | `next/image`; hosts remotos permitidos: `**.public.blob.vercel-storage.com` (`next.config.js`); data URLs para fotos sin Blob |
-| Tests | Ninguno todavía · E2E manual con Playwright MCP (el agente lo ejecuta) |
+| Tests | Vitest 4 (`npm test`): tests `*.test.ts(x)` junto al código, imports explícitos de `vitest`; para componentes, primera línea `// @vitest-environment jsdom` + Testing Library (`@testing-library/react`, matchers de jest-dom ya cargados) · E2E manual con Playwright MCP (el agente lo ejecuta) |
 | Lint / formato | ESLint `next/core-web-vitals`; sin Prettier (respetar el estilo existente: comillas dobles, punto y coma, 2 espacios) |
 
 ## 3. Estructura
@@ -122,7 +122,10 @@ Antes de dar por terminada una tarea de frontend, ejecutar (el agente, no el usu
 ```
 npm run lint
 npx tsc --noEmit
+npm test
 npm run build
 ```
+
+La lógica pura (cálculos, formateo, transformaciones como `components/diagnostico/ahorro.ts`) lleva su test unitario junto al archivo; los componentes con estados relevantes pueden llevar test con Testing Library.
 
 Y cuando la tarea toque un flujo de usuario, prueba E2E con **Playwright MCP** contra `npm run dev` (http://localhost:3000; funciona sin credenciales de Firebase: los leads no persisten y `/admin` abre con sesión dev): navegar, completar el flujo (por ejemplo `/diagnostico` hasta la descarga del PDF, o el formulario de contacto hasta el estado `ok`), verificar estados de carga/error/éxito y responsive en 375 px y 1280 px, capturar evidencia y documentarla en `openspec/changes/<cambio>/reports/`.

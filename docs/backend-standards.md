@@ -22,7 +22,7 @@ Endpoints públicos: recepción de leads y generación del informe PDF. Endpoint
 | Correo | Resend por API REST con `fetch` (`lib/email.ts`), sin SDK |
 | Archivos | Vercel Blob (`@vercel/blob`, `app/api/admin/upload/route.ts`) |
 | PDF | `pdf-lib` (`lib/report.ts` informe al cliente, `lib/leadReport.ts` ficha interna) |
-| Tests | Ninguno todavía (perfil §11); verificación manual con `curl` |
+| Tests | Vitest 4 (`npm test`) para la lógica de `lib/` y helpers puros (tests `*.test.ts` junto al archivo, entorno `node`); los endpoints se verifican además con `curl` |
 
 ## 3. Estructura
 
@@ -122,8 +122,11 @@ Antes de dar por terminada una tarea de backend, ejecutar (el agente, no el usua
 ```
 npm run lint
 npx tsc --noEmit
+npm test
 npm run build
 ```
+
+La lógica extraída a `lib/` (validaciones, transformaciones, armado de datos para PDF o correo) lleva su test unitario; no se testea Firestore ni Resend en unitarios (se cubren con la prueba manual).
 
 Y para cada endpoint nuevo o modificado, prueba manual con `curl` contra `npm run dev` (http://localhost:3000), documentada en `openspec/changes/<cambio>/reports/`:
 

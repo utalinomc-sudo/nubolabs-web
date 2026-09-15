@@ -13,7 +13,7 @@ Antes de planificar, generar specs o escribir código, lee `docs/project-profile
 ## 1. Principios
 
 - **Tareas pequeñas, de a una:** trabaja en pasos cortos. Nunca avances más de un paso sin verificar.
-- **Tests primero cuando hay runner:** este proyecto todavía **no tiene runner de tests** (perfil §5 y §11). Mientras no exista, la verificación mínima de cada tarea son los comandos obligatorios de §8 más una prueba manual documentada (curl para endpoints, Playwright MCP para flujos de UI). Cuando se incorpore el runner, toda funcionalidad nueva parte con un test que falla (TDD).
+- **Tests primero (TDD):** el proyecto usa Vitest (`npm test`, perfil §5). Toda funcionalidad nueva con lógica testeable en aislamiento parte con un test que falla, co-ubicado con el código como `*.test.ts(x)`. Además siguen siendo obligatorios los comandos de §8 y las pruebas manuales documentadas (curl para endpoints, Playwright MCP para flujos de UI).
 - **Tipado completo:** todo el código nuevo va totalmente tipado; nada de `any` sin justificación escrita. `tsconfig` está en `strict`.
 - **Nombres claros:** variables, funciones y archivos con nombres descriptivos.
 - **Cambios incrementales:** prefiere cambios enfocados y revisables antes que refactors grandes.
@@ -87,6 +87,7 @@ Ninguna tarea se marca como terminada sin ejecutar (el agente, no el usuario):
 ```
 npm run lint
 npx tsc --noEmit
+npm test
 npm run build
 ```
 

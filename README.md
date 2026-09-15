@@ -23,6 +23,7 @@ Visitante ──HTTPS──▶ App Next.js 14 (Vercel) ──▶ Servicios en la
 npm install
 cp .env.local.example .env.local   # completar credenciales (opcional para ver la UI)
 npm run dev                        # http://localhost:3000
+npm test                           # tests unitarios (Vitest)
 ```
 
 La landing funciona **sin credenciales**. El formulario responde OK igual (el lead queda solo en consola del servidor hasta configurar Firebase).

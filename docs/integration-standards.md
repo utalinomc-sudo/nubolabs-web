@@ -82,7 +82,10 @@ Referencia: `app/api/admin/upload/route.ts`.
 ```
 npm run lint
 npx tsc --noEmit
+npm test
 npm run build
 ```
+
+Las funciones de integración se testean en unitario solo en su parte pura (armado de payloads, normalización, degradación sin credencial → resultado `skipped`), simulando `fetch` cuando haga falta; nunca se llama al servicio real desde un test.
 
 Más la prueba manual de la integración (con la variable presente y ausente, para comprobar la degradación) documentada en `openspec/changes/<cambio>/reports/`. Nunca probar contra servicios de pago o correos de clientes reales sin autorización explícita.

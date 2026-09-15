@@ -18,13 +18,14 @@ Antes de escribir `tasks.md`, leer `openspec/config.yaml` y `docs/project-profil
 
 ### Pasos de implementación
 - Tareas pequeñas y verificables, en el orden del diseño. Cada tarea que toque un endpoint o un flujo de UI dice cómo se va a probar.
-- Mientras no haya runner de tests (perfil §11), no se crean tareas de "escribir tests unitarios"; se crean tareas de prueba manual documentada. Cuando exista el runner, cada funcionalidad parte con su test (TDD).
+- Cada funcionalidad con lógica testeable en aislamiento parte con su test unitario en Vitest (TDD): la tarea del test va antes que la de implementación. Endpoints y flujos de UI suman además su prueba manual documentada.
 
 ### Pasos finales (OBLIGATORIOS, en este orden)
 - **N — Ejecutar los comandos de verificación** y guardar el reporte:
   ```
   npm run lint
   npx tsc --noEmit
+  npm test
   npm run build
   ```
 - **N+1 — Prueba manual de endpoints con `curl`** (solo si el cambio toca `app/api/**`). El agente levanta `npm run dev`, ejecuta los `curl` (casos OK y de error), y restaura datos si escribió en Firestore real.
@@ -45,6 +46,7 @@ Antes de escribir `tasks.md`, leer `openspec/config.yaml` y `docs/project-profil
 ```
 npm run lint
 npx tsc --noEmit
+npm test
 npm run build
 ```
 

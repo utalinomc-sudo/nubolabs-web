@@ -65,12 +65,12 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 
 | Aspecto | Valor |
 |---|---|
-| Unit tests | **Ninguno todavía** (TBD, ver §11). Recomendado: Vitest + Testing Library |
+| Unit tests | **Vitest 4** (`npm test`, entorno `node` por defecto; config en `vitest.config.mts`). Tests co-ubicados `*.test.ts(x)` con imports explícitos de `vitest`. Testing Library instalada para componentes (activar jsdom por archivo con `// @vitest-environment jsdom`). Primer test: `components/diagnostico/ahorro.test.ts` |
 | E2E | Playwright MCP, ejecutado por el agente contra `npm run dev` (http://localhost:3000). El sitio corre sin credenciales de Firebase: los leads no se persisten y `/admin` queda abierto con sesión "dev" |
 | Lint / formato | ESLint `next/core-web-vitals` (`npm run lint`). No hay Prettier |
 | Type check | `npx tsc --noEmit` |
-| Cobertura objetivo | No exigida mientras no exista runner |
-| **Comandos obligatorios antes de dar por terminada una tarea** | `npm run lint` · `npx tsc --noEmit` · `npm run build` (los tres pasan al 2026-09-08) |
+| Cobertura objetivo | Sin umbral exigido; toda funcionalidad nueva incluye sus tests (TDD, base-standards §1) |
+| **Comandos obligatorios antes de dar por terminada una tarea** | `npm run lint` · `npx tsc --noEmit` · `npm test` · `npm run build` (los cuatro pasan al 2026-09-15) |
 
 ## 6. Idiomas
 
@@ -131,7 +131,7 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 
 | Campo | Por qué falta | Cómo resolverlo |
 |---|---|---|
-| Runner de tests unitarios | No hay ningún test ni runner en el repo | Decidir (recomendado Vitest + Testing Library), instalar, escribir el primer test para `components/diagnostico/ahorro.ts` y correr `/bootstrap-project --update` |
+| (ninguno) | Todos los TBD detectados en el bootstrap quedaron resueltos el 2026-09-15 | Agregar filas aquí cuando aparezca algo nuevo por definir |
 
 ## 12. Estructura del repositorio (resumen)
 

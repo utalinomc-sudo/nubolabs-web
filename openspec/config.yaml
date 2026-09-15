@@ -29,30 +29,33 @@ context: |
   Planificación: adoptar ai-specs/agents/backend-developer.md, frontend-developer.md o integration-developer.md según la capa
   (proponen un plan en .claude/doc/<cambio>/, no implementan). Las skills de ai-specs/skills/ guían el flujo
   (/enrich-us → /opsx:ff → /opsx:apply → /opsx:verify → /adversarial-review → /opsx:archive → /commit).
-  Verificación obligatoria que el agente debe ejecutar antes de marcar una tarea: npm run lint · npx tsc --noEmit · npm run build,
+  Verificación obligatoria que el agente debe ejecutar antes de marcar una tarea: npm run lint · npx tsc --noEmit · npm test · npm run build,
   más curl contra npm run dev si el cambio toca app/api/** y E2E con Playwright MCP si toca un flujo de UI.
-  Todavía no hay runner de tests unitarios (docs/project-profile.md §11): no crear tareas de tests unitarios hasta que exista.
+  Tests unitarios con Vitest (npm test): archivos *.test.ts(x) junto al código, imports explícitos de vitest, entorno node por defecto
+  y `// @vitest-environment jsdom` + Testing Library para componentes. Toda lógica nueva testeable parte con su test (TDD).
 
 rules:
-  _global:
-    - Leer docs/base-standards.md y docs/project-profile.md antes de crear cualquier artefacto; si el perfil está en TEMPLATE, detenerse y pedir /bootstrap-project.
-    - Para artefactos de frontend leer docs/frontend-standards.md; de backend docs/backend-standards.md; de integraciones docs/integration-standards.md.
-    - Mantener docs/api-spec.yml y docs/data-model.md consistentes con specs y tasks (mismo cambio).
-    - Nunca escribir valores de credenciales; nombrar variables de entorno y agregarlas a .env.local.example.
   proposal:
+    - Leer docs/base-standards.md y docs/project-profile.md antes de escribir; si el perfil está en TEMPLATE, detenerse y pedir /bootstrap-project.
     - Incluir una sección "Non-goals" y los criterios de aceptación como escenarios.
     - Indicar qué documentos de docs/documentation-standards.md §3 deberán actualizarse.
+    - Nunca escribir valores de credenciales; nombrar variables de entorno y agregarlas a .env.local.example.
+  specs:
+    - Escribir requisitos y escenarios en español manteniendo los encabezados estructurales y SHALL/MUST en inglés.
+    - Mantener coherencia con docs/api-spec.yml (contratos) y docs/data-model.md (campos persistidos); si un requisito los cambia, indicarlo.
   design:
+    - Para frontend leer docs/frontend-standards.md; para backend docs/backend-standards.md; para integraciones docs/integration-standards.md.
     - Citar los archivos reales del repo que se reutilizan (helpers de lib/, componentes, SECTIONS del CMS).
     - Explicitar cómo degrada el cambio si falta Firebase, Resend o Blob.
   tasks:
     - Seguir docs/openspec-tasks-mandatory-steps.md (paso 0 rama feature/<cambio>; pasos finales obligatorios; el agente ejecuta las pruebas).
     - Toda tarea que toque app/api/** incluye su prueba curl; toda tarea que toque UI incluye su escenario E2E.
+    - Incluir la tarea de actualizar docs/api-spec.yml y docs/data-model.md cuando el cambio toque endpoints o campos, y .env.local.example cuando agregue variables.
 
 operations:
   apply:
     guidance:
-      - Ejecutar npm run lint, npx tsc --noEmit y npm run build antes de marcar cada tarea de código como hecha; reportar la salida si falla.
+      - Ejecutar npm run lint, npx tsc --noEmit, npm test y npm run build antes de marcar cada tarea de código como hecha; reportar la salida si falla.
       - Restaurar cualquier dato de prueba creado en Firestore y dejar constancia en openspec/changes/<cambio>/reports/.
       - Si aparece un pedido nuevo durante apply, actualizar primero los artefactos del cambio (base-standards §7).
   archive:
