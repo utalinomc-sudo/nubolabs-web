@@ -45,4 +45,5 @@ El primer deploy de producción desde `main` reutilizará la caché de build de 
 
 | Fecha | Deploy de producción | Redeploy sin caché | Login real | Detalle de lead | Resultado |
 |---|---|---|---|---|---|
-| — | — | — | — | — | **pendiente** (se completa cuando el dueño lo informe) |
+| 2026-09-16 | `0eae29b`, deploy automático **con caché** tras el merge (comprobado por el agente con `curl`, sin credenciales) | no (aún) | `POST /api/admin/session` con token de prueba → `500 {"error":"Auth no configurado en el servidor."}` (dos veces, con la función ya caliente) | — | **Se confirma el riesgo previsto.** Sitio público en pie con Firestore: `/` 200 con el marcador de Next 16, `/equipo` 200 con los 4 integrantes reales, `/admin/login` 200, `/admin` sin cookie → 307 al login. Solo falla la carga de `firebase-admin/auth` (mismo síntoma que los previews 1 y 2). Queda el redeploy sin caché por el dueño |
+| — | — | — | — | — | **pendiente** (resultado del dueño tras el redeploy sin caché) |
