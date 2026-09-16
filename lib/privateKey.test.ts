@@ -1,4 +1,4 @@
-// Tests de normalizePrivateKey (lib/privateKey.ts). Diseño: openspec/changes/migrar-next-16/design.md, decisión 13.
+// Tests de normalizePrivateKey (lib/privateKey.ts). Diseño: openspec/changes/archive/2026-09-16-migrar-next-16/design.md, decisión 13.
 // firebase-admin 14 valida la clave con el crypto nativo de Node, más estricto que node-forge (firebase-admin 12):
 // rechaza comillas envolventes, PEM en una sola línea con espacios y espacios sobrantes. Cada variante válida
 // se comprueba con createPrivateKey, que es lo mismo que hace cert() por dentro.

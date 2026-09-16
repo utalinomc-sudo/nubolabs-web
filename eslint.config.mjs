@@ -1,6 +1,6 @@
 // Configuración plana de ESLint 9 (reemplaza a `next lint` y .eslintrc.json, eliminados en Next 16).
 // Equivale al `next/core-web-vitals` anterior: reglas de Next, React y React Hooks, sin reglas nuevas.
-// Ver openspec/changes/migrar-next-16/design.md (decisión 4) y docs/frontend-standards.md §2.
+// Ver openspec/changes/archive/2026-09-16-migrar-next-16/design.md (decisión 4) y docs/frontend-standards.md §2.
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 
