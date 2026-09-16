@@ -7,14 +7,15 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // Exporta la ficha completa de un lead a PDF. Protegido: requiere sesión de admin.
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getAdminSession();
   if (!session) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
 
+  const { id } = await params;
   const db = getDb();
   if (!db) return NextResponse.json({ error: "Base de datos no configurada." }, { status: 500 });
 
-  const doc = await db.collection("leads").doc(params.id).get();
+  const doc = await db.collection("leads").doc(id).get();
   if (!doc.exists) return NextResponse.json({ error: "Lead no encontrado." }, { status: 404 });
 
   const lead = { id: doc.id, ...doc.data() } as LeadRecord;

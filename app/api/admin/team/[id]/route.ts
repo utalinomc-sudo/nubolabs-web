@@ -5,15 +5,16 @@ import { getAdminSession } from "@/lib/adminAuth";
 export const runtime = "nodejs";
 
 // Elimina un integrante del equipo.
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getAdminSession();
   if (!session) return NextResponse.json({ error: "No autorizado." }, { status: 401 });
 
+  const { id } = await params;
   const db = getDb();
   if (!db) return NextResponse.json({ error: "Base de datos no configurada." }, { status: 500 });
 
   try {
-    await db.collection("team").doc(params.id).delete();
+    await db.collection("team").doc(id).delete();
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "No se pudo eliminar el integrante." }, { status: 500 });

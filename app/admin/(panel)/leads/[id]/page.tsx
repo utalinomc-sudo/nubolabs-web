@@ -66,8 +66,9 @@ function Barra({ pct }: { pct: number | null }) {
   );
 }
 
-export default async function LeadDetail({ params }: { params: { id: string } }) {
-  const { configured, lead } = await getLead(params.id);
+export default async function LeadDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const { configured, lead } = await getLead(id);
 
   if (!configured) {
     return <p className="text-sm text-ink-muted">Firebase no está configurado.</p>;
@@ -90,8 +91,8 @@ export default async function LeadDetail({ params }: { params: { id: string } })
           ← Volver a leads
         </Link>
         <div className="flex items-center gap-2">
-          <LeadPdfButton id={params.id} />
-          <DeleteLeadButton id={params.id} name={String(lead.name || "")} />
+          <LeadPdfButton id={id} />
+          <DeleteLeadButton id={id} name={String(lead.name || "")} />
         </div>
       </div>
 

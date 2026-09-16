@@ -5,19 +5,20 @@ import { getAdminSession } from "@/lib/adminAuth";
 export const runtime = "nodejs";
 
 // Elimina un lead. Requiere sesión de admin válida.
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getAdminSession();
   if (!session) {
     return NextResponse.json({ error: "No autorizado." }, { status: 401 });
   }
 
+  const { id } = await params;
   const db = getDb();
   if (!db) {
     return NextResponse.json({ error: "Base de datos no configurada." }, { status: 500 });
   }
 
   try {
-    await db.collection("leads").doc(params.id).delete();
+    await db.collection("leads").doc(id).delete();
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "No se pudo eliminar el lead." }, { status: 500 });

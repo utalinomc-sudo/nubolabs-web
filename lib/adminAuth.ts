@@ -18,7 +18,8 @@ export interface AdminSession {
 export async function getAdminSession(): Promise<AdminSession | null> {
   if (!isAdminConfigured) return { email: "dev@local" };
 
-  const token = cookies().get(COOKIE)?.value;
+  const store = await cookies();
+  const token = store.get(COOKIE)?.value;
   if (!token) return null;
 
   const auth = getAdminAuth();

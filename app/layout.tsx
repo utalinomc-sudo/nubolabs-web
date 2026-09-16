@@ -36,7 +36,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${jakarta.variable} ${mono.variable}`}>
+    <html lang="es" data-scroll-behavior="smooth" className={`${jakarta.variable} ${mono.variable}`}>
       <body>{children}</body>
     </html>
   );

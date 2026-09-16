@@ -41,3 +41,4 @@ serviceAccount*.json
 .claude/sessions/
 .claude/settings.local.json
 .worktrees/
+.playwright-mcp/
