@@ -51,5 +51,23 @@ Nota de secuencia: el mismo servidor de desarrollo se mantuvo en marcha para la 
 - Después: idéntico; ningún dato creado, ningún correo enviado (`skipped`), ninguna subida a Blob.
 - Restaurado: no aplica (nada que restaurar).
 
+## Adenda (mismo día, tras las tareas 2.4–2.6: `lib/privateKey.ts` y `lib/firebaseAdmin.ts` protegido)
+
+Los cuatro comandos se repitieron con el código nuevo: `npm test` ✔ 2 archivos, **20 tests** (11 + 9 de `normalizePrivateKey`); `npm run lint` ✔; `npx tsc --noEmit` ✔; `npm run build` ✔ (31 s). La matriz de `curl` se repitió contra `npm run dev` sin credenciales (ver tabla de re-verificación al final): sin cambios, porque sin `FIREBASE_*` el camino de degradación es el mismo. El recorrido E2E no se repitió: el cambio no toca interfaz ni rutas, solo la inicialización del SDK en servidor, cubierta por el test unitario y por las tres ejecuciones de `next start` del reporte del paso 2b.
+
+### Re-verificación de la matriz tras `lib/privateKey.ts` (mismo script, `npx next dev -p 3100`, sin credenciales)
+
+| # | Petición | Código | vs paso 0 |
+|---|---|---|---|
+| 1–3 | `POST /api/leads` (válido / `{"name":"x"}` / no JSON) | 200 / 400 / 400 | idéntico |
+| 4–5 | `POST /api/diagnostico/report` (con índice / `{}`) | 200 PDF / 400 | idéntico |
+| 6–7 | `POST` / `DELETE /api/admin/session` | 500 / 200 + `Set-Cookie` de borrado | idéntico |
+| 8–12 | `/api/admin/config`, `/api/admin/team`, `/api/admin/team/abc`, `/api/admin/leads/abc`, `/api/admin/leads/abc/pdf` | 500 "Base de datos no configurada." | idéntico |
+| 13 | `POST /api/admin/upload` | 500 (falta `BLOB_READ_WRITE_TOKEN`) | idéntico |
+| 14 | `GET /api/admin/test-email` | 200, `result.skipped: true` | idéntico |
+| 15 | `GET /admin/leads/abc` | 200, «Firebase no está configurado.» | idéntico |
+
+`diff` contra el paso 0 con tamaños normalizados: sin diferencias. Log del servidor sin errores. Servidor detenido al terminar (puerto 3100 libre).
+
 ## Resultado
 **PASS** — los cuatro comandos obligatorios en verde y los 11 endpoints responden igual que antes de la migración.
