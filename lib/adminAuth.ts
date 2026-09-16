@@ -22,7 +22,7 @@ export async function getAdminSession(): Promise<AdminSession | null> {
   const token = store.get(COOKIE)?.value;
   if (!token) return null;
 
-  const auth = getAdminAuth();
+  const auth = await getAdminAuth();
   if (!auth) return null;
 
   try {

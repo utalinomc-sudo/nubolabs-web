@@ -9,7 +9,7 @@ const EXPIRES_MS = 5 * 24 * 60 * 60 * 1000; // 5 días
 // Inicia sesión: recibe el ID token del cliente y lo cambia por una cookie
 // de sesión httpOnly verificable en el servidor.
 export async function POST(req: Request) {
-  const auth = getAdminAuth();
+  const auth = await getAdminAuth();
   if (!auth) {
     return NextResponse.json({ error: "Auth no configurado en el servidor." }, { status: 500 });
   }

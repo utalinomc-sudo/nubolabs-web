@@ -36,7 +36,7 @@ last_bootstrap: 2026-09-08
 | Auth | Firebase Auth (email/password) + cookie de sesión httpOnly verificada en servidor | firebase 11 (cliente) / firebase-admin 14 | Solo para `/admin` |
 | Hosting / deploy | Vercel | — | Cada push a `main` despliega automáticamente (~30 s) |
 | Gestor de paquetes | npm | 11 | `package-lock.json` versionado |
-| Runtime | Node.js | 24.x en Vercel (Settings → Build and Deployment) · local 24.16 | Declarado en `package.json` → `engines.node` |
+| Runtime | Node.js | 24.x declarado en `package.json` → `engines.node` · local 24.16 | **Comprobar en Vercel:** el preview del 2026-09-16 corrió con un Node sin `require(esm)` (anterior a 20.19/22.12) y `firebase-admin/auth` no cargaba (`ERR_REQUIRE_ESM` vía `jwks-rsa` → `jose` 6). firebase-admin 14 exige Node ≥ 22; fijar **24.x** en Settings → Build and Deployment y verificarlo en el log de build |
 | Otras librerías | `pdf-lib` 1.17 (PDFs), `@vercel/blob` 2.8 (fotos) | | Migrado a Next 16.3 + firebase-admin 14.4 el 2026-09-16 (cambio `migrar-next-16`) |
 
 ## 3. Capas activas

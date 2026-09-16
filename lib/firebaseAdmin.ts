@@ -8,7 +8,7 @@ import {
   type App,
 } from "firebase-admin/app";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
-import { getAuth, type Auth } from "firebase-admin/auth";
+import type { Auth } from "firebase-admin/auth";
 import { normalizePrivateKey } from "@/lib/privateKey";
 
 const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -51,7 +51,26 @@ export function getDb(): Firestore | null {
   return a ? getFirestore(a) : null;
 }
 
-export function getAdminAuth(): Auth | null {
+// `firebase-admin/auth` se carga solo cuando el panel lo necesita y de forma protegida: arrastra
+// `jwks-rsa` → `jose` (solo ESM), que exige Node ≥ 20.19 / 22.12. Si el runtime no puede cargarlo, el
+// sitio público (que solo usa app + firestore) sigue funcionando y el panel responde "Auth no configurado".
+let authModule: typeof import("firebase-admin/auth") | null = null;
+let authLoadFailed = false;
+
+export async function getAdminAuth(): Promise<Auth | null> {
   const a = getAdminApp();
-  return a ? getAuth(a) : null;
+  if (!a || authLoadFailed) return null;
+  if (!authModule) {
+    try {
+      authModule = await import("firebase-admin/auth");
+    } catch (err) {
+      authLoadFailed = true;
+      console.error(
+        "[firebase-admin] no se pudo cargar firebase-admin/auth (¿Node anterior a 20.19/22.12 sin require(esm)?); el panel queda sin sesión:",
+        err instanceof Error ? err.message : err,
+      );
+      return null;
+    }
+  }
+  return authModule.getAuth(a);
 }

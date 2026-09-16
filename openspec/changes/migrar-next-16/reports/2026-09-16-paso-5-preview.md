@@ -28,7 +28,10 @@ Preview: la URL `https://nubolabs-web-git-feature-migrar-next-16-<equipo>.vercel
 - [ ] "Cerrar sesión" → vuelve a `/admin/login`; `/admin` redirige al login.
 
 **Vercel**
-- [ ] El build del preview terminó en verde (Next 16.3.5 con Turbopack, Node 24) y los logs de funciones no muestran errores tras el recorrido.
+- [ ] **Antes de probar:** Settings → Build and Deployment → Node.js Version = **24.x** (firebase-admin 14 exige Node ≥ 22 y su módulo de auth necesita `require(esm)`, Node ≥ 20.19/22.12). Si estaba en otra versión, cambiarla y pulsar "Redeploy" en el último deployment de la rama. Confirmar en el log de build del deployment que usa Node 24.
+- [ ] El build del preview terminó en verde (Next 16.3.5 con Turbopack, Node 24) y los logs de funciones no muestran errores tras el recorrido (en particular, ningún aviso `[firebase-admin]`).
+
+Historial de intentos: 1.º preview (`2fafb57`) error 500 en páginas dinámicas; 2.º preview (`fbee74f`) mismo error, log `ERR_REQUIRE_ESM` en `firebase-admin/auth` (reporte del paso 2c); 3.º preview (carga perezosa de auth) pendiente.
 
 ## Resultado informado por el dueño
 - Fecha: —
