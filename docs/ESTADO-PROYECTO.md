@@ -1,6 +1,6 @@
 # Estado del proyecto — Nubolabs
 
-> Documento de contexto para retomar el trabajo (incluso desde una conversación nueva o después de mover la carpeta). Última actualización: **2026-09-15**.
+> Documento de contexto para retomar el trabajo (incluso desde una conversación nueva o después de mover la carpeta). Última actualización: **2026-09-16**.
 
 ## Resumen
 Sitio de agencia de IA & automatización. **En producción: https://nubolabs.cl** (apex 308 → www, HTTPS de Vercel).
@@ -59,7 +59,8 @@ Los secretos (`FIREBASE_PRIVATE_KEY`, `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`)
 3. ~~**Verificar dominio `nubolabs.cl` en Resend**~~ ✅ **Hecho el 2026-09-15:** registros DKIM, SPF, MX y DMARC agregados en Vercel DNS, dominio verificado, `NOTIFY_FROM` y `REPORT_FROM` cargadas en Vercel, `RESEND_API_KEY` rotada a la cuenta correcta, informe al cliente probado de punta a punta.
 4. **Limpiar leads de prueba** en Firestore (Prueba Detalle, Prueba Cuestionario, mau, ff, y el lead "mau / nada" del 2026-09-15).
 5. **Endurecer `calc` en `components/diagnostico/ahorro.ts`** para que un porcentaje repetitivo no numérico se trate como 0 (hoy daría `NaN`; la UI siempre envía un número, así que no afecta a usuarios). Hallazgo del primer test; hacerlo como cambio OpenSpec con su test.
-6. **Actualizar dependencias de producción con alertas de seguridad.** `npm audit --omit=dev` (2026-09-15) reporta 21 alertas (1 crítica, 3 altas, 17 moderadas) en `next`, `firebase`, `firebase-admin`, `@google-cloud/*`, `undici`, `postcss`, `uuid`; existían antes de agregar Vitest (las devDependencies nuevas no suman ninguna). Planificar un cambio OpenSpec "actualizar-dependencias" con build, tests y E2E de regresión.
+6. ~~**Actualizar dependencias de producción con alertas de seguridad.**~~ **Parcialmente hecho el 2026-09-16** (cambio `actualizar-dependencias-seguras`): `npm audit fix` sin forzar, `@vercel/blob` 2.8 y `firebase` (SDK cliente) 10 → 11 bajaron las alertas de producción de 21 a 10 (cerradas `undici`, `fast-xml-parser` y todo `@firebase/*`). Las 10 restantes (crítica de `next`, alta de `postcss`, moderadas de `firebase-admin`/`@google-cloud/*`) solo se resuelven con **Next 16.3.5 + firebase-admin 14.4**: ver la HDU `docs/backlog/migrar-next-16.md`.
+7. **Migrar a Next 16 y firebase-admin 14** (`docs/backlog/migrar-next-16.md`): requiere `cookies()` y `params` asíncronos en 5 archivos, reemplazar `next lint` por ESLint 9 y E2E completo. Es el siguiente cambio técnico recomendado por seguridad.
 
 ## Roadmap propuesto (ver `docs/Mejoras-Nubolabs.pdf`, ordenado por impacto)
 1. **Pipeline / mini-CRM de leads** (estados + notas + tasa de conversión; el campo `status` ya se guarda pero no se usa) — *siguiente recomendado*.

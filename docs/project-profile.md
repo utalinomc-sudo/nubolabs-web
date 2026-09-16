@@ -33,11 +33,11 @@ last_bootstrap: 2026-09-08
 | UI / estilos | Tailwind CSS | 3.4 | Tokens de marca en `tailwind.config.ts`; primitivas `.btn-primary`, `.card`, `.field`… en `app/globals.css` |
 | Backend | Next.js Route Handlers (`app/api/**/route.ts`, `runtime = "nodejs"`) | 14.2 | No hay servidor aparte |
 | Base de datos | Firestore vía Firebase Admin SDK | firebase-admin 12 | Colecciones `leads`, `team` y documento `config/site` |
-| Auth | Firebase Auth (email/password) + cookie de sesión httpOnly verificada en servidor | firebase 10 / firebase-admin 12 | Solo para `/admin` |
+| Auth | Firebase Auth (email/password) + cookie de sesión httpOnly verificada en servidor | firebase 11 (cliente) / firebase-admin 12 | Solo para `/admin` |
 | Hosting / deploy | Vercel | — | Cada push a `main` despliega automáticamente (~30 s) |
 | Gestor de paquetes | npm | 11 | `package-lock.json` versionado |
 | Runtime | Node.js | 24.x en Vercel (Settings → Build and Deployment) · local 24.16 | Declarado en `package.json` → `engines.node` |
-| Otras librerías | `pdf-lib` 1.17 (PDFs), `@vercel/blob` 2.6 (fotos) | | |
+| Otras librerías | `pdf-lib` 1.17 (PDFs), `@vercel/blob` 2.8 (fotos) | | Migración pendiente a Next 16 + firebase-admin 14: `docs/backlog/migrar-next-16.md` |
 
 ## 3. Capas activas
 
