@@ -29,15 +29,15 @@ last_bootstrap: 2026-09-08
 | Capa | Tecnología | Versión | Notas |
 |---|---|---|---|
 | Lenguaje | TypeScript | 5.5 | `strict: true`; alias `@/*` → raíz del repo |
-| Framework | Next.js (App Router) + React | 14.2 / 18.3 | Server Components por defecto; `"use client"` solo donde hay interacción |
+| Framework | Next.js (App Router, Turbopack) + React | 16.3 / 18.3 | Server Components por defecto; `"use client"` solo donde hay interacción. El App Router corre con el React 19.3 canary que empaqueta Next; `react` 18.3 instalado sirve a los tests (Testing Library) |
 | UI / estilos | Tailwind CSS | 3.4 | Tokens de marca en `tailwind.config.ts`; primitivas `.btn-primary`, `.card`, `.field`… en `app/globals.css` |
-| Backend | Next.js Route Handlers (`app/api/**/route.ts`, `runtime = "nodejs"`) | 14.2 | No hay servidor aparte |
-| Base de datos | Firestore vía Firebase Admin SDK | firebase-admin 12 | Colecciones `leads`, `team` y documento `config/site` |
-| Auth | Firebase Auth (email/password) + cookie de sesión httpOnly verificada en servidor | firebase 11 (cliente) / firebase-admin 12 | Solo para `/admin` |
+| Backend | Next.js Route Handlers (`app/api/**/route.ts`, `runtime = "nodejs"`) | 16.3 | No hay servidor aparte. `params` y `cookies()` son asíncronos (`await`) |
+| Base de datos | Firestore vía Firebase Admin SDK | firebase-admin 14 | Colecciones `leads`, `team` y documento `config/site` |
+| Auth | Firebase Auth (email/password) + cookie de sesión httpOnly verificada en servidor | firebase 11 (cliente) / firebase-admin 14 | Solo para `/admin` |
 | Hosting / deploy | Vercel | — | Cada push a `main` despliega automáticamente (~30 s) |
 | Gestor de paquetes | npm | 11 | `package-lock.json` versionado |
 | Runtime | Node.js | 24.x en Vercel (Settings → Build and Deployment) · local 24.16 | Declarado en `package.json` → `engines.node` |
-| Otras librerías | `pdf-lib` 1.17 (PDFs), `@vercel/blob` 2.8 (fotos) | | Migración pendiente a Next 16 + firebase-admin 14: `docs/backlog/migrar-next-16.md` |
+| Otras librerías | `pdf-lib` 1.17 (PDFs), `@vercel/blob` 2.8 (fotos) | | Migrado a Next 16.3 + firebase-admin 14.4 el 2026-09-16 (cambio `migrar-next-16`) |
 
 ## 3. Capas activas
 
@@ -67,10 +67,10 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 |---|---|
 | Unit tests | **Vitest 4** (`npm test`, entorno `node` por defecto; config en `vitest.config.mts`). Tests co-ubicados `*.test.ts(x)` con imports explícitos de `vitest`. Testing Library instalada para componentes (activar jsdom por archivo con `// @vitest-environment jsdom`). Primer test: `components/diagnostico/ahorro.test.ts` |
 | E2E | Playwright MCP, ejecutado por el agente contra `npm run dev` (http://localhost:3000). El sitio corre sin credenciales de Firebase: los leads no se persisten y `/admin` queda abierto con sesión "dev" |
-| Lint / formato | ESLint `next/core-web-vitals` (`npm run lint`). No hay Prettier |
+| Lint / formato | ESLint 9 con flat config: `eslint.config.mjs` extiende `eslint-config-next/core-web-vitals`; `npm run lint` = `eslint .` (el comando de lint integrado en Next desapareció en la 16). Excepción documentada: `@next/next/no-html-link-for-pages` desactivada solo en `components/landing/Nav.tsx`. No hay Prettier |
 | Type check | `npx tsc --noEmit` |
 | Cobertura objetivo | Sin umbral exigido; toda funcionalidad nueva incluye sus tests (TDD, base-standards §1) |
-| **Comandos obligatorios antes de dar por terminada una tarea** | `npm run lint` · `npx tsc --noEmit` · `npm test` · `npm run build` (los cuatro pasan al 2026-09-15) |
+| **Comandos obligatorios antes de dar por terminada una tarea** | `npm run lint` · `npx tsc --noEmit` · `npm test` · `npm run build` (los cuatro pasan al 2026-09-16 con Next 16.3 y Turbopack) |
 
 ## 6. Idiomas
 

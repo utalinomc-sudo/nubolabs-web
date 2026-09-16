@@ -8,7 +8,7 @@ context: |
   Proyecto: sitio web y panel de administración de Nubolabs (agencia de IA & automatización, https://nubolabs.cl).
   Capta leads con un diagnóstico operativo (/diagnostico), entrega un informe PDF y permite administrar
   contenido (CMS), equipo y leads desde /admin.
-  Stack: Next.js 14 App Router + React 18 + TypeScript strict + Tailwind 3 (tokens de marca) ·
+  Stack: Next.js 16 App Router (Turbopack; params y cookies asíncronos) + React 18 + TypeScript strict + Tailwind 3 (tokens de marca) ·
   Route Handlers en app/api/** (Node runtime) · Firestore vía Firebase Admin (leads, team, config/site) ·
   Firebase Auth con cookie de sesión para /admin · Resend por REST (correos e informe PDF) · Vercel Blob (fotos) ·
   pdf-lib (PDFs) · deploy automático en Vercel al hacer push a main.

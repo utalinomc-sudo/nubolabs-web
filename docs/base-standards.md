@@ -1,5 +1,5 @@
 ---
-description: Reglas de desarrollo del sitio y panel de Nubolabs (Next.js 14 + TypeScript + Tailwind + Firebase + Vercel), aplicables a todos los agentes de IA (Claude Code, Cursor, Codex, Gemini). Fuente única de verdad.
+description: Reglas de desarrollo del sitio y panel de Nubolabs (Next.js 16 + TypeScript + Tailwind + Firebase + Vercel), aplicables a todos los agentes de IA (Claude Code, Cursor, Codex, Gemini). Fuente única de verdad.
 alwaysApply: true
 ---
 

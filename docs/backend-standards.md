@@ -1,5 +1,5 @@
 ---
-description: Estándares de backend del sitio de Nubolabs — Next.js 14 Route Handlers, Firebase Admin (Firestore + sesión admin), Resend, generación de PDF con pdf-lib, forma de errores, validación, logging y verificación.
+description: Estándares de backend del sitio de Nubolabs — Next.js 16 Route Handlers, Firebase Admin (Firestore + sesión admin), Resend, generación de PDF con pdf-lib, forma de errores, validación, logging y verificación.
 alwaysApply: true
 ---
 
@@ -15,9 +15,9 @@ Endpoints públicos: recepción de leads y generación del informe PDF. Endpoint
 
 | Elemento | Tecnología / versión |
 |---|---|
-| Runtime | Node.js (`export const runtime = "nodejs"` en cada handler) · Next.js 14.2 |
+| Runtime | Node.js (`export const runtime = "nodejs"` en cada handler) · Next.js 16.3 con Turbopack (APIs de Next 16: `node_modules/next/dist/docs/`) |
 | Capa HTTP | Route Handlers del App Router (`NextResponse`) |
-| Persistencia | Firestore vía `firebase-admin` 12 (`lib/firebaseAdmin.ts`) |
+| Persistencia | Firestore vía `firebase-admin` 14 (`lib/firebaseAdmin.ts`, API modular `firebase-admin/app`, `/firestore`, `/auth`) |
 | Auth | Firebase Auth: ID token del cliente → cookie de sesión `admin_session` (5 días) verificada con `verifySessionCookie` (`lib/adminAuth.ts`) |
 | Correo | Resend por API REST con `fetch` (`lib/email.ts`), sin SDK |
 | Archivos | Vercel Blob (`@vercel/blob`, `app/api/admin/upload/route.ts`) |
@@ -53,7 +53,7 @@ Regla: lógica reutilizable va en `lib/` con `import "server-only"`; los handler
 ## 4. Convenciones
 
 ### Endpoints y contratos
-- Un `route.ts` por recurso; exporta solo los métodos que existen (`POST`, `GET`, `DELETE`). Parámetros dinámicos tipados: `{ params }: { params: { id: string } }`.
+- Un `route.ts` por recurso; exporta solo los métodos que existen (`POST`, `GET`, `DELETE`). Parámetros dinámicos asíncronos (Next 16): `{ params }: { params: Promise<{ id: string }> }` y `const { id } = await params` justo después de comprobar la sesión. `cookies()` también es asíncrono: `const store = await cookies()` (`lib/adminAuth.ts`).
 - Siempre `export const runtime = "nodejs"`. Agrega `export const dynamic = "force-dynamic"` en lecturas que no deben cachearse (PDFs, diagnósticos).
 - Rutas nuevas siguen el patrón `/api/<recurso>` (público) o `/api/admin/<recurso>[/[id]]` (protegido) y se documentan en `docs/api-spec.yml` en el mismo cambio.
 - Respuestas de éxito: `{ ok: true, ...datos }` (por ejemplo `{ ok: true, id }`, `{ ok: true, persisted: false }`).

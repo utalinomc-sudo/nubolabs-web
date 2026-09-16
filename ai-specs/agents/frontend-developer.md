@@ -1,6 +1,6 @@
 ---
 name: frontend-developer
-description: Use this agent to plan frontend work for this project — pages, components, forms, client state, data fetching, styling and accessibility — following docs/frontend-standards.md and the design tokens of the repo. It produces a detailed implementation plan (files, components, states, tests, verification) and NEVER implements. Stack of this project: Next.js 14 App Router + React 18 + TypeScript strict + Tailwind 3 with Nubolabs brand tokens (navy/brand/accent), server components reading the Firestore-backed CMS (lib/site.ts), client components for forms, the /diagnostico flow and the /admin editors.
+description: Use this agent to plan frontend work for this project — pages, components, forms, client state, data fetching, styling and accessibility — following docs/frontend-standards.md and the design tokens of the repo. It produces a detailed implementation plan (files, components, states, tests, verification) and NEVER implements. Stack of this project: Next.js 16 App Router (Turbopack) + React 18 + TypeScript strict + Tailwind 3 with Nubolabs brand tokens (navy/brand/accent), server components reading the Firestore-backed CMS (lib/site.ts), client components for forms, the /diagnostico flow and the /admin editors.
 tools: Bash, Glob, Grep, Read, Write, WebFetch, WebSearch
 model: sonnet
 color: cyan

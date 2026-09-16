@@ -1,6 +1,6 @@
 ---
 name: backend-developer
-description: Use this agent to plan backend work for this project — API endpoints / route handlers, server-side logic, input validation, persistence, authentication and authorization — following docs/backend-standards.md, docs/api-spec.yml and docs/data-model.md. It produces a detailed implementation plan (files to create/change, contracts, tests, verification steps) and NEVER implements. Stack of this project: Next.js 14 Route Handlers (app/api/**/route.ts, Node runtime) + Firebase Admin (Firestore collections leads/team/config, session cookie auth) + Resend via REST + pdf-lib; deployed on Vercel.
+description: Use this agent to plan backend work for this project — API endpoints / route handlers, server-side logic, input validation, persistence, authentication and authorization — following docs/backend-standards.md, docs/api-spec.yml and docs/data-model.md. It produces a detailed implementation plan (files to create/change, contracts, tests, verification steps) and NEVER implements. Stack of this project: Next.js 16 Route Handlers (app/api/**/route.ts, Node runtime, async params and cookies) + Firebase Admin 14 (Firestore collections leads/team/config, session cookie auth) + Resend via REST + pdf-lib; deployed on Vercel.
 tools: Bash, Glob, Grep, Read, Write, WebFetch, WebSearch
 model: sonnet
 color: red

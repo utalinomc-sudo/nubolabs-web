@@ -1,5 +1,5 @@
 ---
-description: Estándares de frontend del sitio de Nubolabs — Next.js 14 App Router, server vs client components, CMS en Firestore (lib/site.ts), Tailwind con tokens de marca, formularios, accesibilidad, copy en español de Chile y verificación (lint, typecheck, build, E2E con Playwright MCP).
+description: Estándares de frontend del sitio de Nubolabs — Next.js 16 App Router, server vs client components, CMS en Firestore (lib/site.ts), Tailwind con tokens de marca, formularios, accesibilidad, copy en español de Chile y verificación (lint, typecheck, build, E2E con Playwright MCP).
 alwaysApply: true
 ---
 
@@ -13,14 +13,15 @@ Tres superficies: la **landing** (`/`) compuesta por secciones de `components/la
 
 | Elemento | Tecnología / versión |
 |---|---|
-| Framework | Next.js 14.2 App Router · React 18.3 |
+| Framework | Next.js 16.3 App Router con Turbopack · React 18.3 instalado (el App Router corre con el React 19.3 canary que empaqueta Next; `react` 18.3 sirve a los tests con Testing Library) |
 | Lenguaje | TypeScript 5.5 `strict`; alias `@/*` → raíz |
 | Estilos | Tailwind CSS 3.4 con tokens de marca (`tailwind.config.ts`) + primitivas en `app/globals.css` |
 | Fuentes | Plus Jakarta Sans (`--font-jakarta`, `font-sans`) e IBM Plex Mono (`--font-mono`) vía `next/font/google` en `app/layout.tsx` |
 | Estado / datos | Estado local con hooks; datos de servidor por props; mutaciones con `fetch("/api/...")` |
 | Imágenes | `next/image`; hosts remotos permitidos: `**.public.blob.vercel-storage.com` (`next.config.js`); data URLs para fotos sin Blob |
 | Tests | Vitest 4 (`npm test`): tests `*.test.ts(x)` junto al código, imports explícitos de `vitest`; para componentes, primera línea `// @vitest-environment jsdom` + Testing Library (`@testing-library/react`, matchers de jest-dom ya cargados) · E2E manual con Playwright MCP (el agente lo ejecuta) |
-| Lint / formato | ESLint `next/core-web-vitals`; sin Prettier (respetar el estilo existente: comillas dobles, punto y coma, 2 espacios) |
+| Lint / formato | ESLint 9 con flat config (`eslint.config.mjs` extiende `eslint-config-next/core-web-vitals`; `npm run lint` = `eslint .`); sin Prettier (respetar el estilo existente: comillas dobles, punto y coma, 2 espacios). Excepción documentada: `@next/next/no-html-link-for-pages` desactivada solo en `components/landing/Nav.tsx` |
+| Documentación de Next | Para APIs de Next 16 consultar `node_modules/next/dist/docs/` (documentación de la versión instalada). `AGENTS.md` y `CLAUDE.md` no reciben el bloque gestionado de `next dev` (`agentRules: false` en `next.config.js`) |
 
 ## 3. Estructura
 

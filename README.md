@@ -2,12 +2,12 @@
 
 Sitio web de Nubolabs. Primera versión: landing pública (dirección de diseño **1b · claro & azul**) + estructura de backend (Firestore para leads y panel de administración placeholder).
 
-Mismo stack que ConCar Chile: **Next.js 14 · TypeScript · Tailwind CSS · Firebase · Vercel**.
+Mismo stack que ConCar Chile: **Next.js 16 · TypeScript · Tailwind CSS · Firebase · Vercel**.
 
 ## Arquitectura
 
 ```
-Visitante ──HTTPS──▶ App Next.js 14 (Vercel) ──▶ Servicios en la nube
+Visitante ──HTTPS──▶ App Next.js 16 (Vercel) ──▶ Servicios en la nube
                      ├─ Sitio público  /            ├─ Firestore   (leads, config)
                      └─ Panel admin    /admin        ├─ Firebase Auth (login admin)
                                                       └─ Vercel Blob (imágenes, v2)
