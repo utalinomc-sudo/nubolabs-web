@@ -1,6 +1,6 @@
 # HDU — Migrar a Next 16 y firebase-admin 14 (cierre de alertas de seguridad)
 
-> Historia enriquecida el 2026-09-16 a partir del análisis del cambio `actualizar-dependencias-seguras`. Estado: **cerrada el 2026-09-16** — cambio OpenSpec archivado en `openspec/changes/archive/2026-09-16-migrar-next-16/` y mezclado a `main`. Queda la tarea 5.3 (redeploy de producción sin caché de build y login real), seguida en `docs/ESTADO-PROYECTO.md`, pendiente 11. Prioridad: alta (alerta crítica de `next`, cerrada con la migración).
+> Historia enriquecida el 2026-09-16 a partir del análisis del cambio `actualizar-dependencias-seguras`. Estado: **cerrada el 2026-09-16** — cambio OpenSpec archivado en `openspec/changes/archive/2026-09-16-migrar-next-16/` y mezclado a `main`. Tarea 5.3 cerrada el mismo día: el login de producción necesitó además fijar `jose` 5 bajo `jwks-rsa` (`a1ea8a7`, sin `require(esm)` en el runtime de Vercel); login real confirmado por el dueño (`docs/ESTADO-PROYECTO.md`, pendiente 11). Prioridad: alta (alerta crítica de `next`, cerrada con la migración).
 
 ## Original
 
