@@ -65,7 +65,7 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 
 | Aspecto | Valor |
 |---|---|
-| Unit tests | **Vitest 4** (`npm test`, entorno `node` por defecto; config en `vitest.config.mts`). Tests co-ubicados `*.test.ts(x)` con imports explícitos de `vitest`. Testing Library instalada para componentes (activar jsdom por archivo con `// @vitest-environment jsdom`). Primer test: `components/diagnostico/ahorro.test.ts` |
+| Unit tests | **Vitest 4** (`npm test`, entorno `node` por defecto; config en `vitest.config.mts`). Tests co-ubicados `*.test.ts(x)` con imports explícitos de `vitest`. Testing Library instalada para componentes (activar jsdom por archivo con `// @vitest-environment jsdom`). Tests actuales: `components/diagnostico/ahorro.test.ts` (11 casos) y `lib/privateKey.test.ts` (9 casos, normalización de `FIREBASE_PRIVATE_KEY`) |
 | E2E | Playwright MCP, ejecutado por el agente contra `npm run dev` (http://localhost:3000). El sitio corre sin credenciales de Firebase: los leads no se persisten y `/admin` queda abierto con sesión "dev" |
 | Lint / formato | ESLint 9 con flat config: `eslint.config.mjs` extiende `eslint-config-next/core-web-vitals`; `npm run lint` = `eslint .` (el comando de lint integrado en Next desapareció en la 16). Excepción documentada: `@next/next/no-html-link-for-pages` desactivada solo en `components/landing/Nav.tsx`. No hay Prettier |
 | Type check | `npx tsc --noEmit` |

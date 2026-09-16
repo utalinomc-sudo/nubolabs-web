@@ -38,3 +38,11 @@
 
 ## Resultado
 **PASS** — el preview con Next 16.3.5, ESLint 9 y firebase-admin 14.4 funciona igual que producción, incluido el login real y las operaciones del panel. Queda libre el camino para `/adversarial-review`, `/opsx:archive` y la mezcla a `main`.
+
+## Tras el merge (tarea 5.3, añadida el 2026-09-16 tras `/adversarial-review`)
+
+El primer deploy de producción desde `main` reutilizará la caché de build de los despliegues con Next 14, la misma condición sospechosa de los intentos 1.º y 2.º. Acción del dueño: redesplegar producción **sin caché de build** ("Redeploy" con "Use existing Build Cache" desmarcado), entrar en `/admin/login` con el usuario real y abrir el detalle de un lead. Si respondiera `500 Auth no configurado`, revisar el log de funciones (aviso `[firebase-admin] no se pudo cargar firebase-admin/auth`) y repetir el redeploy sin caché; el sitio público no depende de ese módulo y seguiría en pie.
+
+| Fecha | Deploy de producción | Redeploy sin caché | Login real | Detalle de lead | Resultado |
+|---|---|---|---|---|---|
+| — | — | — | — | — | **pendiente** (se completa cuando el dueño lo informe) |

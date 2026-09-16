@@ -1,6 +1,6 @@
 # HDU — Migrar a Next 16 y firebase-admin 14 (cierre de alertas de seguridad)
 
-> Historia enriquecida el 2026-09-16 a partir del análisis del cambio `actualizar-dependencias-seguras`. Estado: **implementada el 2026-09-16 (pendiente de archivar)** — cambio OpenSpec `openspec/changes/migrar-next-16/`; se cierra con `/opsx:archive` tras la validación del preview. Prioridad: alta (alerta crítica de `next` abierta).
+> Historia enriquecida el 2026-09-16 a partir del análisis del cambio `actualizar-dependencias-seguras`. Estado: **implementada el 2026-09-16 (pendiente de archivar)** — cambio OpenSpec `openspec/changes/migrar-next-16/`; se cierra con `/opsx:archive` tras la validación del preview. Prioridad: alta (alerta crítica de `next`, cerrada con la migración).
 
 ## Original
 
