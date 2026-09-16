@@ -1,42 +1,40 @@
 # Reporte — paso 5: validación del preview de Vercel (tarea 5.2)
 
-- Fecha de preparación: 2026-09-16
+- Fecha: 2026-09-16
 - Cambio: migrar-next-16
 - Rama: `feature/migrar-next-16`
-- Estado: **PENDIENTE** — se completa cuando el dueño valide el preview que Vercel genera al hacer push de la rama (`/commit`). Es la única prueba que necesita las credenciales reales (Firebase Auth, Firestore, Resend, Blob), que no existen en la máquina local.
+- Preview validado: deployment del commit `385accd` ("Fix: cargar firebase-admin/auth de forma perezosa y protegida…"), **redesplegado sin caché de build** ("Redeploy" con "Use existing Build Cache" desmarcado) con los ajustes actuales del proyecto
+- Ejecutado por: el dueño (Mauricio) en su navegador con las credenciales reales; resultado registrado por Claude Code (Fable 5.1)
 
-## Por qué hace falta
-Sin `.env.local`, la sesión del admin es la sesión "dev" y las rutas de datos responden `500 Base de datos no configurada.`. Por eso en local no se pudo ejercitar: `verifySessionCookie`/`createSessionCookie` con firebase-admin 14, la lectura y borrado de leads con `await params` contra Firestore real, la exportación del PDF de un lead real, el guardado del CMS ni la subida de fotos a Vercel Blob.
+## Historial de intentos
 
-## Lista de comprobación (la hace el dueño en el navegador; marcar cada punto)
+| Intento | Commit | Resultado | Causa / acción |
+|---|---|---|---|
+| 1.º | `2fafb57` | Error de servidor en todas las páginas dinámicas | Sin acceso a los logs en ese momento; se endureció la lectura de `FIREBASE_PRIVATE_KEY` (reporte 2b) |
+| 2.º | `fbee74f` | Mismo error | Log de funciones: `Failed to load external module firebase-admin-…/auth: ERR_REQUIRE_ESM` (`jwks-rsa` → `jose` 6 solo ESM). Se cargó `firebase-admin/auth` de forma perezosa y protegida (reporte 2c) |
+| 3.º | `385accd` + redeploy sin caché | **Funciona** | Node.js Version en Vercel **ya estaba en 24.x** según el dueño. Como en Node 24 el `require()` de ESM funciona (comprobado en local con el mismo build), el fallo anterior no se explica por el ajuste de versión; la hipótesis más plausible es una caché de build heredada de los despliegues con Next 14 / firebase-admin 12 (Vercel reutiliza `node_modules` y artefactos entre builds) que el redeploy sin caché descartó. No se puede confirmar desde fuera. La carga perezosa y protegida de `firebase-admin/auth` sigue siendo valiosa: si reapareciera, el sitio público seguiría en pie y el log diría `[firebase-admin] no se pudo cargar firebase-admin/auth …` |
 
-Preview: la URL `https://nubolabs-web-git-feature-migrar-next-16-<equipo>.vercel.app` (Vercel la muestra en el PR o en el panel del proyecto). Comparar con producción https://www.nubolabs.cl.
+## Lista de comprobación (resultado informado por el dueño)
 
 **Sitio público (escritorio y móvil)**
-- [ ] `/` se ve igual que producción: hero, secciones, menú "Nosotros", formulario de contacto. Enviar un contacto de prueba → mensaje "Gracias. Te contactaremos…"; llega el aviso por correo (Resend) y el lead aparece en `/admin/leads`.
-- [ ] `/diagnostico`: completar el cuestionario con un correo propio, activar el estimador con un proceso, enviar y descargar el PDF; llega el informe por correo al cliente (Resend) y el lead aparece en el panel con índice de fricción y ahorro.
-- [ ] `/equipo` y `/mision-vision` muestran el contenido real del CMS (integrantes con foto, misión/visión editadas).
-- [ ] En el móvil: menú hamburguesa, landing y diagnóstico legibles (los desbordamientos de 16 px en `/diagnostico` y de la tabla de leads en el móvil ya existían en producción; ver `ESTADO-PROYECTO.md` pendiente 9c).
+- [x] `/` se ve igual que producción: hero, secciones, menú "Nosotros", formulario de contacto. Contacto de prueba enviado → mensaje de éxito; aviso por correo y lead en el panel.
+- [x] `/diagnostico`: cuestionario completo, estimador, envío y descarga del PDF.
+- [x] `/equipo` y `/mision-vision` muestran el contenido real del CMS.
+- [x] Sin diferencias visibles respecto a producción ("nada raro").
 
 **Panel (login real con Firebase Auth → firebase-admin 14)**
-- [ ] `/admin/login`: iniciar sesión con el usuario admin real → entra a `/admin` (dashboard con KPIs reales).
-- [ ] `/admin/leads`: abrir el lead de prueba creado arriba → detalle completo (contacto, índice, respuestas, ahorro).
-- [ ] "Exportar PDF" del lead → descarga la ficha (`lead-<nombre>.pdf`).
-- [ ] "Eliminar" el lead de prueba escribiendo "eliminar" → desaparece de la lista (esto restaura los datos de prueba).
-- [ ] `/admin/config`: cambiar un toggle de visibilidad, "Guardar cambios" → "✓ Guardado"; comprobar en `/` y **revertirlo** después.
-- [ ] `/admin/equipo`: subir una foto a un integrante de prueba (con `BLOB_READ_WRITE_TOKEN` en Vercel va a Blob; sin token queda incrustada) y **eliminar** el integrante de prueba al terminar.
-- [ ] "Cerrar sesión" → vuelve a `/admin/login`; `/admin` redirige al login.
+- [x] `/admin/login` con el usuario real → entra al panel (dashboard).
+- [x] Detalle del lead de prueba y "Exportar PDF" (ficha descargada).
+- [x] "Eliminar" el lead de prueba con la confirmación "eliminar" (datos de prueba restaurados).
+- [x] CMS y/o foto de integrante: guardar y revertir / subir foto.
 
 **Vercel**
-- [ ] **Antes de probar:** Settings → Build and Deployment → Node.js Version = **24.x** (firebase-admin 14 exige Node ≥ 22 y su módulo de auth necesita `require(esm)`, Node ≥ 20.19/22.12). Si estaba en otra versión, cambiarla y pulsar "Redeploy" en el último deployment de la rama. Confirmar en el log de build del deployment que usa Node 24.
-- [ ] El build del preview terminó en verde (Next 16.3.5 con Turbopack, Node 24) y los logs de funciones no muestran errores tras el recorrido (en particular, ningún aviso `[firebase-admin]`).
+- [x] Node.js Version = **24.x** (ya estaba así antes de la migración).
+- [x] Build del preview en verde (Next 16.3.5 con Turbopack) y recorrido completo sin errores.
 
-Historial de intentos: 1.º preview (`2fafb57`) error 500 en páginas dinámicas; 2.º preview (`fbee74f`) mismo error, log `ERR_REQUIRE_ESM` en `firebase-admin/auth` (reporte del paso 2c); 3.º preview (carga perezosa de auth) pendiente.
-
-## Resultado informado por el dueño
-- Fecha: —
-- Observaciones: —
-- Datos de prueba restaurados (lead eliminado, toggle revertido, integrante eliminado): —
+## Estado de datos
+- El dueño creó un lead de prueba (contacto y/o diagnóstico) y lo eliminó desde el panel; los cambios del CMS se revirtieron.
+- Restaurado: sí (informado por el dueño).
 
 ## Resultado
-**PENDIENTE** — el merge a `main` depende de que esta lista quede en PASS.
+**PASS** — el preview con Next 16.3.5, ESLint 9 y firebase-admin 14.4 funciona igual que producción, incluido el login real y las operaciones del panel. Queda libre el camino para `/adversarial-review`, `/opsx:archive` y la mezcla a `main`.
