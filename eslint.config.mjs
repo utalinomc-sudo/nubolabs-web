@@ -24,5 +24,9 @@ export default defineConfig([
     ".claude/**",
     "openspec/**",
     "docs/**",
+    // Carpetas locales con punto (ESLint 9 no las ignora por defecto): worktree de línea base que crea el E2E
+    // y artefactos del navegador de Playwright MCP. Sin esto, `npm run lint` lintearía una segunda copia de la app.
+    ".worktrees/**",
+    ".playwright-mcp/**",
   ]),
 ]);
