@@ -1,6 +1,6 @@
 # Estado del proyecto — Nubolabs
 
-> Documento de contexto para retomar el trabajo (incluso desde una conversación nueva o después de mover la carpeta). Última actualización: **2026-09-16**.
+> Documento de contexto para retomar el trabajo (incluso desde una conversación nueva o después de mover la carpeta). Última actualización: **2026-10-16**.
 
 ## Resumen
 Sitio de agencia de IA & automatización. **En producción: https://nubolabs.cl** (apex 308 → www, HTTPS de Vercel).
@@ -69,6 +69,7 @@ Los secretos (`FIREBASE_PRIVATE_KEY`, `RESEND_API_KEY`, `BLOB_READ_WRITE_TOKEN`)
 13. **Alinear React de tests y runtime.** Los tests de componentes corren con `react-dom` 18.3 instalado, mientras el App Router de Next 16 ejecuta el React 19.3 canary que empaqueta Next; los tests unitarios no prueban el runtime real (lo cubren el E2E y el preview). Evaluar subir a React 19 en un cambio propio.
 
 ## Roadmap propuesto (ver `docs/Mejoras-Nubolabs.pdf`, ordenado por impacto)
+0. **Preparar la web para los prospectos de O&A** — 7 HDU en `docs/backlog/prospectos-oa.md` (mensaje para pymes, lenguaje sin jerga, formulario mínimo con consentimiento, confianza/testimonios, casos por rubro, cifras con respaldo, entrada `/oa`). **Prioridad inmediata:** la fase 1 (HDU-01, 03, 02) debe salir antes del correo de O&A (2026-10-16).
 1. **Pipeline / mini-CRM de leads** (estados + notas + tasa de conversión; el campo `status` ya se guarda pero no se usa) — *siguiente recomendado*.
 2. ~~**Informe de diagnóstico en PDF + respuesta automática al cliente**~~. ✅ **Implementado y operativo** (dominio verificado en Resend el 2026-09-15).
 3. **SEO + analítica** (hoy NO hay sitemap/robots/OpenGraph/analytics).
