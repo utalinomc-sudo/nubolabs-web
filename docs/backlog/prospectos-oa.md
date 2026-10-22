@@ -265,7 +265,7 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 **Cambio OpenSpec:** `cifras-con-respaldo` · Fase 2 · Tamaño S
 
-**Estado (2026-10-22):** implementada en la rama `feature/cifras-con-respaldo`, en preview; pendiente de aprobación y mezcla. Sección de cifras oculta hasta tener el dato real del piloto.
+**Estado (2026-10-22):** ✅ en producción; archivado en `openspec/changes/archive/2026-10-22-cifras-con-respaldo/` (spec `openspec/specs/landing/cifras/spec.md`). Sección de cifras oculta hasta tener el dato real del piloto.
 
 ### Original
 "Las cifras de ejemplo (+120h, −90%). A un dueño desconfiado, números redondos sin respaldo le suenan a humo. Cuando tengamos el resultado real del piloto de O&A, reemplazarlas por ese dato verdadero. Un número real vale más que tres inventados."

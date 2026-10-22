@@ -65,8 +65,8 @@
       "nombre": "Puesta en marcha",
       "descripcion": "Preview y aprobación de cada cambio, textos en el admin y envío del correo de O&A",
       "peso": 0.15,
-      "avance": 0.44,
-      "nota": "Sitio, dominio, Vercel, Firebase y Resend ya operan; HDU-01 cumplió su parte (publicada y hero con los textos recomendados, 30 % → 35 %); HDU-03 y HDU-02 con preview aprobado y publicadas (35 % → 40 %); HDU-10 (40 % → 42 %) y HDU-04 (42 % → 44 %) con preview aprobado y publicadas el 2026-10-22. Falta cargar los textos de HDU-02 en el admin (Servicios y Ejemplos), la URL de agenda, la validación legal de /privacidad y de la respuesta sobre datos, el testimonio autorizado de Mauricio O., el preview y la aprobación de los otros 4 cambios y enviar el correo de O&A"
+      "avance": 0.46,
+      "nota": "Sitio, dominio, Vercel, Firebase y Resend ya operan; HDU-01 cumplió su parte (publicada y hero con los textos recomendados, 30 % → 35 %); HDU-03 y HDU-02 con preview aprobado y publicadas (35 % → 40 %); HDU-10 (40 % → 42 %), HDU-04 (42 % → 44 %) y HDU-06 (44 % → 46 %) con preview aprobado y publicadas el 2026-10-22. Falta cargar los textos de HDU-02 en el admin (Servicios y Ejemplos), la URL de agenda, la validación legal de /privacidad y de la respuesta sobre datos, el testimonio autorizado de Mauricio O., la cifra real del piloto, el preview y la aprobación de los otros 3 cambios y enviar el correo de O&A"
     }
   ],
   "historias": [
@@ -135,8 +135,10 @@
       "fase": "Fase 2",
       "entrega": "Fase 2",
       "sp": 3,
-      "estado": "pendiente",
-      "nota": "Artefactos OpenSpec creados (cifras-con-respaldo)"
+      "estado": "produccion",
+      "nota": "Mezclada a main (6b28624) y publicada por el deploy automático de Vercel; sin cifras de ejemplo en www.nubolabs.cl. Sección «Cifras de resultados» oculta hasta cargar el dato real del piloto de O&A con su fuente",
+      "fecha": "2026-10-22",
+      "entregadaEn": "Fase 2"
     },
     {
       "id": "HDU-07",
