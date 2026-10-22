@@ -93,7 +93,7 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 **Cambio OpenSpec:** `lenguaje-sin-jerga` · Fase 1 · Tamaño M · Depende de HDU-01
 
-**Estado (2026-10-22):** implementada en la rama `feature/lenguaje-sin-jerga`, en preview; pendiente de aprobación y mezcla. Tras mezclar: "Usar los textos recomendados" en Servicios y Ejemplos en `/admin/config` y guardar (ver `docs/ESTADO-PROYECTO.md`). En `/diagnostico` solo cambia el encabezado; el panel de resultados ("Índice de fricción", estimador, "ahorrar automatizándolos") pasa a HDU-09.
+**Estado (2026-10-22):** ✅ en producción; archivado en `openspec/changes/archive/2026-10-22-lenguaje-sin-jerga/` (spec `openspec/specs/landing/contenido-pyme/spec.md`). Pendiente del dueño: "Usar los textos recomendados" en Servicios y Ejemplos en `/admin/config` y guardar (ver `docs/ESTADO-PROYECTO.md`). En `/diagnostico` solo cambia el encabezado; el panel de resultados ("Índice de fricción", estimador, "ahorrar automatizándolos") pasa a HDU-09.
 
 ### Original
 "Sacar o bajar el vocabulario técnico. 'n8n, Make, APIs, CRM, ERP, agentes IA conectados' es ruido para este prospecto. No borrarlo del todo (da seriedad), pero que no sea lo primero: primero el resultado en su idioma, el 'cómo' técnico abajo y en chico."
