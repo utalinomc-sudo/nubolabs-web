@@ -83,11 +83,11 @@ Con todas las secciones visibles y sin las secciones de otros cambios, la portad
 - **THEN** ve "Lo que ganas", "Servicios", "Ejemplos" y "Cómo trabajamos", y cada uno lleva a su sección de la portada
 
 ### Requirement: Textos de los Casos sin jerga
-Los textos por defecto de Casos SHALL no usar jerga: la bajada por defecto SHALL ser "Ejemplos reales de lo que dejamos funcionando en empresas como la tuya." y los títulos y descripciones por defecto MUST NOT contener las palabras prohibidas de la regla de vocabulario.
+Los textos por defecto de Casos SHALL no usar jerga: el encabezado por defecto SHALL ser el que fija la spec `landing/casos-por-rubro` (etiqueta "Ejemplos por rubro" y título "Esto es lo que dejamos funcionando en negocios como el tuyo", sin bajada), y la etiqueta, el título y los textos de los casos por defecto MUST NOT contener las palabras prohibidas de la regla de vocabulario.
 
 #### Scenario: Casos por defecto
 - **WHEN** `config/site` no tiene `content.casos`
-- **THEN** la bajada y los casos de la sección no contienen palabras prohibidas
+- **THEN** el encabezado y los casos de la sección no contienen palabras prohibidas y no se muestra bajada
 
 ### Requirement: Textos recomendados en el admin
 En `/admin/config`, cada sección editable de este cambio (¿Te suena?, Lo que ganas, Enfoque, Servicios, Casos y Proceso) SHALL ofrecer la acción "Usar los textos recomendados", que reemplaza en el formulario los textos de esa sección por los defaults vigentes sin guardar. Los cambios solo se publican al pulsar "Guardar cambios". Al guardar, el admin SHALL enviar la visibilidad y solo las secciones del contenido que cambiaron desde la carga o el último guardado; MUST NOT enviar `content.equipo`, que se edita en `/admin/equipo`.

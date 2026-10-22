@@ -222,7 +222,7 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 ## HDU-05 · Casos de uso reconocibles por rubro
 
-**Estado (2026-10-22):** implementada en la rama `feature/casos-por-rubro`, en preview; pendiente de aprobación y mezcla.
+**Estado (2026-10-22):** ✅ en producción; archivado en `openspec/changes/archive/2026-10-22-casos-por-rubro/` (spec `openspec/specs/landing/casos-por-rubro/spec.md`). Falta cargar los textos recomendados de Ejemplos en el admin para ver los 14 casos y el filtro.
 
 **Cambio OpenSpec:** `casos-por-rubro` · Fase 2 · Tamaño M · Depende de HDU-02
 
@@ -379,7 +379,7 @@ Claude crea propuesta, diseño y tareas; Mauro revisa; `/opsx:apply`; verificaci
 | HDU-02 lenguaje-sin-jerga | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-lenguaje-sin-jerga/`, spec `openspec/specs/landing/contenido-pyme/`) |
 | HDU-03 formulario-minimo-consentimiento | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-formulario-minimo-consentimiento/`, specs `openspec/specs/leads/formulario-contacto/` y `openspec/specs/sitio/privacidad/`). Revisión adversarial con su Major corregido; incluye el detalle escrito de "Otra cosa" y del rubro "Otro" (70 caracteres). Pendiente post-merge (Mauro): `NEXT_PUBLIC_SCHEDULE_URL` en Vercel cuando exista la agenda, lead de prueba (revisarlo y borrarlo) y validación legal de `/privacidad` antes del 1-dic-2026 |
 | HDU-04 confianza-recomendacion | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-confianza-recomendacion/`, spec `openspec/specs/landing/confianza/`) |
-| HDU-05 casos-por-rubro | en preview (2026-10-22): implementada en `feature/casos-por-rubro`; pendiente de aprobación y mezcla |
+| HDU-05 casos-por-rubro | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-casos-por-rubro/`, spec `openspec/specs/landing/casos-por-rubro/`) |
 | HDU-06 cifras-con-respaldo | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-cifras-con-respaldo/`, spec `openspec/specs/landing/cifras/`) |
 | HDU-07 landing-referidos-oa | en curso: artefactos OpenSpec creados (2026-10-21) |
 | HDU-09 diagnostico-mapa-oportunidades | en curso: artefactos OpenSpec creados (2026-10-21) |
