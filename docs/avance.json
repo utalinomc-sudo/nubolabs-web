@@ -65,8 +65,8 @@
       "nombre": "Puesta en marcha",
       "descripcion": "Preview y aprobación de cada cambio, textos en el admin y envío del correo de O&A",
       "peso": 0.15,
-      "avance": 0.42,
-      "nota": "Sitio, dominio, Vercel, Firebase y Resend ya operan; HDU-01 cumplió su parte (publicada y hero con los textos recomendados, 30 % → 35 %); HDU-03 y HDU-02 con preview aprobado y publicadas (35 % → 40 %); HDU-10 con preview aprobado y publicada el 2026-10-22 (40 % → 42 %). Falta cargar los textos de HDU-02 en el admin (Servicios y Ejemplos), la URL de agenda, la validación legal de /privacidad y de la respuesta sobre datos de las preguntas frecuentes, el preview y la aprobación de los otros 5 cambios y enviar el correo de O&A"
+      "avance": 0.44,
+      "nota": "Sitio, dominio, Vercel, Firebase y Resend ya operan; HDU-01 cumplió su parte (publicada y hero con los textos recomendados, 30 % → 35 %); HDU-03 y HDU-02 con preview aprobado y publicadas (35 % → 40 %); HDU-10 (40 % → 42 %) y HDU-04 (42 % → 44 %) con preview aprobado y publicadas el 2026-10-22. Falta cargar los textos de HDU-02 en el admin (Servicios y Ejemplos), la URL de agenda, la validación legal de /privacidad y de la respuesta sobre datos, el testimonio autorizado de Mauricio O., el preview y la aprobación de los otros 4 cambios y enviar el correo de O&A"
     }
   ],
   "historias": [
@@ -113,8 +113,10 @@
       "fase": "Fase 2",
       "entrega": "Fase 2",
       "sp": 5,
-      "estado": "pendiente",
-      "nota": "Artefactos OpenSpec creados (confianza-recomendacion)"
+      "estado": "produccion",
+      "nota": "Mezclada a main (e4d4a32) y publicada por el deploy automático de Vercel; bloque «Nos recomiendan» con texto puente y compromisos comprobado en www.nubolabs.cl. Sin testimonios: el de Mauricio O. se carga desde el admin cuando lo apruebe por escrito",
+      "fecha": "2026-10-22",
+      "entregadaEn": "Fase 2"
     },
     {
       "id": "HDU-05",

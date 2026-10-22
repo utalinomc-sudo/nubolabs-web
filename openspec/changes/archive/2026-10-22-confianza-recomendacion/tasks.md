@@ -45,7 +45,7 @@
 
 ## Antes de mezclar (agente, con Mauro)
 
-- [ ] M.1 Confirmar con Mauro que en la consola de Firebase `config/site.content.confianza.testimonios` no existe, está vacío o solo tiene testimonios autorizados: el preview comparte Firestore y un testimonio guardado desde ahí se publicaría al mezclar.
+- [x] M.1 Confirmar con Mauro que en la consola de Firebase `config/site.content.confianza.testimonios` no existe, está vacío o solo tiene testimonios autorizados: el preview comparte Firestore y un testimonio guardado desde ahí se publicaría al mezclar.
 
 ## Post-merge (Mauro, en producción)
 
