@@ -359,7 +359,7 @@ Claude crea propuesta, diseño y tareas; Mauro revisa; `/opsx:apply`; verificaci
 
 | HDU | Estado |
 |---|---|
-| HDU-01 mensaje-principal-pyme | en curso: implementado en `feature/mensaje-principal-pyme` (2026-10-22); lint, tipos, 37 tests, build y E2E a 1280/375 px en verde (`openspec/changes/mensaje-principal-pyme/reports/`). Falta: revisión adversaria, preview de Vercel, archivar, commit y mezcla; después, en producción, "Usar los textos recomendados" en `/admin/config` → Hero |
+| HDU-01 mensaje-principal-pyme | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-mensaje-principal-pyme/`, spec `openspec/specs/landing/hero/`). Revisión adversarial con sus 2 Major corregidos; sin "Para dueños de pymes" (decisión del mismo día). Pendiente post-merge (Mauro): `/admin/config` → Hero → "Usar los textos recomendados" → "Guardar cambios" |
 | HDU-02 lenguaje-sin-jerga | en curso: artefactos OpenSpec creados (2026-10-21) |
 | HDU-03 formulario-minimo-consentimiento | en curso: artefactos OpenSpec creados (2026-10-21) |
 | HDU-04 confianza-recomendacion | en curso: artefactos OpenSpec creados (2026-10-21) |
