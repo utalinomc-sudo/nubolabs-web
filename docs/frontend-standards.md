@@ -33,17 +33,21 @@ app/
   diagnostico/page.tsx    monta <DiagnosticoFlow />
   equipo/page.tsx         lista integrantes (getTeamMembers); notFound() si visible.equipo es false
   mision-vision/page.tsx  misión, visión y objetivos desde content.nosotros
+  privacidad/page.tsx     política de privacidad desde content.privacidad (siempre visible; texto plano en párrafos)
   admin/login/page.tsx    client: Firebase Auth → POST /api/admin/session
   admin/(panel)/layout.tsx  server: redirect a /admin/login si no hay sesión; sidebar
   admin/(panel)/{page,leads,leads/[id],config,equipo}/page.tsx
 components/
-  landing/   Nav (client), Hero, HeroPanel (client), Problem, Approach, Services, Process, UseCases, ContactForm (client), Footer
+  landing/   Nav (client), Hero, HeroPanel (client), Problem, Approach, Services, Process, UseCases, ContactForm (client, 2 pasos), ContactSuccess (client), Footer
   diagnostico/  DiagnosticoFlow.tsx (client), AhorroEstimator.tsx (client), cuestionario.ts, ahorro.ts
   admin/     ConfigEditor, TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
   Logo.tsx (Logo, LogoMark) · icons.tsx · LinkedInIcon.tsx
 lib/content.ts      textos por defecto (nav, heroFeed/heroFeedMore del panel del hero, problems, approach, services, useCases…)
 lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig(), mergeConfig(), normalizeTags(), renderHighlight()  (puro: tests y admin)
 lib/site.ts         getSiteConfig(), getTeamMembers() + re-exports de lib/siteConfig.ts  (server-only)
+lib/leadOptions.ts  GOALS, INDUSTRIES, CONSENT_TEXTS, CONSENT_VERSION y helpers  (puro: formulario, API, correo, PDF y admin)
+lib/leads.ts        normalizeLead(), validadores (correo, WhatsApp), honeypot, LEAD_SOURCES, safeScheduleUrl()  (puro)
+lib/leadSummary.ts  rubro, objetivos y novedades de un lead para el equipo (correo, ficha PDF y admin)  (puro)
 ```
 
 Regla: una sección de landing = un componente en `components/landing/`; un editor del admin = un componente en `components/admin/`; lógica pura del diagnóstico en archivos `.ts` junto a sus componentes.

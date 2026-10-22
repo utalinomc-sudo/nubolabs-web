@@ -117,3 +117,29 @@ describe("defaults del hero", () => {
     expect(forbiddenWordsIn(hero.subtitle)).toEqual([]);
   });
 });
+
+describe("privacidad (cambio formulario-minimo-consentimiento)", () => {
+  it("sin content.privacidad usa el borrador con el correo de contacto y el plazo de 30 días", () => {
+    const p = mergeConfig(defaultSiteConfig(), {}).content.privacidad;
+    expect(p.titulo).toBeTruthy();
+    expect(p.texto).toContain("mauricio.nubolabs@gmail.com");
+    expect(p.texto).toContain("30 días");
+    expect(p.texto).toContain("Firebase");
+    expect(p.texto).toContain("Resend");
+    expect(p.texto).toContain("Vercel");
+    expect(p.texto).toContain("Agencia de Protección de Datos Personales");
+  });
+
+  it("título o texto vacíos o con solo espacios caen al borrador", () => {
+    const base = defaultSiteConfig();
+    const p = mergeConfig(base, { content: { privacidad: { titulo: "  ", texto: "" } } }).content.privacidad;
+    expect(p).toEqual(base.content.privacidad);
+  });
+
+  it("un texto propio reemplaza al borrador", () => {
+    const base = defaultSiteConfig();
+    const p = mergeConfig(base, { content: { privacidad: { texto: "Texto validado por O&A." } } }).content.privacidad;
+    expect(p.texto).toBe("Texto validado por O&A.");
+    expect(p.titulo).toBe(base.content.privacidad.titulo);
+  });
+});

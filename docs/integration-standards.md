@@ -15,6 +15,7 @@ alwaysApply: true
 | Resend | Aviso de lead nuevo al equipo; informe PDF al cliente | REST `POST https://api.resend.com/emails` con `fetch` (sin SDK) | `RESEND_API_KEY`; opcionales `NOTIFY_EMAIL`, `NOTIFY_FROM`, `REPORT_FROM` | `lib/email.ts` |
 | Vercel Blob | Fotos de integrantes del equipo | SDK `@vercel/blob` (`put`) | `BLOB_READ_WRITE_TOKEN` | `app/api/admin/upload/route.ts`; fallback cliente en `components/admin/TeamEditor.tsx` |
 | Agenda externa | CTA "Agendar mi sesión" en el informe y correo | Solo URL | `SCHEDULE_URL` | `lib/report.ts`, `lib/email.ts` |
+| Agenda externa (formulario) | Botón "Elegir horario" en la pantalla de éxito del formulario de la portada | Solo URL pública, fijada en el build | `NEXT_PUBLIC_SCHEDULE_URL` (solo `http(s)://`; si falta, el éxito dice "Te escribimos en menos de 24 horas") | `app/page.tsx` → `safeScheduleUrl()` en `lib/leads.ts` → `components/landing/ContactSuccess.tsx` |
 
 Hoy **no hay webhooks entrantes ni automatizaciones (n8n/Make) conectadas**; la sección §3 fija el patrón para cuando se agreguen (están en el roadmap: aviso por WhatsApp, anti-spam).
 

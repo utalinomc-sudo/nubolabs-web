@@ -20,13 +20,22 @@ Escribe `POST /api/leads`; lee el panel (`app/admin/(panel)/leads/**`); borra `D
 |---|---|---|---|
 | `name` | string | Sí | Nombre del contacto (trim) |
 | `email` | string | Sí | Validado con regex simple |
-| `phone` | string | No (default `""`) | Teléfono |
-| `company` | string | No (default `""`) | Empresa |
-| `message` | string | No (default `""`) | Mensaje libre; en diagnósticos, resumen generado (índice, área crítica, ahorro) |
-| `source` | string | Sí (default `"landing"`) | `landing` (formulario del home) o `diagnostico` |
+| `phone` | string | Sí desde 2026-10-22 (antes opcional) | WhatsApp, 8 a 15 dígitos, máx. 30 caracteres |
+| `company` | string | No (default `""`) | Empresa (máx. 120) |
+| `message` | string | No (default `""`) | Mensaje libre del formulario (máx. 1.000); en diagnósticos, resumen generado (índice, área crítica, ahorro) |
+| `source` | string | Sí (default `"landing"`) | `landing` (formulario del home) o `diagnostico` (`LEAD_SOURCES` en `lib/leads.ts`) |
 | `status` | string | Sí (siempre `"new"` hoy) | Reservado para el pipeline/mini-CRM del roadmap |
 | `createdAt` | string ISO | Sí | Fecha de creación (servidor) |
-| `meta` | objeto | No | Solo en diagnósticos; ver §2.1 |
+| `goals` | `GoalKey[]` | No | Objetivos elegidos en el formulario (claves de `GOALS` en `lib/leadOptions.ts`); se omite si queda vacío |
+| `industry` | `IndustryKey` | No | Rubro (`gastronomia`, `automotriz`, `construccion`, `servicios`, `comercio`, `otro`) |
+| `contactConsent` | `true` | Sí en leads nuevos | Consentimiento obligatorio de contacto (Ley 21.719) |
+| `marketingConsent` | boolean | Sí en leads nuevos | Acepta recibir novedades |
+| `consentAt` | string ISO | Sí en leads nuevos | Hora del servidor al recibir el consentimiento |
+| `consentText` | `{ contact, marketing? }` | Sí en leads nuevos | Texto exacto de cada casilla aceptada (`CONSENT_TEXTS`); nunca el que manda el cliente |
+| `consentVersion` | string | Sí en leads nuevos | Versión de los textos (`CONSENT_VERSION`, hoy `2026-10-21`) |
+| `meta` | objeto | No | Solo en diagnósticos; ver §2.1. `meta.rubro` sigue guardando el texto del rubro para el informe |
+
+Los leads anteriores al 2026-10-22 no traen `goals`, `industry` ni los campos de consentimiento: todo lector los trata como opcionales (`lib/leadSummary.ts`). Los creados con el campo trampa `website` lleno no se guardan.
 
 #### 2.1 Forma de `meta` (diagnóstico)
 
@@ -69,6 +78,7 @@ Escribe `POST /api/admin/config` con `set(patch, { merge: true })`; lee `getSite
 | `content.casos` | `{ eyebrow, title, subtitle, items[] { title, body } }` | |
 | `content.nosotros` | `{ eyebrow, title, mision, vision, objetivos[] }` | Página `/mision-vision` |
 | `content.equipo` | `{ eyebrow, title, historia }` | Página `/equipo` |
+| `content.privacidad` | `{ titulo, texto }` | Página `/privacidad` (siempre visible, sin clave en `visible`). `texto` en párrafos separados por línea en blanco, mostrado como texto plano. Un campo vacío cae al borrador por defecto de `lib/siteConfig.ts` |
 
 Las secciones **Problemas, Enfoque y Proceso** solo tienen toggle de visibilidad; sus textos siguen en `lib/content.ts` (pendiente del roadmap).
 

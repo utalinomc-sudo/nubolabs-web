@@ -60,6 +60,7 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 | Resend (API REST, sin SDK) | Aviso por correo de cada lead nuevo; envío del informe PDF al cliente | `RESEND_API_KEY`; opcionales `NOTIFY_EMAIL`, `NOTIFY_FROM`, `REPORT_FROM` | Activa: avisos desde `avisos@nubolabs.cl` e informe desde `informe@nubolabs.cl`. Dominio verificado el 2026-09-15; la key pertenece a la cuenta Resend `utalinomc@gmail.com` |
 | Vercel Blob | Fotos de integrantes del equipo | `BLOB_READ_WRITE_TOKEN` | Opcional: sin token, la foto se reduce en el navegador y se incrusta como data URL en Firestore |
 | Agenda (Calendly, WhatsApp u otro) | Destino del botón "Agendar mi sesión" del informe | `SCHEDULE_URL` | Opcional (default `https://www.nubolabs.cl`) |
+| Agenda del formulario (Calendly u otra) | Botón "Elegir horario" tras enviar el formulario de la portada | `NEXT_PUBLIC_SCHEDULE_URL` (pública, se fija en el build) | Opcional: sin ella no hay botón y se dice "Te escribimos en menos de 24 horas" |
 
 ## 5. Calidad y verificación
 

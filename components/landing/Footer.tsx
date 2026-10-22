@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Logo } from "@/components/Logo";
 
 export function Footer() {
@@ -11,7 +12,11 @@ export function Footer() {
           </span>
         </div>
         <span className="text-[12.5px] text-[#93A5C4]">
-          hola@nubolabs.ai · © {new Date().getFullYear()} Nubolabs
+          {/* Enlace a la política (cambio formulario-minimo-consentimiento). El footer completo llega con HDU-10. */}
+          <Link href="/privacidad" className="text-ink-muted underline underline-offset-2 hover:text-brand">
+            Privacidad
+          </Link>{" "}
+          · hola@nubolabs.ai · © {new Date().getFullYear()} Nubolabs
         </span>
       </div>
     </footer>

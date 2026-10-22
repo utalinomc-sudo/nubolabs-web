@@ -16,7 +16,13 @@ export default async function AdminConfig() {
         <ConfigEditor
           sections={SECTIONS}
           initialVisible={visible}
-          initialContent={{ hero: content.hero, servicios: content.servicios, casos: content.casos, nosotros: content.nosotros }}
+          initialContent={{
+            hero: content.hero,
+            servicios: content.servicios,
+            casos: content.casos,
+            nosotros: content.nosotros,
+            privacidad: content.privacidad,
+          }}
         />
       </div>
     </div>

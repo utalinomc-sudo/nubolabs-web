@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getDb } from "@/lib/firebaseAdmin";
+import { leadIndustryText } from "@/lib/leadSummary";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,8 @@ interface LeadRow {
   createdAt: string;
   indice: number | null;
   ahorroMes: number | null;
+  industry: string | null; // texto del rubro (o el rubro libre de leads antiguos)
+  marketingConsent: boolean;
 }
 
 async function getLeads(): Promise<{ configured: boolean; leads: LeadRow[] }> {
@@ -32,6 +35,8 @@ async function getLeads(): Promise<{ configured: boolean; leads: LeadRow[] }> {
       createdAt: x.createdAt ?? "",
       indice: typeof meta.indiceFriccion === "number" ? meta.indiceFriccion : null,
       ahorroMes: ahorro?.totales?.mes ?? null,
+      industry: leadIndustryText({ industry: x.industry, meta }),
+      marketingConsent: x.marketingConsent === true,
     };
   });
   return { configured: true, leads };
@@ -91,17 +96,27 @@ export default async function AdminLeads() {
               ) : (
                 leads.map((l) => (
                   <tr key={l.id} className="border-b border-line/60 last:border-0">
-                    <td className="px-5 py-3 font-semibold">{l.name || "—"}</td>
+                    <td className="px-5 py-3 font-semibold">
+                      {l.name || "—"}
+                      {l.marketingConsent && (
+                        <span className="ml-2 whitespace-nowrap rounded-full bg-success-50 px-2 py-0.5 text-[10.5px] font-bold text-success-strong">
+                          Acepta novedades
+                        </span>
+                      )}
+                    </td>
                     <td className="px-5 py-3">
                       <a href={`mailto:${l.email}`} className="text-brand hover:underline">
                         {l.email}
                       </a>
                     </td>
-                    <td className="px-5 py-3 text-ink-soft">{l.company || "—"}</td>
+                    <td className="px-5 py-3 text-ink-soft">
+                      {l.company || "—"}
+                      {l.industry && <span className="block text-[12px] text-ink-muted">{l.industry}</span>}
+                    </td>
                     <td className="px-5 py-3">
                       <span
                         className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                          l.source === "diagnostico" ? "bg-[#FFEFED] text-accent" : "bg-[#EBF1FF] text-brand"
+                          l.source === "diagnostico" ? "bg-accent-50 text-accent-strong" : "bg-brand-50 text-brand"
                         }`}
                       >
                         {l.source}

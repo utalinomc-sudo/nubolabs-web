@@ -154,3 +154,10 @@ export const IconArrowRight = ({ className }: P) => (
     <path {...stroke} d="m12 5 7 7-7 7" />
   </svg>
 );
+
+export const IconArrowLeft = ({ className }: P) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <path {...stroke} d="M19 12H5" />
+    <path {...stroke} d="m12 19-7-7 7-7" />
+  </svg>
+);

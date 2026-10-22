@@ -9,7 +9,7 @@ El formulario de la portada es donde el prospecto que llega por O&A pasa de mir�
   - Paso 2 "¿Dónde te contactamos?": nombre, correo y WhatsApp obligatorios; empresa y "¿Algo que quieras contarnos antes de la llamada?" opcionales; consentimiento **obligatorio** de contacto y **opcional** de novedades (desmarcado).
   - Barra de progreso, botón "Volver", validación al salir de cada campo con errores junto al campo.
   - **Se elimina** la pregunta "¿Qué tarea te gustaría dejar de hacer a mano?" y el texto "Email corporativo".
-- **Pantalla de éxito orientada a agendar:** "¡Listo, {nombre}! Ahora elige el día y la hora." con botón "Elegir horario" a `NEXT_PUBLIC_SCHEDULE_URL` (si falta: "Te escribimos en menos de 24 horas", sin botón roto) y "Qué pasa ahora" con los objetivos elegidos.
+- **Pantalla de éxito orientada a agendar:** "¡Listo, {nombre}! Ahora elige el día y la hora." con botón "Elegir horario" a `NEXT_PUBLIC_SCHEDULE_URL`; si falta, el título pasa a "¡Listo, {nombre}! Te escribimos en menos de 24 horas." y no hay botón (ajuste del 2026-10-22) y "Qué pasa ahora" con los objetivos elegidos.
 - **Opciones compartidas** en `lib/leadOptions.ts` (sin `server-only`): `GOALS`, `INDUSTRIES`, `GoalKey`, `IndustryKey`, textos canónicos de consentimiento (`CONSENT_TEXTS`, `CONSENT_VERSION`). Las reutilizan HDU-05 (casos por rubro) y HDU-07 (referidos).
 - **Validación en el servidor** con la función pura `normalizeLead()` en `lib/leads.ts` (+ tests): exige nombre, correo válido, WhatsApp (8 a 15 dígitos) y `contactConsent: true`; descarta objetivos y rubros fuera de la lista; limita largos; acepta `source` solo de `LEAD_SOURCES` (`landing`, `diagnostico`; HDU-07 suma `oa`).
 - **Prueba del consentimiento** en cada lead: `contactConsent`, `marketingConsent`, `consentAt` (hora del servidor), `consentText` (texto exacto mostrado, tomado de las constantes del servidor) y `consentVersion`.
@@ -41,7 +41,7 @@ El formulario de la portada es donde el prospecto que llega por O&A pasa de mir�
 
 #### Scenario: Lead mínimo y agenda
 - **WHEN** un visitante salta el paso 1, completa nombre, correo y WhatsApp válidos, marca el consentimiento de contacto y envía
-- **THEN** el lead se guarda con `contactConsent: true`, `marketingConsent: false`, `consentAt` y `consentText`, llega el aviso por correo y la pantalla de éxito ofrece "Elegir horario"
+- **THEN** el lead se guarda con `contactConsent: true`, `marketingConsent: false`, `consentAt` y `consentText`, llega el aviso por correo y la pantalla de éxito ofrece "Elegir horario" (si la agenda está configurada)
 
 #### Scenario: Sin consentimiento
 - **WHEN** el visitante intenta enviar sin marcar el consentimiento de contacto

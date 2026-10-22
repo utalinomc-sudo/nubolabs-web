@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { getDb } from "@/lib/firebaseAdmin";
 import { DeleteLeadButton } from "@/components/admin/DeleteLeadButton";
 import { LeadPdfButton } from "@/components/admin/LeadPdfButton";
+import { goalLabel } from "@/lib/leadOptions";
+import { formatConsentDate, leadIndustryText, leadMarketingText } from "@/lib/leadSummary";
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +82,14 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
   const abiertas = (meta.abiertas as { pregunta: string; respuesta: string }[] | undefined) ?? [];
   const ahorro = meta.ahorro as AhorroMeta | null | undefined;
   const indice = typeof meta.indiceFriccion === "number" ? meta.indiceFriccion : null;
+  // Datos del formulario nuevo (cambio formulario-minimo-consentimiento). Los leads antiguos no los traen.
+  const isDiag = lead.source === "diagnostico";
+  const industry = leadIndustryText({ industry: lead.industry, meta });
+  const goals = (Array.isArray(lead.goals) ? lead.goals : []).map(goalLabel).filter((g): g is string => !!g);
+  const formMessage = !isDiag && typeof lead.message === "string" && lead.message.trim() ? lead.message : null;
+  const marketing = leadMarketingText(lead);
+  const consentAt = formatConsentDate(lead.consentAt);
+  const hasConsent = lead.contactConsent === true;
   const createdAt = lead.createdAt
     ? new Date(String(lead.createdAt)).toLocaleString("es-CL", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Santiago" })
     : "—";
@@ -101,7 +111,7 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
         <h1 className="text-2xl font-extrabold tracking-[-0.5px]">{String(lead.name || "—")}</h1>
         <span
           className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-            lead.source === "diagnostico" ? "bg-[#FFEFED] text-accent" : "bg-[#EBF1FF] text-brand"
+            isDiag ? "bg-accent-50 text-accent-strong" : "bg-brand-50 text-brand"
           }`}
         >
           {String(lead.source ?? "landing")}
@@ -117,9 +127,48 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
           </span>
         ) : null}
         {lead.company ? <span>{String(lead.company)}</span> : null}
-        {meta.rubro ? <span>{String(meta.rubro)}</span> : null}
+        {industry ? <span>{industry}</span> : null}
         <span className="text-ink-muted">{createdAt}</span>
       </div>
+
+      {/* Lo que quiere lograr */}
+      {(goals.length > 0 || industry || formMessage) && (
+        <div className="mt-6 card p-6">
+          <h2 className="font-bold">Lo que quiere lograr</h2>
+          {goals.length > 0 && (
+            <ul className="mt-3 flex flex-wrap gap-2">
+              {goals.map((g) => (
+                <li key={g} className="rounded-full bg-brand-50 px-3 py-1 text-[12.5px] font-semibold text-brand">
+                  {g}
+                </li>
+              ))}
+            </ul>
+          )}
+          {industry && (
+            <p className="mt-3 text-sm text-ink-soft">
+              <span className="font-semibold text-ink">Rubro:</span> {industry}
+            </p>
+          )}
+          {formMessage && (
+            <blockquote className="mt-4 rounded-r-xl border-l-[3px] border-brand bg-surface-soft px-4 py-3 text-sm text-ink-soft">
+              <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-ink-muted">Lo que nos contó</span>
+              <span className="whitespace-pre-wrap">{formMessage}</span>
+            </blockquote>
+          )}
+        </div>
+      )}
+
+      {/* Consentimientos (Ley 21.719) */}
+      {(hasConsent || marketing) && (
+        <div className="mt-6 card p-6">
+          <h2 className="font-bold">Consentimientos</h2>
+          <dl className="mt-3 grid gap-4 sm:grid-cols-3">
+            <Campo k="Contacto" v={hasConsent ? `✓ Aceptado${consentAt ? ` · ${consentAt}` : ""}` : "—"} />
+            <Campo k="Novedades" v={marketing ?? "—"} />
+            <Campo k="Versión del texto" v={typeof lead.consentVersion === "string" ? lead.consentVersion : "—"} />
+          </dl>
+        </div>
+      )}
 
       {/* Índice de fricción */}
       {indice !== null && (
@@ -159,7 +208,7 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
                     <span className="text-ink-soft">{r.pregunta}</span>
                     <span
                       className={`whitespace-nowrap rounded-md px-2 py-0.5 text-[11px] font-semibold ${
-                        (r.valor ?? 0) >= 4 ? "bg-[#FFEFED] text-accent" : "bg-surface-muted text-ink-soft"
+                        (r.valor ?? 0) >= 4 ? "bg-accent-50 text-accent-strong" : "bg-surface-muted text-ink-soft"
                       }`}
                     >
                       {r.valor ?? "—"} · {ESCALA_LBL[r.valor ?? 0] ?? ""}
@@ -256,8 +305,8 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
         <p className="mt-6 text-sm text-ink-muted">El cliente no agregó el paso opcional de estimación de ahorro.</p>
       ) : null}
 
-      {/* Mensaje crudo (para leads simples de la landing) */}
-      {lead.message && areas.length === 0 ? (
+      {/* Mensaje de diagnósticos sin áreas (los del formulario se muestran en "Lo que quiere lograr") */}
+      {lead.message && isDiag && areas.length === 0 ? (
         <div className="mt-6 card p-5">
           <h2 className="mb-2 font-bold">Mensaje</h2>
           <p className="whitespace-pre-wrap text-sm text-ink-soft">{String(lead.message)}</p>

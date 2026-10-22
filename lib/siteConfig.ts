@@ -25,6 +25,8 @@ export interface SiteContent {
   casos: { eyebrow: string; title: string; subtitle: string; items: CaseItem[] };
   nosotros: { eyebrow: string; title: string; mision: string; vision: string; objetivos: string[] };
   equipo: { eyebrow: string; title: string; historia: string };
+  // Página /privacidad (cambio formulario-minimo-consentimiento, design.md decisión 6). Párrafos separados por línea en blanco.
+  privacidad: { titulo: string; texto: string };
 }
 export interface SiteConfig {
   visible: Record<string, boolean>;
@@ -43,6 +45,19 @@ export const SECTIONS: { key: string; label: string; hint: string }[] = [
   { key: "equipo", label: "Nuestro equipo (página)", hint: "Página /equipo y su link en el menú" },
   { key: "contacto", label: "Contacto", hint: "Formulario de contacto del home" },
 ];
+
+// Borrador de la política de privacidad (Ley 21.719). Lo valida O&A o un abogado antes del 1-dic-2026;
+// mientras tanto se edita desde /admin/config → Privacidad.
+const PRIVACY_DRAFT = [
+  "Esta página explica cómo Nubolabs cuida los datos que nos entregas en nubolabs.cl. Es un borrador en revisión legal.",
+  "Responsable. Nubolabs es responsable del tratamiento de tus datos. Para cualquier consulta sobre privacidad, escríbenos a mauricio.nubolabs@gmail.com.",
+  "Qué datos guardamos. Tu nombre, correo, WhatsApp, empresa, rubro, lo que quieres lograr y el mensaje que nos dejes. Si haces el diagnóstico, también tus respuestas.",
+  "Para qué los usamos. Para responder tu solicitud y coordinar tu diagnóstico. Solo te enviaremos ideas y novedades si marcas esa casilla.",
+  "Quién más los trata. El sitio está alojado en Vercel, guardamos los datos en Google Firebase y enviamos los correos con Resend. Los tres tienen servidores fuera de Chile, así que tus datos se transfieren al extranjero para prestar el servicio.",
+  "Cuánto tiempo los guardamos. Hasta 24 meses desde nuestro último contacto, o antes si nos pides borrarlos.",
+  "Tus derechos. Puedes pedir acceso a tus datos, rectificarlos, suprimirlos, oponerte a su uso, pedir su portabilidad o su bloqueo. Escríbenos a mauricio.nubolabs@gmail.com y te respondemos en un plazo máximo de 30 días corridos. Si no quedas conforme con la respuesta, puedes reclamar ante la Agencia de Protección de Datos Personales.",
+  "Novedades. Si aceptaste recibir novedades, puedes retirar ese consentimiento cuando quieras escribiéndonos al mismo correo.",
+].join("\n\n");
 
 // ── Defaults (fallback si Firestore no tiene overrides) ──────────────
 export function defaultSiteConfig(): SiteConfig {
@@ -91,6 +106,10 @@ export function defaultSiteConfig(): SiteConfig {
         title: "Las personas detrás de Nubolabs",
         historia:
           "Somos un equipo que combina rediseño de procesos, ingeniería e inteligencia artificial. Nos obsesiona que la tecnología resuelva problemas reales de operación: menos tareas manuales, menos errores y más tiempo para lo que importa.",
+      },
+      privacidad: {
+        titulo: "Cómo cuidamos tus datos",
+        texto: PRIVACY_DRAFT,
       },
     },
   };
@@ -150,6 +169,11 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
         objetivos: c.nosotros?.objetivos ?? base.content.nosotros.objetivos,
       },
       equipo: { ...base.content.equipo, ...(c.equipo ?? {}) },
+      // Un título o texto vacío cae al borrador, para no publicar una página en blanco.
+      privacidad: {
+        titulo: pickText(asRecord(c.privacidad).titulo, base.content.privacidad.titulo),
+        texto: pickText(asRecord(c.privacidad).texto, base.content.privacidad.texto),
+      },
     },
   };
 }

@@ -1,4 +1,5 @@
 import "server-only";
+import { leadSummaryRows } from "@/lib/leadSummary";
 
 interface LeadEmail {
   id?: string;
@@ -8,6 +9,11 @@ interface LeadEmail {
   company?: string;
   source?: string;
   message?: string;
+  // Desde formulario-minimo-consentimiento (opcionales para no romper leads antiguos).
+  goals?: string[];
+  industry?: string;
+  marketingConsent?: boolean;
+  consentAt?: string;
 }
 
 function escapeHtml(s: string) {
@@ -81,8 +87,9 @@ export async function sendLeadNotification(lead: LeadEmail): Promise<EmailResult
   const rows: [string, string | undefined][] = [
     ["Nombre", lead.name],
     ["Email", lead.email],
-    ["Teléfono", lead.phone],
+    ["WhatsApp", lead.phone],
     ["Empresa", lead.company],
+    ...leadSummaryRows(lead), // Rubro, Quiere lograr, Novedades (solo si hay dato)
     ["Origen", lead.source],
   ];
   const rowsHtml = rows

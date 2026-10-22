@@ -7,6 +7,7 @@ import { Process } from "@/components/landing/Process";
 import { UseCases } from "@/components/landing/UseCases";
 import { ContactForm } from "@/components/landing/ContactForm";
 import { Footer } from "@/components/landing/Footer";
+import { safeScheduleUrl } from "@/lib/leads";
 import { getSiteConfig } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,7 @@ export default async function HomePage() {
         {visible.servicios && <Services content={content.servicios} />}
         {visible.proceso && <Process />}
         {visible.casos && <UseCases content={content.casos} />}
-        {visible.contacto && <ContactForm />}
+        {visible.contacto && <ContactForm scheduleUrl={safeScheduleUrl(process.env.NEXT_PUBLIC_SCHEDULE_URL)} />}
       </main>
       <Footer />
     </>

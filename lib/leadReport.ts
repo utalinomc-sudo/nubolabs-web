@@ -1,5 +1,7 @@
 import "server-only";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import { formatConsentDate, leadGoalsText, leadIndustryText, leadMarketingText } from "@/lib/leadSummary";
+import { winAnsiDeep } from "@/lib/pdfText";
 
 // Informe interno (admin): ficha completa de un lead de diagnóstico.
 // Incluye contacto, índice de fricción, TODAS las preguntas con su respuesta,
@@ -61,11 +63,18 @@ export interface LeadRecord {
   message?: unknown;
   createdAt?: unknown;
   meta?: Record<string, unknown> | null;
+  // Desde formulario-minimo-consentimiento (ausentes en leads antiguos).
+  goals?: unknown;
+  industry?: unknown;
+  marketingConsent?: unknown;
+  consentAt?: unknown;
 }
 
 const s = (v: unknown) => (v == null ? "" : String(v));
 
-export async function buildLeadDetailPdf(lead: LeadRecord): Promise<Uint8Array> {
+export async function buildLeadDetailPdf(rawLead: LeadRecord): Promise<Uint8Array> {
+  // Helvetica solo dibuja WinAnsi: emojis o flechas en datos del cliente harían fallar el PDF completo.
+  const lead = winAnsiDeep(rawLead);
   const meta = (lead.meta ?? {}) as Record<string, unknown>;
   const areas = (meta.areas as AreaMeta[] | undefined) ?? [];
   const abiertas = ((meta.abiertas as { pregunta: string; respuesta: string }[] | undefined) ?? []).filter(
@@ -170,14 +179,17 @@ export async function buildLeadDetailPdf(lead: LeadRecord): Promise<Uint8Array> 
   text(page, src.toUpperCase(), M + CW - tagW + 9, y + 2, 9, bold, isDiag ? C.orange : C.blue);
   y -= 30;
 
+  const marketing = leadMarketingText(lead);
+  const consentDate = formatConsentDate(lead.consentAt);
   const fields: [string, string][] = [
     ["Email", s(lead.email) || "—"],
-    ["Teléfono", s(lead.phone) || "—"],
+    ["WhatsApp", s(lead.phone) || "—"],
     ["Empresa", s(lead.company) || "—"],
-    ["Rubro", s(meta.rubro) || "—"],
+    ["Rubro", leadIndustryText({ industry: lead.industry, meta }) || "—"],
     ["Recibido", createdAt],
     ["ID", s(lead.id) || "—"],
   ];
+  if (marketing) fields.push(["Novedades", consentDate ? `${marketing} (${consentDate})` : marketing]);
   const colW = CW / 3;
   for (let i = 0; i < fields.length; i += 3) {
     ensure(34);
@@ -191,6 +203,20 @@ export async function buildLeadDetailPdf(lead: LeadRecord): Promise<Uint8Array> 
     y -= 38;
   }
   y -= 4;
+
+  // Lo que quiere lograr (objetivos del formulario), a ancho completo.
+  const goals = leadGoalsText(lead);
+  if (goals) {
+    ensure(34);
+    text(page, "QUIERE LOGRAR", M, y, 8, bold, C.faint);
+    y -= 14;
+    for (const l of wrap(goals, font, 10.5, CW)) {
+      ensure(14);
+      text(page, l, M, y, 10.5, font, C.ink);
+      y -= 14;
+    }
+    y -= 10;
+  }
 
   const sectionTitle = (title: string) => {
     ensure(30);
@@ -358,9 +384,11 @@ export async function buildLeadDetailPdf(lead: LeadRecord): Promise<Uint8Array> 
     y -= 18;
   }
 
-  // ── Mensaje crudo (leads de landing) ──────────────────────────────────
+  // ── Mensaje del prospecto ─────────────────────────────────────────────
+  // En leads del formulario es lo que escribió la persona. En los del diagnóstico es un resumen automático
+  // que ya está en las áreas, así que solo se imprime si no hay áreas.
   const message = s(lead.message);
-  if (message && areas.length === 0) {
+  if (message && (!isDiag || areas.length === 0)) {
     sectionTitle("MENSAJE");
     const ml = wrap(message, font, 10.5, CW);
     ml.forEach((l) => {

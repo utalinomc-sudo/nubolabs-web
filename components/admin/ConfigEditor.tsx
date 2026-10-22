@@ -4,7 +4,7 @@ import { useState } from "react";
 import { defaultSiteConfig, type CaseItem, type ServiceItem, type SiteContent } from "@/lib/siteConfig";
 
 // Secciones que edita esta pantalla (los tipos vienen de lib/siteConfig.ts, sin duplicarlos).
-type Content = Pick<SiteContent, "hero" | "servicios" | "casos" | "nosotros">;
+type Content = Pick<SiteContent, "hero" | "servicios" | "casos" | "nosotros" | "privacidad">;
 type HeroTextKey = Exclude<keyof Content["hero"], "tags">;
 
 const HERO_TAG_SLOTS = 3;
@@ -15,18 +15,24 @@ interface Props {
   initialContent: Content;
 }
 
-function Field({ label, value, onChange, hint, textarea }: {
+function Field({ label, value, onChange, hint, textarea, rows = 3 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   hint?: string;
   textarea?: boolean;
+  rows?: number;
 }) {
   return (
     <label className="block">
       <span className="text-[13px] font-semibold text-ink-soft">{label}</span>
       {textarea ? (
-        <textarea className="field mt-1.5 resize-none" rows={3} value={value} onChange={(e) => onChange(e.target.value)} />
+        <textarea
+          className={`field mt-1.5 ${rows > 3 ? "resize-y" : "resize-none"}`}
+          rows={rows}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        />
       ) : (
         <input className="field mt-1.5" value={value} onChange={(e) => onChange(e.target.value)} />
       )}
@@ -41,6 +47,16 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
   const [status, setStatus] = useState<"idle" | "saving" | "ok" | "error">("idle");
   const [error, setError] = useState("");
   const [heroReset, setHeroReset] = useState(false);
+  const [privacyReset, setPrivacyReset] = useState(false);
+
+  function setPrivacidad(k: "titulo" | "texto", v: string) {
+    setContent((c) => ({ ...c, privacidad: { ...c.privacidad, [k]: v } }));
+  }
+  // Carga el borrador de privacidad sin guardar (cambio formulario-minimo-consentimiento, design.md decisión 6).
+  function loadRecommendedPrivacy() {
+    setContent((c) => ({ ...c, privacidad: defaultSiteConfig().content.privacidad }));
+    setPrivacyReset(true);
+  }
 
   function setHero(k: HeroTextKey, v: string) {
     setContent((c) => ({ ...c, hero: { ...c.hero, [k]: v } }));
@@ -101,6 +117,7 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
       if (!res.ok) throw new Error();
       setStatus("ok");
       setHeroReset(false); // el aviso de "textos recomendados cargados" ya no aplica tras guardar
+      setPrivacyReset(false);
       setTimeout(() => setStatus("idle"), 2500);
     } catch {
       setStatus("error");
@@ -310,6 +327,40 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
               </button>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Privacidad (página /privacidad, siempre visible) */}
+      <section className="card p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-extrabold">Privacidad</h2>
+          <button
+            type="button"
+            onClick={loadRecommendedPrivacy}
+            className="rounded-lg border border-line-strong px-3 py-2 text-[13px] font-semibold text-ink-soft transition hover:border-brand hover:text-brand"
+          >
+            Usar los textos recomendados
+          </button>
+        </div>
+        <p className="mt-1 text-sm text-ink-muted">
+          Se muestra en <b>/privacidad</b> y se enlaza desde los formularios. Es un borrador: debe validarlo O&amp;A o un abogado
+          antes del 1-dic-2026.
+        </p>
+        {privacyReset && (
+          <p role="status" className="mt-2 text-[12px] font-semibold text-brand">
+            Borrador recomendado cargado. Revísalo y pulsa “Guardar cambios” para publicarlo.
+          </p>
+        )}
+        <div className="mt-4 space-y-4">
+          <Field label="Título" value={content.privacidad.titulo} onChange={(v) => setPrivacidad("titulo", v)} />
+          <Field
+            label="Texto"
+            value={content.privacidad.texto}
+            onChange={(v) => setPrivacidad("texto", v)}
+            textarea
+            rows={14}
+            hint="Separa los párrafos con una línea en blanco. Se muestra como texto (sin HTML). Si lo dejas vacío, se publica el borrador."
+          />
         </div>
       </section>
 

@@ -1,4 +1,5 @@
 import "server-only";
+import { winAnsiDeep } from "@/lib/pdfText";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 
 // ── Marca ────────────────────────────────────────────────────────────────
@@ -137,7 +138,9 @@ function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): 
 }
 
 // ── Generación del PDF ─────────────────────────────────────────────────────
-export async function buildReportPdf(data: ReportData): Promise<Uint8Array> {
+export async function buildReportPdf(rawData: ReportData): Promise<Uint8Array> {
+  // Helvetica solo dibuja WinAnsi: emojis o flechas en nombre o respuestas harían fallar el informe completo.
+  const data = winAnsiDeep(rawData);
   const doc = await PDFDocument.create();
   doc.setTitle("Informe de diagnóstico operativo — Nubolabs");
   doc.setAuthor("Nubolabs");

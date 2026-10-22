@@ -121,3 +121,76 @@ export const metrics = [
   { value: "minutos", label: "donde antes había días de reportería" },
   { value: "−90%", label: "de error en tareas repetitivas" },
 ];
+
+// ── Sección de contacto: formulario de 2 pasos (cambio formulario-minimo-consentimiento, design.md decisión 4) ──
+// Textos fijos (no CMS en este cambio). Las opciones y los textos de consentimiento viven en lib/leadOptions.ts.
+export const contactSection = {
+  eyebrow: "AGENDA TU DIAGNÓSTICO",
+  title: "Conversemos 30 minutos sobre tu negocio",
+  lead: "Sin costo, por videollamada y sin compromiso. Si no te podemos ayudar, te lo decimos.",
+  takeaways: [
+    {
+      icon: "search",
+      title: "Tus oportunidades principales",
+      body: "Dónde está lo que más te frena y lo que más te conviene.",
+    },
+    { icon: "file", title: "Por dónde partir y cuánto cuesta", body: "Una recomendación concreta, sin compromiso." },
+    { icon: "users", title: "No necesitas saber de tecnología", body: "Tú hablas de tu negocio; lo técnico es tarea nuestra." },
+  ],
+  progress: (step: 1 | 2) => `Paso ${step} de 2`,
+  step1: {
+    legend: "¿Qué te gustaría lograr?",
+    hint: "Elige todas las que quieras. Así preparamos la conversación para ti.",
+    goalsLabel: "Objetivos",
+    industryLabel: "¿En qué rubro está tu negocio?",
+    skip: "Saltar este paso",
+    next: "Siguiente",
+  },
+  step2: {
+    legend: "¿Dónde te contactamos?",
+    hint: "Te escribimos solo para coordinar tu diagnóstico.",
+    labels: {
+      name: "Nombre",
+      phone: "WhatsApp",
+      email: "Correo",
+      company: "Empresa",
+      message: "¿Algo que quieras contarnos antes de la llamada?",
+    },
+    optional: "(opcional)",
+    placeholders: {
+      phone: "+56 9 1234 5678",
+      email: "tu@empresa.cl",
+      message: "Ej.: las cotizaciones se nos acumulan y perdemos clientes",
+    },
+    privacyLink: "Cómo cuidamos tus datos",
+    back: "Volver",
+    submit: "Agendar mi diagnóstico gratis",
+    sending: "Enviando…",
+    note: "30 minutos · por videollamada · sin compromiso",
+  },
+  errors: {
+    name: "Escribe tu nombre para saber cómo llamarte.",
+    phone: "Revisa el WhatsApp: debe tener entre 8 y 15 dígitos.",
+    email: "Revisa el correo: falta la @ o el dominio (ej.: tu@empresa.cl).",
+    consent: "Necesitamos tu permiso para contactarte sobre el diagnóstico.",
+    server: "No pudimos enviar tu solicitud. Intenta de nuevo.",
+  },
+  success: {
+    // Con agenda configurada se invita a elegir horario; sin agenda, escribimos nosotros (spec, "Agenda inmediata").
+    withSchedule: {
+      title: (name: string) => `¡Listo, ${name}! Ahora elige el día y la hora.`,
+      body: "Tu diagnóstico gratuito ya está pedido. Elige el horario que más te acomode.",
+      button: "Elegir horario",
+      steps: ["Eliges el horario (toma 1 minuto).", "Te llega la confirmación por correo."],
+    },
+    withoutSchedule: {
+      title: (name: string) => `¡Listo, ${name}! Te escribimos en menos de 24 horas.`,
+      body: "Tu diagnóstico gratuito ya está pedido. Te contactamos por WhatsApp o correo para coordinar el día y la hora.",
+      steps: ["Te escribimos en menos de 24 horas.", "Coordinamos el día y la hora que te acomode."],
+    },
+    nextTitle: "Qué pasa ahora",
+    topic: (goals: string | null) =>
+      goals ? `Conversamos 30 minutos sobre cómo ${goals}.` : "Conversamos 30 minutos sobre lo que quieres lograr.",
+    selfDiagnosis: "Mientras tanto, haz el autodiagnóstico de 5 minutos →",
+  },
+} as const;

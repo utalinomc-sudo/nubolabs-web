@@ -23,7 +23,7 @@ El paso 1 SHALL ofrecer como opciones de selección múltiple los objetivos "Ven
 - **THEN** quedan seleccionados los dos objetivos y solo el rubro "Construcción"
 
 ### Requirement: Datos de contacto y validación en el navegador
-El paso 2 SHALL pedir con etiqueta visible: Nombre (obligatorio), WhatsApp (obligatorio), Correo (obligatorio), Empresa (opcional) y "¿Algo que quieras contarnos antes de la llamada?" (opcional, máximo 1.000 caracteres). Los obligatorios SHALL marcarse como tales. Cada campo obligatorio SHALL validarse al salir de él: nombre no vacío; correo con formato `algo@dominio.ext`; WhatsApp con 8 a 15 dígitos. Un campo inválido SHALL mostrar un mensaje específico junto al campo, asociado al campo para lectores de pantalla. Al enviar con errores, el foco SHALL ir al primer campo inválido y no se SHALL enviar nada.
+El paso 2 SHALL pedir con etiqueta visible: Nombre (obligatorio), WhatsApp (obligatorio), Correo (obligatorio), Empresa (opcional) y "¿Algo que quieras contarnos antes de la llamada?" (opcional, máximo 1.000 caracteres). Los obligatorios SHALL marcarse como tales. Cada campo obligatorio con texto SHALL validarse al salir de él: nombre no vacío; correo con formato `algo@dominio.ext`; WhatsApp con 8 a 15 dígitos. Un campo obligatorio vacío SHALL marcarse al intentar enviar (no al salir de él, para no mostrar errores antes de que la persona escriba). Los campos SHALL limitar su largo igual que el servidor (nombre y empresa 120, correo 254, WhatsApp 30, mensaje 1.000) y todo valor que el navegador acepte MUST ser aceptado también por el servidor. Un campo inválido SHALL mostrar un mensaje específico junto al campo, asociado al campo para lectores de pantalla. Al enviar con errores, el foco SHALL ir al primer campo inválido y no se SHALL enviar nada.
 
 #### Scenario: Correo mal escrito
 - **WHEN** el visitante escribe "carolina@tallerrojas" y sale del campo
@@ -45,14 +45,14 @@ El paso 2 SHALL mostrar dos casillas desmarcadas por defecto: (1) obligatoria, "
 - **THEN** el lead queda con `marketingConsent: false`
 
 ### Requirement: Envío y estados del formulario
-Al enviar, el botón SHALL deshabilitarse y mostrar "Enviando…". Si la API responde error, el formulario SHALL mostrar el mensaje `error` de la respuesta (o "No pudimos enviar tu solicitud. Intenta de nuevo.") y conservar lo escrito. Si responde OK, SHALL reemplazarse por la pantalla de éxito.
+Al enviar, el botón SHALL deshabilitarse y mostrar "Enviando…". Si la API responde error con `{ error }`, el formulario SHALL mostrar ese mensaje; ante cualquier otro fallo (sin respuesta legible o sin red) SHALL mostrar "No pudimos enviar tu solicitud. Intenta de nuevo." y MUST NOT mostrar mensajes técnicos del navegador. En ambos casos SHALL conservar lo escrito. Si responde OK, SHALL reemplazarse por la pantalla de éxito.
 
 #### Scenario: Error del servidor
 - **WHEN** `POST /api/leads` responde 500 con `{ error: "No se pudo guardar la solicitud. Intenta de nuevo." }`
 - **THEN** el visitante ve ese mensaje, el botón vuelve a habilitarse y sus datos siguen escritos
 
 ### Requirement: Agenda inmediata tras el envío
-La pantalla de éxito SHALL decir "¡Listo, {primer nombre}! Ahora elige el día y la hora." Si la URL de agenda está configurada, SHALL mostrar un botón "Elegir horario" que la abre en una pestaña nueva; si no lo está, MUST NOT mostrar ese botón y SHALL decir "Te escribimos en menos de 24 horas". SHALL listar "Qué pasa ahora" en 3 pasos, donde el tercero es "Conversamos 30 minutos sobre cómo {objetivos elegidos en minúscula, unidos con comas e "y"}." o, sin objetivos (o solo "Otra cosa"), "Conversamos 30 minutos sobre lo que quieres lograr.". SHALL ofrecer además el enlace al autodiagnóstico de `/diagnostico`.
+Si la URL de agenda está configurada, la pantalla de éxito SHALL decir "¡Listo, {primer nombre}! Ahora elige el día y la hora." y mostrar un botón "Elegir horario" que la abre en una pestaña nueva. Si no lo está, MUST NOT mostrar ese botón ni pedir que elija un horario, y SHALL decir "¡Listo, {primer nombre}! Te escribimos en menos de 24 horas." (ajuste del 2026-10-22: sin agenda no hay horario que elegir). SHALL listar "Qué pasa ahora" en 3 pasos, donde el tercero es "Conversamos 30 minutos sobre cómo {objetivos elegidos en minúscula, unidos con comas e "y"}." o, sin objetivos (o solo "Otra cosa"), "Conversamos 30 minutos sobre lo que quieres lograr.". SHALL ofrecer además el enlace al autodiagnóstico de `/diagnostico`.
 
 #### Scenario: Con URL de agenda y objetivos
 - **WHEN** la URL de agenda está configurada y el visitante eligió "Vender más" y "Cobrar a tiempo"
@@ -63,7 +63,7 @@ La pantalla de éxito SHALL decir "¡Listo, {primer nombre}! Ahora elige el día
 - **THEN** no hay botón de agenda y se lee "Te escribimos en menos de 24 horas"
 
 ### Requirement: Validación y normalización en el servidor
-`POST /api/leads` SHALL responder 400 con `{ error }` en español cuando: el cuerpo no es JSON ("JSON inválido."); falta el nombre o el correo, o el correo es inválido; el WhatsApp (`phone`) no tiene entre 8 y 15 dígitos; o `contactConsent` no es exactamente `true` ("Necesitamos tu permiso para contactarte."). SHALL recortar espacios y limitar largos (nombre y empresa 120 caracteres, teléfono 30, mensaje 1.000). SHALL conservar en `goals` solo claves válidas sin repetir y guardar `industry` solo si es una clave válida; los valores desconocidos MUST ser ignorados sin error. `source` SHALL aceptarse solo si pertenece a la lista de orígenes permitidos (`landing`, `diagnostico`); en otro caso SHALL guardarse `landing`.
+`POST /api/leads` SHALL responder 400 con `{ error }` en español cuando: el cuerpo no es JSON ("JSON inválido."); falta el nombre o el correo, o el correo es inválido; el WhatsApp (`phone`) no tiene entre 8 y 15 dígitos; o `contactConsent` no es exactamente `true` ("Necesitamos tu permiso para contactarte."). SHALL recortar espacios y limitar largos (nombre y empresa 120 caracteres, mensaje 1.000). El correo (más de 254) y el WhatsApp (más de 30 caracteres) MUST validarse sobre el texto completo y rechazarse si exceden el largo, nunca guardarse recortados. `meta` SHALL aceptarse solo en leads con `source: "diagnostico"` y hasta 64 KB serializado; si excede, la respuesta SHALL ser 400. SHALL conservar en `goals` solo claves válidas sin repetir y guardar `industry` solo si es una clave válida; los valores desconocidos MUST ser ignorados sin error. `source` SHALL aceptarse solo si pertenece a la lista de orígenes permitidos (`landing`, `diagnostico`); en otro caso SHALL guardarse `landing`.
 
 #### Scenario: Objetivos y rubro inválidos
 - **WHEN** llega un lead válido con `goals: ["sell_more", "hackear", "sell_more"]` e `industry: "mineria"`
@@ -92,7 +92,7 @@ El formulario SHALL incluir un campo trampa invisible para personas (fuera de pa
 - **THEN** la respuesta es 200, no se crea documento en `leads` y no sale correo
 
 ### Requirement: Consentimiento y WhatsApp en el diagnóstico
-El paso de contacto de `/diagnostico` SHALL pedir WhatsApp como obligatorio, ofrecer el rubro como selector con la misma lista de rubros y mostrar las mismas dos casillas de consentimiento con las mismas reglas. Sin el consentimiento obligatorio o con WhatsApp inválido, SHALL mostrar el error y no enviar. Las preguntas, el cálculo y el informe del diagnóstico MUST NOT cambiar.
+El paso de contacto de `/diagnostico` SHALL pedir WhatsApp como obligatorio, ofrecer el rubro como selector con la misma lista de rubros y mostrar las mismas dos casillas de consentimiento con las mismas reglas. Sin el consentimiento obligatorio o con WhatsApp inválido, SHALL mostrar el error y no enviar. Si el servidor rechaza los datos (400), SHALL mostrar su mensaje y MUST NOT mostrar la confirmación; ante fallos del servidor (5xx) o de red, la confirmación sigue mostrándose como hoy. Las preguntas, el cálculo y el informe del diagnóstico MUST NOT cambiar.
 
 #### Scenario: Diagnóstico sin consentimiento
 - **WHEN** el visitante responde todo y envía sin marcar el consentimiento de contacto

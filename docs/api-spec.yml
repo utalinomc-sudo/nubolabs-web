@@ -25,9 +25,17 @@ paths:
       tags: [público]
       summary: Registra un lead (formulario de contacto o diagnóstico)
       description: |
-        Guarda el lead en Firestore (`leads`), envía el aviso por correo al equipo (Resend) y, si
-        `source` es `diagnostico` y `meta` trae `indiceFriccion`, genera y envía el informe PDF al cliente.
-        Correo e informe no bloquean la respuesta. Sin Firebase Admin configurado responde `persisted: false`.
+        Valida y normaliza el cuerpo con `normalizeLead()` (`lib/leads.ts`), guarda el lead en Firestore (`leads`),
+        envía el aviso por correo al equipo (Resend) y, si `source` es `diagnostico` y `meta` trae `indiceFriccion`,
+        genera y envía el informe PDF al cliente. Correo e informe no bloquean la respuesta. Sin Firebase Admin
+        configurado responde `persisted: false`.
+
+        Desde `formulario-minimo-consentimiento` (**BREAKING**): `phone` (WhatsApp, 8 a 15 dígitos) y
+        `contactConsent: true` son obligatorios. El servidor agrega la prueba del consentimiento (`consentAt` con su
+        propia hora, `consentText` con el texto oficial de cada casilla aceptada y `consentVersion`); lo que mande el
+        cliente en esos campos se ignora. `goals` e `industry` desconocidos se descartan sin error y un `source` fuera
+        de la lista se guarda como `landing`. Si llega el campo trampa `website` con texto (honeypot), responde
+        `200 { ok: true, persisted: false }` sin guardar ni avisar.
       requestBody:
         required: true
         content:
@@ -46,7 +54,11 @@ paths:
                   persisted: { type: boolean, description: "false si Firebase Admin no está configurado" }
                   id: { type: string, description: "Id del documento en Firestore (solo si persisted)" }
         "400":
-          description: JSON inválido, faltan nombre/email o email inválido
+          description: |
+            Cuerpo inválido. Mensajes: "JSON inválido.", "Solicitud inválida." (no es un objeto),
+            "Nombre y email son obligatorios.", "El email no es válido.",
+            "Revisa el WhatsApp: debe tener entre 8 y 15 dígitos." y "Necesitamos tu permiso para contactarte."
+            (`contactConsent` distinto de `true`).
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
@@ -312,16 +324,24 @@ components:
 
     LeadInput:
       type: object
-      description: Definido en `types/lead.ts`
+      description: Definido en `types/lead.ts`; se valida con `normalizeLead()` en `lib/leads.ts`.
       properties:
-        name: { type: string }
-        email: { type: string, format: email }
-        phone: { type: string }
-        company: { type: string }
-        message: { type: string }
-        source: { type: string, description: "`landing` (default) o `diagnostico`", example: landing }
+        name: { type: string, maxLength: 120 }
+        email: { type: string, format: email, maxLength: 254 }
+        phone: { type: string, maxLength: 30, description: "WhatsApp: 8 a 15 dígitos (se ignoran espacios, +, guiones)", example: "+56 9 1234 5678" }
+        company: { type: string, maxLength: 120 }
+        message: { type: string, maxLength: 1000 }
+        source: { type: string, enum: [landing, diagnostico], description: "Otro valor se guarda como `landing`", example: landing }
+        goals:
+          type: array
+          description: "Objetivos de `lib/leadOptions.ts` (GOALS); los desconocidos y repetidos se descartan"
+          items: { type: string, enum: [sell_more, respond_faster, clear_numbers, collect_on_time, organize_team, drop_spreadsheets, grow_orderly, other] }
+        industry: { type: string, enum: [gastronomia, automotriz, construccion, servicios, comercio, otro], description: "Un valor desconocido se descarta" }
+        contactConsent: { type: boolean, description: "Obligatorio y exactamente `true`" }
+        marketingConsent: { type: boolean, description: "Opcional; solo `true` cuenta como aceptado" }
+        website: { type: string, description: "Campo trampa (honeypot): debe llegar vacío o no venir" }
         meta: { $ref: "#/components/schemas/DiagnosticoMeta" }
-      required: [name, email]
+      required: [name, email, phone, contactConsent]
 
     DiagnosticoMeta:
       type: object

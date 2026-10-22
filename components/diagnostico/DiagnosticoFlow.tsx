@@ -6,6 +6,9 @@ import { LogoMark } from "@/components/Logo";
 import { AhorroEstimator } from "./AhorroEstimator";
 import { type Proceso, blank, calc, calcTotals, fmtCLP } from "./ahorro";
 import { AREAS, ESCALA, ABIERTAS, TOTAL_Q, nivelFriccion } from "./cuestionario";
+import { contactSection } from "@/lib/content";
+import { CONSENT_TEXTS, INDUSTRIES, industryLabel, isIndustryKey, type IndustryKey } from "@/lib/leadOptions";
+import { LEAD_MAX, isValidEmail, isValidPhone } from "@/lib/leads";
 
 const C = {
   navy: "#0B1D3A",
@@ -25,7 +28,13 @@ type Resp = (number | null)[][];
 export function DiagnosticoFlow() {
   const [resp, setResp] = useState<Resp>(() => AREAS.map((a) => a.preguntas.map(() => null)));
   const [abiertas, setAbiertas] = useState({ mayorProblema: "", solucionMagica: "" });
-  const [contact, setContact] = useState({ nombre: "", email: "", telefono: "", empresa: "", rubro: "" });
+  // Paso de contacto (cambio formulario-minimo-consentimiento, design.md decisión 5): WhatsApp obligatorio,
+  // rubro de la lista compartida y los mismos consentimientos que el formulario de la portada.
+  const [contact, setContact] = useState<{ nombre: string; email: string; telefono: string; empresa: string; industry: IndustryKey | "" }>(
+    { nombre: "", email: "", telefono: "", empresa: "", industry: "" },
+  );
+  const [contactConsent, setContactConsent] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const [ahorroActivo, setAhorroActivo] = useState(false);
   const [procesos, setProcesos] = useState<Proceso[]>(() => [blank()]);
   const [status, setStatus] = useState<"idle" | "loading" | "ok">("idle");
@@ -82,8 +91,16 @@ export function DiagnosticoFlow() {
       setError(`Te falta${faltan === 1 ? "" : "n"} ${faltan} pregunta${faltan === 1 ? "" : "s"} por responder.`);
       return;
     }
-    if (!nombre || email.indexOf("@") < 0) {
+    if (!nombre || !isValidEmail(email)) {
       setError("Ingresa tu nombre y un email válido.");
+      return;
+    }
+    if (!isValidPhone(contact.telefono)) {
+      setError(contactSection.errors.phone);
+      return;
+    }
+    if (!contactConsent) {
+      setError(contactSection.errors.consent);
       return;
     }
     setError("");
@@ -132,7 +149,7 @@ export function DiagnosticoFlow() {
 
     const empresa = contact.empresa.trim();
     const meta = {
-      rubro: contact.rubro.trim(),
+      rubro: industryLabel(contact.industry) ?? "", // lib/report.ts y los PDFs siguen leyendo meta.rubro
       indiceFriccion: indice,
       nivelFriccion: nivel?.txt,
       areas,
@@ -140,8 +157,10 @@ export function DiagnosticoFlow() {
       ahorro,
     };
 
+    // Si el servidor rechaza los datos (400) se muestra su mensaje y no se confirma: antes el lead se perdía en
+    // silencio. Ante fallos del servidor (5xx) o de red no se bloquea la confirmación (el diagnóstico sigue útil).
     try {
-      await fetch("/api/leads", {
+      const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -151,11 +170,20 @@ export function DiagnosticoFlow() {
           company: empresa,
           message,
           source: "diagnostico",
+          industry: contact.industry || undefined,
+          contactConsent: true,
+          marketingConsent,
           meta,
         }),
       });
+      if (res.status === 400) {
+        const json: { error?: string } = await res.json().catch(() => ({}));
+        setError(json.error || contactSection.errors.server);
+        setStatus("idle");
+        return;
+      }
     } catch {
-      // no bloqueamos la confirmación si el backend falla
+      // red caída: no bloqueamos la confirmación
     }
 
     setSubmitted({ name: nombre, company: empresa, meta });
@@ -428,15 +456,41 @@ export function DiagnosticoFlow() {
                 Te enviamos el análisis de tus respuestas con las oportunidades que vemos. Sin compromiso.
               </div>
               <div className="flex flex-col gap-2.5">
-                <input style={field} placeholder="Nombre" value={contact.nombre} onChange={(e) => setContact({ ...contact, nombre: e.target.value })} />
-                <input style={field} type="email" placeholder="Email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
-                <input style={field} type="tel" placeholder="Teléfono (opcional)" value={contact.telefono} onChange={(e) => setContact({ ...contact, telefono: e.target.value })} />
-                <input style={field} placeholder="Empresa (opcional)" value={contact.empresa} onChange={(e) => setContact({ ...contact, empresa: e.target.value })} />
-                <input style={field} placeholder="Rubro o industria (opcional)" value={contact.rubro} onChange={(e) => setContact({ ...contact, rubro: e.target.value })} />
+                <input style={field} aria-label="Nombre" aria-required="true" maxLength={LEAD_MAX.name} placeholder="Nombre *" autoComplete="given-name" value={contact.nombre} onChange={(e) => setContact({ ...contact, nombre: e.target.value })} />
+                <input style={field} aria-label="Email" aria-required="true" maxLength={LEAD_MAX.email} type="email" inputMode="email" autoComplete="email" placeholder="Email *" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
+                <input style={field} aria-label="WhatsApp" aria-required="true" maxLength={LEAD_MAX.phone} type="tel" inputMode="tel" autoComplete="tel" placeholder="WhatsApp * (ej.: +56 9 1234 5678)" value={contact.telefono} onChange={(e) => setContact({ ...contact, telefono: e.target.value })} />
+                <input style={field} aria-label="Empresa (opcional)" maxLength={LEAD_MAX.company} autoComplete="organization" placeholder="Empresa (opcional)" value={contact.empresa} onChange={(e) => setContact({ ...contact, empresa: e.target.value })} />
+                <select
+                  style={{ ...field, color: contact.industry ? C.navy : C.muted }}
+                  aria-label="Rubro (opcional)"
+                  value={contact.industry}
+                  onChange={(e) => setContact({ ...contact, industry: isIndustryKey(e.target.value) ? e.target.value : "" })}
+                >
+                  <option value="">Rubro (opcional)</option>
+                  {INDUSTRIES.map((i) => (
+                    <option key={i.key} value={i.key}>
+                      {i.label}
+                    </option>
+                  ))}
+                </select>
+                <label style={consentRow}>
+                  <input type="checkbox" aria-required="true" checked={contactConsent} onChange={(e) => setContactConsent(e.target.checked)} style={consentBox} />
+                  <span>
+                    {CONSENT_TEXTS.contact}{" "}
+                    <Link href="/privacidad" target="_blank" rel="noopener" style={{ color: C.blue, fontWeight: 600, textDecoration: "underline" }}>
+                      {contactSection.step2.privacyLink}
+                    </Link>{" "}
+                    <span style={{ color: "#D63C2F" }} aria-hidden="true">*</span>
+                  </span>
+                </label>
+                <label style={consentRow}>
+                  <input type="checkbox" checked={marketingConsent} onChange={(e) => setMarketingConsent(e.target.checked)} style={consentBox} />
+                  <span>{CONSENT_TEXTS.marketing}</span>
+                </label>
                 <button onClick={enviar} disabled={status === "loading"} style={btn}>
                   {status === "loading" ? "Enviando…" : "Enviar diagnóstico →"}
                 </button>
-                <div style={{ fontSize: 11, color: "#F04438", minHeight: 14, textAlign: "center" }}>{error}</div>
+                <div role="alert" style={{ fontSize: 11.5, color: "#D63C2F", minHeight: 14, textAlign: "center", fontWeight: 600 }}>{error}</div>
               </div>
             </div>
           )}
@@ -450,7 +504,12 @@ export function DiagnosticoFlow() {
             Nubo<b style={{ color: C.blue }}>labs</b>
             <span style={{ fontSize: 12, fontWeight: 500, color: C.faint, marginLeft: 8 }}>Tu operación, en piloto automático.</span>
           </span>
-          <span style={{ fontSize: 12.5, color: C.faint }}>hola@nubolabs.ai · © {new Date().getFullYear()} Nubolabs</span>
+          <span style={{ fontSize: 12.5, color: C.faint }}>
+            <Link href="/privacidad" style={{ color: C.muted, textDecoration: "underline" }}>
+              Privacidad
+            </Link>{" "}
+            · hola@nubolabs.ai · © {new Date().getFullYear()} Nubolabs
+          </span>
         </div>
       </footer>
 
@@ -507,6 +566,8 @@ const field: React.CSSProperties = {
   width: "100%",
   background: "#fff",
 };
+const consentRow: React.CSSProperties = { display: "flex", gap: 10, alignItems: "flex-start", fontSize: 12.5, lineHeight: 1.5, color: C.muted, cursor: "pointer" };
+const consentBox: React.CSSProperties = { width: 18, height: 18, marginTop: 1, flex: "none", accentColor: C.blue, cursor: "pointer" };
 const contactCard: React.CSSProperties = {
   background: "#fff",
   border: `1px solid ${C.cardBorder}`,
