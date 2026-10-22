@@ -50,6 +50,12 @@
 - [x] 8.6 Borrador de `/privacidad`: mencionar a Vercel (aloja el sitio) y el derecho a reclamar ante la Agencia de Protección de Datos Personales; ajustar el test de defaults.
 - [x] 8.7 Repetir N (4 comandos), los `curl` afectados (WhatsApp largo, correo largo, `meta` en `landing` y > 64 KB) y el E2E del diagnóstico con un 400; agregar resultados a los reportes.
 
+## 9. Detalle de "Otra cosa" y "Otro" (pedido de Mauro, 2026-10-22; design.md decisión 4b)
+
+- [x] 9.1 Tests (deben fallar): `lib/leads.test.ts` (`goalOther`/`industryOther` recortados, máximo 70, guardados solo con `other`/`otro`, descartados en otro caso o si no son texto); `lib/leadSummary.test.ts` ("Otra cosa: …", "Otro: …"); `ContactForm.test.tsx` (los campos aparecen al marcar la opción, `maxLength` 70, se envían; al desmarcar desaparecen y no se envían). Implementar en `lib/leads.ts`, `types/lead.ts`, `lib/leadSummary.ts`, `lib/content.ts` y `ContactForm.tsx`.
+- [x] 9.2 `DiagnosticoFlow.tsx`: campo "¿Cuál es tu rubro?" (70) al elegir "Otro"; envía `industryOther` y `meta.rubro` con el texto. Test (debe fallar) en `DiagnosticoFlow.test.tsx`.
+- [x] 9.3 Docs (`docs/api-spec.yml` `LeadInput.goalOther`/`industryOther`, `docs/data-model.md`), los 4 comandos y un E2E corto (campos, 70 caracteres, payload y admin/correo por test).
+
 ## N. Verificación obligatoria (OBLIGATORIO — el agente lo ejecuta)
 
 - [x] N.1 Ejecutar `npm run lint`, `npx tsc --noEmit`, `npm test` y `npm run build`; guardar la salida en `openspec/changes/formulario-minimo-consentimiento/reports/AAAA-MM-DD-paso-N-verificacion.md`. Si algo falla, la tarea sigue abierta.

@@ -8,7 +8,7 @@ import { IconArrowLeft, IconArrowRight, IconCheck, IconFile, IconSearch, IconUse
 import { ContactSuccess } from "@/components/landing/ContactSuccess";
 import { contactSection as copy } from "@/lib/content";
 import { CONSENT_TEXTS, GOALS, INDUSTRIES, describeGoals, type GoalKey, type IndustryKey } from "@/lib/leadOptions";
-import { isValidEmail, isValidPhone, type LeadSource } from "@/lib/leads";
+import { LEAD_MAX, isValidEmail, isValidPhone, type LeadSource } from "@/lib/leads";
 
 type Status = "idle" | "loading" | "ok";
 type RequiredField = "name" | "phone" | "email";
@@ -32,6 +32,10 @@ export function ContactForm({ source = "landing", scheduleUrl = null }: ContactF
   const [step, setStep] = useState<1 | 2>(1);
   const [goals, setGoals] = useState<GoalKey[]>([]);
   const [industry, setIndustry] = useState<IndustryKey | null>(null);
+  // Detalle de "Otra cosa" / "Otro": se conserva si la persona desmarca y vuelve a marcar, pero solo se envía si la
+  // opción está elegida (design.md decisión 4b).
+  const [goalOther, setGoalOther] = useState("");
+  const [industryOther, setIndustryOther] = useState("");
   const [values, setValues] = useState<Values>({ name: "", phone: "", email: "", company: "", message: "" });
   const [errors, setErrors] = useState<Partial<Record<RequiredField, boolean>>>({});
   const [contactConsent, setContactConsent] = useState(false);
@@ -95,6 +99,8 @@ export function ContactForm({ source = "landing", scheduleUrl = null }: ContactF
       message: values.message.trim() || undefined,
       goals: goals.length ? goals : undefined,
       industry: industry ?? undefined,
+      goalOther: goals.includes("other") && goalOther.trim() ? goalOther.trim() : undefined,
+      industryOther: industry === "otro" && industryOther.trim() ? industryOther.trim() : undefined,
       contactConsent: true,
       marketingConsent,
       source,
@@ -201,6 +207,16 @@ export function ContactForm({ source = "landing", scheduleUrl = null }: ContactF
                       </Chip>
                     ))}
                   </div>
+                  {goals.includes("other") && (
+                    <OtherField
+                      id="contacto-goal-other"
+                      label={s1.goalOther.label}
+                      optional={s1.optional}
+                      placeholder={s1.goalOther.placeholder}
+                      value={goalOther}
+                      onChange={setGoalOther}
+                    />
+                  )}
                   <span id="contacto-rubro" className="mb-2.5 mt-5 block text-sm font-bold">
                     {s1.industryLabel}
                   </span>
@@ -215,6 +231,16 @@ export function ContactForm({ source = "landing", scheduleUrl = null }: ContactF
                       </Chip>
                     ))}
                   </div>
+                  {industry === "otro" && (
+                    <OtherField
+                      id="contacto-industry-other"
+                      label={s1.industryOther.label}
+                      optional={s1.optional}
+                      placeholder={s1.industryOther.placeholder}
+                      value={industryOther}
+                      onChange={setIndustryOther}
+                    />
+                  )}
                   <div className="mt-[22px] flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <button type="button" onClick={() => goTo(2)} className="min-h-11 px-1 text-[14.5px] font-bold text-ink-muted hover:text-brand">
                       {s1.skip}
@@ -399,6 +425,37 @@ function Chip({ pressed, onClick, children }: { pressed: boolean; onClick: () =>
       {pressed && <IconCheck className="h-3.5 w-3.5 [&_path]:[stroke-width:3.2]" />}
       {children}
     </button>
+  );
+}
+
+// Campo de una línea para el detalle de "Otra cosa" u "Otro" (opcional, máx. 70 caracteres, con contador).
+function OtherField({ id, label, optional, placeholder, value, onChange }: {
+  id: string;
+  label: string;
+  optional: string;
+  placeholder: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="mt-3 flex flex-col gap-[7px] motion-safe:animate-feed-in">
+      <label htmlFor={id} className="text-sm font-bold">
+        {label} <span className="font-medium text-ink-muted">{optional}</span>
+      </label>
+      <input
+        id={id}
+        type="text"
+        maxLength={LEAD_MAX.goalOther}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        aria-describedby={`${id}-count`}
+        className="min-h-[50px] w-full scroll-mt-28 rounded-xl border-[1.5px] border-line-strong bg-white px-[15px] py-[13px] text-base outline-none transition placeholder:text-ink-muted focus:border-brand focus:ring-4 focus:ring-brand/10"
+      />
+      <span id={`${id}-count`} className="self-end font-mono text-xs text-ink-muted">
+        {value.length}/{LEAD_MAX.goalOther}
+      </span>
+    </div>
   );
 }
 

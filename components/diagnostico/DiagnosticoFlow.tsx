@@ -7,7 +7,8 @@ import { AhorroEstimator } from "./AhorroEstimator";
 import { type Proceso, blank, calc, calcTotals, fmtCLP } from "./ahorro";
 import { AREAS, ESCALA, ABIERTAS, TOTAL_Q, nivelFriccion } from "./cuestionario";
 import { contactSection } from "@/lib/content";
-import { CONSENT_TEXTS, INDUSTRIES, industryLabel, isIndustryKey, type IndustryKey } from "@/lib/leadOptions";
+import { CONSENT_TEXTS, INDUSTRIES, isIndustryKey, type IndustryKey } from "@/lib/leadOptions";
+import { leadIndustryText } from "@/lib/leadSummary";
 import { LEAD_MAX, isValidEmail, isValidPhone } from "@/lib/leads";
 
 const C = {
@@ -30,9 +31,14 @@ export function DiagnosticoFlow() {
   const [abiertas, setAbiertas] = useState({ mayorProblema: "", solucionMagica: "" });
   // Paso de contacto (cambio formulario-minimo-consentimiento, design.md decisión 5): WhatsApp obligatorio,
   // rubro de la lista compartida y los mismos consentimientos que el formulario de la portada.
-  const [contact, setContact] = useState<{ nombre: string; email: string; telefono: string; empresa: string; industry: IndustryKey | "" }>(
-    { nombre: "", email: "", telefono: "", empresa: "", industry: "" },
-  );
+  const [contact, setContact] = useState<{
+    nombre: string;
+    email: string;
+    telefono: string;
+    empresa: string;
+    industry: IndustryKey | "";
+    industryOther: string; // rubro escrito cuando se elige "Otro" (máx. 70)
+  }>({ nombre: "", email: "", telefono: "", empresa: "", industry: "", industryOther: "" });
   const [contactConsent, setContactConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [ahorroActivo, setAhorroActivo] = useState(false);
@@ -149,7 +155,8 @@ export function DiagnosticoFlow() {
 
     const empresa = contact.empresa.trim();
     const meta = {
-      rubro: industryLabel(contact.industry) ?? "", // lib/report.ts y los PDFs siguen leyendo meta.rubro
+      // lib/report.ts y los PDFs siguen leyendo meta.rubro ("Otro: …" si la persona escribió su rubro).
+      rubro: leadIndustryText({ industry: contact.industry, industryOther: contact.industryOther }) ?? "",
       indiceFriccion: indice,
       nivelFriccion: nivel?.txt,
       areas,
@@ -171,6 +178,7 @@ export function DiagnosticoFlow() {
           message,
           source: "diagnostico",
           industry: contact.industry || undefined,
+          industryOther: contact.industry === "otro" && contact.industryOther.trim() ? contact.industryOther.trim() : undefined,
           contactConsent: true,
           marketingConsent,
           meta,
@@ -473,6 +481,16 @@ export function DiagnosticoFlow() {
                     </option>
                   ))}
                 </select>
+                {contact.industry === "otro" && (
+                  <input
+                    style={field}
+                    aria-label="¿Cuál es tu rubro?"
+                    maxLength={LEAD_MAX.industryOther}
+                    placeholder="¿Cuál es tu rubro? (ej.: transporte, salud)"
+                    value={contact.industryOther}
+                    onChange={(e) => setContact({ ...contact, industryOther: e.target.value })}
+                  />
+                )}
                 <label style={consentRow}>
                   <input type="checkbox" aria-required="true" checked={contactConsent} onChange={(e) => setContactConsent(e.target.checked)} style={consentBox} />
                   <span>

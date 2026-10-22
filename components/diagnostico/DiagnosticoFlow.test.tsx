@@ -59,6 +59,24 @@ describe("DiagnosticoFlow: paso de contacto", () => {
     expect(screen.getByRole("button", { name: /Enviar diagnóstico/ })).toBeEnabled();
   });
 
+  it("con el rubro 'Otro' permite escribirlo (70 caracteres) y lo envía también como rubro del informe", async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ ok: true, persisted: false }) });
+    render(<DiagnosticoFlow />);
+    expect(screen.queryByLabelText("¿Cuál es tu rubro?")).not.toBeInTheDocument();
+    answerAll();
+    fillContact();
+    fireEvent.change(screen.getByLabelText("Rubro (opcional)"), { target: { value: "otro" } });
+    const other = screen.getByLabelText("¿Cuál es tu rubro?");
+    expect(other).toHaveAttribute("maxLength", "70");
+    fireEvent.change(other, { target: { value: "Transporte de carga" } });
+    fireEvent.click(consent());
+    send();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body as string);
+    expect(body).toMatchObject({ industry: "otro", industryOther: "Transporte de carga" });
+    expect(body.meta.rubro).toBe("Otro: Transporte de carga");
+  });
+
   it("si el servidor falla (500) confirma igual, como antes", async () => {
     fetchMock.mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({ error: "No se pudo guardar la solicitud." }) });
     render(<DiagnosticoFlow />);

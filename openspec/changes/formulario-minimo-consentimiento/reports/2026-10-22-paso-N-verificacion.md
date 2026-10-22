@@ -41,5 +41,9 @@ Con el servidor detenido: `npm run lint` ✔ · `npx tsc --noEmit` ✔ · `npm t
 
 Tests nuevos (sección 8 de `tasks.md`): paridad navegador/servidor y límites en `lib/leads.test.ts` (+11; el caso "Mi WhatsApp es el +56 9 1234 5678" y los de `meta` fallaron antes de implementar), `components/diagnostico/DiagnosticoFlow.test.tsx` (4; 2 fallaron antes), `ContactForm.test.tsx` (+2; ambos fallaron antes), `app/api/leads/route.test.ts` (5; cubren el comportamiento existente del handler, pasaron de entrada), `lib/pdfText.test.ts` (4) y `lib/leadReport.test.ts` (+2, fallaron con "WinAnsi cannot encode" antes de `winAnsiDeep`), y `siteConfig.test.ts` (Vercel y la Agencia en el borrador; falló antes).
 
+## Detalle de "Otra cosa" y "Otro" (tareas 9.x, pedido de Mauro)
+
+`npm run lint` ✔ · `npx tsc --noEmit` ✔ · `npm test` ✔ (**15 archivos, 127 tests**) · `npm run build` ✔. Tests nuevos que fallaron antes de implementar: `goalOther`/`industryOther` en `lib/leads.test.ts`, "Otra cosa: …" / "Otro: …" en `lib/leadSummary.test.ts`, campos y envío en `ContactForm.test.tsx` (2) y rubro "Otro" en `DiagnosticoFlow.test.tsx`.
+
 ## Resultado
 PASS

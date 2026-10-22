@@ -22,6 +22,25 @@ El paso 1 SHALL ofrecer como opciones de selección múltiple los objetivos "Ven
 - **WHEN** el visitante pulsa "Vender más", "Cobrar a tiempo", "Automotriz" y luego "Construcción"
 - **THEN** quedan seleccionados los dos objetivos y solo el rubro "Construcción"
 
+### Requirement: Detalle de "Otra cosa" y "Otro"
+Cuando el objetivo "Otra cosa" está seleccionado, el paso 1 SHALL mostrar un campo de una línea, opcional y con etiqueta visible, para escribir qué otra cosa quiere lograr; cuando el rubro "Otro" está seleccionado, SHALL mostrar un campo de una línea, opcional y con etiqueta visible, para escribir su rubro. Ambos campos MUST aceptar como máximo 70 caracteres. Si la opción se deselecciona, el campo SHALL ocultarse y su texto MUST NOT enviarse. El servidor SHALL guardar esos textos (recortados de espacios y limitados a 70 caracteres) como `goalOther` solo si `goals` incluye `other`, y como `industryOther` solo si `industry` es `otro`; en otro caso MUST descartarlos. El paso de contacto de `/diagnostico` SHALL ofrecer el mismo campo cuando el rubro elegido es "Otro".
+
+#### Scenario: Escribir otro objetivo
+- **WHEN** el visitante marca "Otra cosa" y escribe "Abrir una segunda sucursal"
+- **THEN** el lead se guarda con `goals` que incluye `other` y `goalOther: "Abrir una segunda sucursal"`
+
+#### Scenario: Escribir el rubro
+- **WHEN** el visitante marca el rubro "Otro" y escribe "Transporte de carga"
+- **THEN** el lead se guarda con `industry: "otro"` e `industryOther: "Transporte de carga"`, y el equipo ve el rubro como "Otro: Transporte de carga"
+
+#### Scenario: Máximo 70 caracteres
+- **WHEN** el visitante intenta escribir más de 70 caracteres en cualquiera de los dos campos
+- **THEN** el campo no acepta más de 70
+
+#### Scenario: Opción deseleccionada
+- **WHEN** el visitante escribe un texto en "Otra cosa" y luego desmarca "Otra cosa"
+- **THEN** el campo desaparece y el texto no se envía
+
 ### Requirement: Datos de contacto y validación en el navegador
 El paso 2 SHALL pedir con etiqueta visible: Nombre (obligatorio), WhatsApp (obligatorio), Correo (obligatorio), Empresa (opcional) y "¿Algo que quieras contarnos antes de la llamada?" (opcional, máximo 1.000 caracteres). Los obligatorios SHALL marcarse como tales. Cada campo obligatorio con texto SHALL validarse al salir de él: nombre no vacío; correo con formato `algo@dominio.ext`; WhatsApp con 8 a 15 dígitos. Un campo obligatorio vacío SHALL marcarse al intentar enviar (no al salir de él, para no mostrar errores antes de que la persona escriba). Los campos SHALL limitar su largo igual que el servidor (nombre y empresa 120, correo 254, WhatsApp 30, mensaje 1.000) y todo valor que el navegador acepte MUST ser aceptado también por el servidor. Un campo inválido SHALL mostrar un mensaje específico junto al campo, asociado al campo para lectores de pantalla. Al enviar con errores, el foco SHALL ir al primer campo inválido y no se SHALL enviar nada.
 
@@ -103,7 +122,7 @@ El paso de contacto de `/diagnostico` SHALL pedir WhatsApp como obligatorio, ofr
 - **THEN** el lead se guarda con `source: "diagnostico"`, `industry: "gastronomia"`, los campos de consentimiento, y el informe PDF se puede descargar como hoy
 
 ### Requirement: Datos del lead visibles para el equipo
-El aviso por correo de cada lead, el detalle del lead en el admin y la ficha PDF interna SHALL mostrar, cuando existan: objetivos (con su texto en español), rubro (con su texto en español; en leads antiguos, el rubro libre guardado en el diagnóstico), el mensaje del prospecto y el estado de los consentimientos ("Acepta novedades" / "Sin novedades", con fecha). La lista de leads del admin SHALL mostrar el rubro y una marca de "Acepta novedades". Los leads antiguos sin estos campos SHALL seguir mostrándose sin errores.
+El aviso por correo de cada lead, el detalle del lead en el admin y la ficha PDF interna SHALL mostrar, cuando existan: objetivos (con su texto en español; "Otra cosa" junto al texto escrito en `goalOther`), rubro (con su texto en español; en leads antiguos, el rubro libre guardado en el diagnóstico), el mensaje del prospecto y el estado de los consentimientos ("Acepta novedades" / "Sin novedades", con fecha). La lista de leads del admin SHALL mostrar el rubro y una marca de "Acepta novedades". Los leads antiguos sin estos campos SHALL seguir mostrándose sin errores.
 
 #### Scenario: Lead nuevo en el admin
 - **WHEN** el admin abre el detalle de un lead con objetivos, rubro, mensaje y novedades aceptadas

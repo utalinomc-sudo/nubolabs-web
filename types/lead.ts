@@ -10,6 +10,8 @@ export interface LeadInput {
   source?: string;
   goals?: string[];
   industry?: string;
+  goalOther?: string; // texto de "Otra cosa" (máx. 70), solo si goals incluye "other"
+  industryOther?: string; // texto del rubro "Otro" (máx. 70), solo si industry es "otro"
   contactConsent?: boolean; // obligatorio: debe ser exactamente true
   marketingConsent?: boolean;
   website?: string; // campo trampa (honeypot): debe llegar vacío
@@ -35,6 +37,8 @@ export interface LeadRecord {
   createdAt: string; // ISO
   goals?: GoalKey[];
   industry?: IndustryKey;
+  goalOther?: string;
+  industryOther?: string;
   contactConsent: true;
   marketingConsent: boolean;
   consentAt: string; // ISO, hora del servidor

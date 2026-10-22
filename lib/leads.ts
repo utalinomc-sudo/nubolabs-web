@@ -9,7 +9,7 @@ export type LeadSource = (typeof LEAD_SOURCES)[number];
 
 // Largos máximos. Los formularios usan los mismos en `maxLength`. Correo y WhatsApp no se recortan: si se pasan,
 // se rechazan (un número o correo recortado sería un dato equivocado). Ver revisión adversarial del cambio.
-export const LEAD_MAX = { name: 120, email: 254, company: 120, phone: 30, message: 1000 } as const;
+export const LEAD_MAX = { name: 120, email: 254, company: 120, phone: 30, message: 1000, goalOther: 70, industryOther: 70 } as const;
 const MAX = LEAD_MAX;
 // Tamaño máximo de `meta` (detalle del diagnóstico) serializado en JSON.
 export const META_MAX_BYTES = 64 * 1024;
@@ -98,6 +98,15 @@ export function normalizeLead(body: unknown, now: Date = new Date()): NormalizeR
     if (goals.length > 0) lead.goals = goals;
   }
   if (isIndustryKey(body.industry)) lead.industry = body.industry;
+  // Detalle escrito de "Otra cosa" y "Otro": solo si esa opción está elegida (pedido de Mauro, 2026-10-22).
+  if (lead.goals?.includes("other")) {
+    const goalOther = text(body.goalOther, MAX.goalOther);
+    if (goalOther) lead.goalOther = goalOther;
+  }
+  if (lead.industry === "otro") {
+    const industryOther = text(body.industryOther, MAX.industryOther);
+    if (industryOther) lead.industryOther = industryOther;
+  }
   // `meta` (detalle del diagnóstico) solo en leads del diagnóstico y con tamaño acotado.
   if (lead.source === "diagnostico" && isPlainObject(body.meta)) {
     if (JSON.stringify(body.meta).length > META_MAX_BYTES) return { ok: false, error: LEAD_ERRORS.invalidBody };

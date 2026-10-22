@@ -56,6 +56,12 @@ HDU-05 (casos por rubro) e HDU-07 (referidos) importan `INDUSTRIES`/`IndustryKey
 - Textos fijos en `lib/content.ts` como `contactSection` (no CMS en este cambio). El `id="contacto"` se mantiene.
 - *Alternativa descartada:* librería de formularios (react-hook-form): el formulario es pequeño y el repo usa `useState` (frontend-standards §4).
 
+### 4b. Detalle de "Otra cosa" y "Otro" (pedido de Mauro, 2026-10-22)
+- Al marcar el objetivo "Otra cosa" aparece bajo los objetivos el campo "¿Qué otra cosa te gustaría lograr?"; al marcar el rubro "Otro" aparece bajo los rubros "¿Cuál es tu rubro?". Una línea, opcionales, `maxLength` 70 con contador visible. Al desmarcar la opción el campo se oculta y su texto no va en el envío (se conserva en memoria por si la persona vuelve a marcarla).
+- Payload: `goalOther` y `industryOther`. `normalizeLead` los recorta, los limita a 70 (`LEAD_MAX.goalOther`/`industryOther`) y los guarda solo si `goals` incluye `other` o `industry === "otro"`; si no, se descartan.
+- Lectura para el equipo (`lib/leadSummary.ts`): objetivos "Otra cosa: {goalOther}"; rubro "Otro: {industryOther}". El diagnóstico escribe además `meta.rubro` con el texto (para el informe).
+- `describeGoals` no cambia: "Otra cosa" sigue sin tema en la frase de la pantalla de éxito.
+
 ### 5. Diagnóstico: solo el paso de contacto
 En `DiagnosticoFlow.tsx`: el input libre "Rubro" pasa a `<select>` con `INDUSTRIES`; "Teléfono (opcional)" pasa a "WhatsApp" obligatorio; se agregan las dos casillas (mismos textos y enlace) con el mismo estilo inline del archivo. `enviar()` suma las validaciones `isValidPhone` y consentimiento antes del envío (mismos mensajes que la portada) y agrega `industry`, `contactConsent`, `marketingConsent` al cuerpo. `meta.rubro` se sigue llenando con `industryLabel(industry)` para que `lib/report.ts` y los PDFs no cambien. Se mantiene la regla de no bloquear la confirmación por fallos del backend (5xx o red). *Ajustado tras la revisión adversarial:* un 400 no es un fallo del backend sino datos rechazados, así que `enviar()` lee la respuesta y, si es 400, muestra `json.error` y no confirma (antes el lead se perdía en silencio). Los inputs llevan `maxLength` iguales al servidor y `aria-required`. El footer propio suma el enlace "Privacidad".
 

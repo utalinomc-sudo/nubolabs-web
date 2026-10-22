@@ -28,6 +28,8 @@ Escribe `POST /api/leads`; lee el panel (`app/admin/(panel)/leads/**`); borra `D
 | `createdAt` | string ISO | Sí | Fecha de creación (servidor) |
 | `goals` | `GoalKey[]` | No | Objetivos elegidos en el formulario (claves de `GOALS` en `lib/leadOptions.ts`); se omite si queda vacío |
 | `industry` | `IndustryKey` | No | Rubro (`gastronomia`, `automotriz`, `construccion`, `servicios`, `comercio`, `otro`) |
+| `goalOther` | string | No | Texto de "Otra cosa" (máx. 70); solo si `goals` incluye `other`. El equipo lo ve como "Otra cosa: …" |
+| `industryOther` | string | No | Rubro escrito al elegir "Otro" (máx. 70); solo si `industry` es `otro`. El equipo lo ve como "Otro: …" |
 | `contactConsent` | `true` | Sí en leads nuevos | Consentimiento obligatorio de contacto (Ley 21.719) |
 | `marketingConsent` | boolean | Sí en leads nuevos | Acepta recibir novedades |
 | `consentAt` | string ISO | Sí en leads nuevos | Hora del servidor al recibir el consentimiento |

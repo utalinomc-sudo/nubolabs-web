@@ -35,7 +35,7 @@ async function getLeads(): Promise<{ configured: boolean; leads: LeadRow[] }> {
       createdAt: x.createdAt ?? "",
       indice: typeof meta.indiceFriccion === "number" ? meta.indiceFriccion : null,
       ahorroMes: ahorro?.totales?.mes ?? null,
-      industry: leadIndustryText({ industry: x.industry, meta }),
+      industry: leadIndustryText({ industry: x.industry, industryOther: x.industryOther, meta }),
       marketingConsent: x.marketingConsent === true,
     };
   });

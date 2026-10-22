@@ -66,6 +66,8 @@ export interface LeadRecord {
   // Desde formulario-minimo-consentimiento (ausentes en leads antiguos).
   goals?: unknown;
   industry?: unknown;
+  industryOther?: unknown;
+  goalOther?: unknown;
   marketingConsent?: unknown;
   consentAt?: unknown;
 }
@@ -185,7 +187,7 @@ export async function buildLeadDetailPdf(rawLead: LeadRecord): Promise<Uint8Arra
     ["Email", s(lead.email) || "—"],
     ["WhatsApp", s(lead.phone) || "—"],
     ["Empresa", s(lead.company) || "—"],
-    ["Rubro", leadIndustryText({ industry: lead.industry, meta }) || "—"],
+    ["Rubro", leadIndustryText({ industry: lead.industry, industryOther: lead.industryOther, meta }) || "—"],
     ["Recibido", createdAt],
     ["ID", s(lead.id) || "—"],
   ];

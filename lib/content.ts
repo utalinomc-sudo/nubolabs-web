@@ -143,6 +143,10 @@ export const contactSection = {
     hint: "Elige todas las que quieras. Así preparamos la conversación para ti.",
     goalsLabel: "Objetivos",
     industryLabel: "¿En qué rubro está tu negocio?",
+    // Campos de una línea que aparecen al elegir "Otra cosa" u "Otro" (máx. 70 caracteres).
+    goalOther: { label: "¿Qué otra cosa te gustaría lograr?", placeholder: "Ej.: abrir una segunda sucursal" },
+    industryOther: { label: "¿Cuál es tu rubro?", placeholder: "Ej.: transporte, salud, educación" },
+    optional: "(opcional)",
     skip: "Saltar este paso",
     next: "Siguiente",
   },

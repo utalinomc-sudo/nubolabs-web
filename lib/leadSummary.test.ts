@@ -24,6 +24,13 @@ describe("leadSummary", () => {
     expect(leadMarketingText({})).toBeNull();
   });
 
+  it("muestra el detalle escrito en 'Otra cosa' y 'Otro'", () => {
+    expect(leadGoalsText({ goals: ["sell_more", "other"], goalOther: "Abrir una sucursal" })).toBe("Vender más · Otra cosa: Abrir una sucursal");
+    expect(leadGoalsText({ goals: ["other"] })).toBe("Otra cosa");
+    expect(leadIndustryText({ industry: "otro", industryOther: "Transporte de carga" })).toBe("Otro: Transporte de carga");
+    expect(leadIndustryText({ industry: "otro" })).toBe("Otro");
+  });
+
   it("fecha del consentimiento en hora de Chile", () => {
     expect(formatConsentDate("2026-10-22T15:30:00.000Z")).toBe("22-10-2026 12:30");
     expect(formatConsentDate("no es fecha")).toBeNull();

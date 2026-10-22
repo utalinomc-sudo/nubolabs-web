@@ -84,8 +84,14 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
   const indice = typeof meta.indiceFriccion === "number" ? meta.indiceFriccion : null;
   // Datos del formulario nuevo (cambio formulario-minimo-consentimiento). Los leads antiguos no los traen.
   const isDiag = lead.source === "diagnostico";
-  const industry = leadIndustryText({ industry: lead.industry, meta });
-  const goals = (Array.isArray(lead.goals) ? lead.goals : []).map(goalLabel).filter((g): g is string => !!g);
+  const industry = leadIndustryText({ industry: lead.industry, industryOther: lead.industryOther, meta });
+  const goalOther = typeof lead.goalOther === "string" ? lead.goalOther.trim() : "";
+  const goals = (Array.isArray(lead.goals) ? lead.goals : [])
+    .map((g) => {
+      const label = goalLabel(g);
+      return label && g === "other" && goalOther ? `${label}: ${goalOther}` : label;
+    })
+    .filter((g): g is string => !!g);
   const formMessage = !isDiag && typeof lead.message === "string" && lead.message.trim() ? lead.message : null;
   const marketing = leadMarketingText(lead);
   const consentAt = formatConsentDate(lead.consentAt);

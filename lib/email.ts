@@ -12,6 +12,8 @@ interface LeadEmail {
   // Desde formulario-minimo-consentimiento (opcionales para no romper leads antiguos).
   goals?: string[];
   industry?: string;
+  goalOther?: string;
+  industryOther?: string;
   marketingConsent?: boolean;
   consentAt?: string;
 }

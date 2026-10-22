@@ -5,7 +5,9 @@ import { goalLabel, industryLabel } from "@/lib/leadOptions";
 
 type LeadLike = {
   industry?: unknown;
+  industryOther?: unknown;
   goals?: unknown;
+  goalOther?: unknown;
   marketingConsent?: unknown;
   consentAt?: unknown;
   meta?: unknown;
@@ -14,6 +16,8 @@ type LeadLike = {
 // Rubro con su texto en español; en leads antiguos del diagnóstico, el rubro libre de meta.rubro.
 export function leadIndustryText(lead: LeadLike): string | null {
   const fromList = industryLabel(lead.industry);
+  const other = typeof lead.industryOther === "string" ? lead.industryOther.trim() : "";
+  if (fromList && lead.industry === "otro" && other) return `${fromList}: ${other}`;
   if (fromList) return fromList;
   const meta = lead.meta && typeof lead.meta === "object" ? (lead.meta as Record<string, unknown>) : null;
   const free = typeof meta?.rubro === "string" ? meta.rubro.trim() : "";
@@ -22,7 +26,13 @@ export function leadIndustryText(lead: LeadLike): string | null {
 
 export function leadGoalsText(lead: LeadLike): string | null {
   if (!Array.isArray(lead.goals)) return null;
-  const labels = lead.goals.map(goalLabel).filter((l): l is string => !!l);
+  const other = typeof lead.goalOther === "string" ? lead.goalOther.trim() : "";
+  const labels = lead.goals
+    .map((g) => {
+      const label = goalLabel(g);
+      return label && g === "other" && other ? `${label}: ${other}` : label;
+    })
+    .filter((l): l is string => !!l);
   return labels.length ? labels.join(" · ") : null;
 }
 

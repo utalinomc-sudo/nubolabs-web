@@ -73,6 +73,41 @@ describe("ContactForm: pasos y opciones", () => {
   });
 });
 
+describe("ContactForm: detalle de 'Otra cosa' y 'Otro'", () => {
+  it("los campos aparecen al marcar la opción, aceptan 70 caracteres y desaparecen al desmarcar", () => {
+    render(<ContactForm />);
+    expect(screen.queryByLabelText(/¿Qué otra cosa te gustaría lograr?/)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/¿Cuál es tu rubro?/)).not.toBeInTheDocument();
+    fireEvent.click(chip("Otra cosa"));
+    fireEvent.click(chip("Otro"));
+    const goalOther = screen.getByLabelText(/¿Qué otra cosa te gustaría lograr?/);
+    const industryOther = screen.getByLabelText(/¿Cuál es tu rubro?/);
+    expect(goalOther).toHaveAttribute("maxLength", "70");
+    expect(industryOther).toHaveAttribute("maxLength", "70");
+    fireEvent.click(chip("Otra cosa"));
+    expect(screen.queryByLabelText(/¿Qué otra cosa te gustaría lograr?/)).not.toBeInTheDocument();
+  });
+
+  it("envía el texto solo de las opciones marcadas", async () => {
+    respond(200, { ok: true, persisted: false });
+    render(<ContactForm />);
+    fireEvent.click(chip("Otra cosa"));
+    fireEvent.change(screen.getByLabelText(/¿Qué otra cosa te gustaría lograr?/), { target: { value: "Abrir una segunda sucursal" } });
+    fireEvent.click(chip("Otro"));
+    fireEvent.change(screen.getByLabelText(/¿Cuál es tu rubro?/), { target: { value: "Transporte de carga" } });
+    fireEvent.click(chip("Otra cosa")); // se desmarca: su texto no debe ir
+    fireEvent.click(screen.getByRole("button", { name: "Siguiente" }));
+    fillValid();
+    fireEvent.click(screen.getByRole("checkbox", { name: /Acepto que Nubolabs use mis datos/ }));
+    submit();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const body = sentBody();
+    expect(body.industry).toBe("otro");
+    expect(body.industryOther).toBe("Transporte de carga");
+    expect(body).not.toHaveProperty("goalOther");
+  });
+});
+
 describe("ContactForm: validación", () => {
   it("valida el correo al salir del campo", () => {
     render(<ContactForm />);

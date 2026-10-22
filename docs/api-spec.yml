@@ -337,6 +337,8 @@ components:
           description: "Objetivos de `lib/leadOptions.ts` (GOALS); los desconocidos y repetidos se descartan"
           items: { type: string, enum: [sell_more, respond_faster, clear_numbers, collect_on_time, organize_team, drop_spreadsheets, grow_orderly, other] }
         industry: { type: string, enum: [gastronomia, automotriz, construccion, servicios, comercio, otro], description: "Un valor desconocido se descarta" }
+        goalOther: { type: string, maxLength: 70, description: "Detalle escrito de 'Otra cosa'; se guarda solo si `goals` incluye `other` (recortado a 70)" }
+        industryOther: { type: string, maxLength: 70, description: "Rubro escrito al elegir 'Otro'; se guarda solo si `industry` es `otro` (recortado a 70)" }
         contactConsent: { type: boolean, description: "Obligatorio y exactamente `true`" }
         marketingConsent: { type: boolean, description: "Opcional; solo `true` cuenta como aceptado" }
         website: { type: string, description: "Campo trampa (honeypot): debe llegar vacío o no venir" }

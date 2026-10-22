@@ -162,6 +162,19 @@ describe("normalizeLead: lead guardado", () => {
     expect(ok({ ...VALID, goals: "sell_more" })).not.toHaveProperty("goals");
   });
 
+  it("guarda el detalle de 'Otra cosa' y 'Otro' solo con esas opciones, recortado y hasta 70", () => {
+    const lead = ok({ ...VALID, goals: ["sell_more", "other"], goalOther: "  Abrir una segunda sucursal  ", industry: "otro", industryOther: "Transporte de carga" });
+    expect(lead.goalOther).toBe("Abrir una segunda sucursal");
+    expect(lead.industryOther).toBe("Transporte de carga");
+    expect(ok({ ...VALID, goals: ["other"], goalOther: "x".repeat(90) }).goalOther).toHaveLength(70);
+    const sinOpcion = ok({ ...VALID, goals: ["sell_more"], goalOther: "no va", industry: "automotriz", industryOther: "no va" });
+    expect(sinOpcion).not.toHaveProperty("goalOther");
+    expect(sinOpcion).not.toHaveProperty("industryOther");
+    const vacios = ok({ ...VALID, goals: ["other"], goalOther: "   ", industry: "otro", industryOther: 42 });
+    expect(vacios).not.toHaveProperty("goalOther");
+    expect(vacios).not.toHaveProperty("industryOther");
+  });
+
   it("acepta solo orígenes conocidos", () => {
     expect(ok({ ...VALID, source: "diagnostico" }).source).toBe("diagnostico");
     expect(ok({ ...VALID, source: "x" }).source).toBe("landing");
