@@ -47,6 +47,7 @@ Todas las capas del perfil §3 aplican en este proyecto:
 - [API](./api-spec.yml) — aplica (11 endpoints bajo `/api`)
 - [Modelo de datos](./data-model.md) — aplica (Firestore: `leads`, `team`, `config/site`)
 - [Estado del proyecto](./ESTADO-PROYECTO.md) — documento vivo con lo que funciona en producción, pendientes y roadmap. Se actualiza al cerrar cada cambio.
+- [Avance del proyecto](./avance.json) — registro del avance por puntos de historia (historias, estado y pesos; lo lee la skill personal `avance-backlog`). Se actualiza después de cada mezcla a `main` y de cada publicación en producción, en el mismo commit.
 
 ## 4. Skills del proyecto
 

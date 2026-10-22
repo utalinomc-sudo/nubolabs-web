@@ -1,0 +1,170 @@
+{
+  "nombre": "Nubolabs · Web para los prospectos de O&A",
+  "actualizado": "2026-10-22",
+  "descripcion": "Registro del avance del proyecto por puntos de historia. Lo lee la skill avance-backlog; se actualiza después de cada fusión a main o publicación en producción. Mide las historias de docs/backlog/prospectos-oa.md (la HDU-08 cuenta en documentación y diseño). SP referenciales desde el tamaño de cada HDU: S = 3, M = 5.",
+  "alcances": [
+    {
+      "nombre": "Todo el backlog",
+      "descripcion": "Las 9 historias de la campaña O&A (HDU-01 a 07, 09 y 10)"
+    },
+    {
+      "nombre": "Fase 1",
+      "descripcion": "Lo que debe estar publicado antes del correo de O&A",
+      "filtro": {
+        "fase": "Fase 1"
+      }
+    }
+  ],
+  "entregas": [
+    {
+      "nombre": "Fase 1",
+      "descripcion": "Mensaje principal, lenguaje sin jerga y formulario mínimo con consentimiento, antes del correo de O&A"
+    },
+    {
+      "nombre": "Fase 2",
+      "descripcion": "Completa el rediseño: confianza, casos por rubro, cifras, cierre con preguntas frecuentes, entrada /oa y diagnóstico con mapa de oportunidades"
+    }
+  ],
+  "modulos": {
+    "EP-MSJ": {
+      "nombre": "Mensaje",
+      "descripcion": "Hero y textos de la landing en el idioma del dueño de pyme"
+    },
+    "EP-CAP": {
+      "nombre": "Captación",
+      "descripcion": "Formulario de 2 pasos con consentimiento, preguntas frecuentes y llamados a la acción"
+    },
+    "EP-CNF": {
+      "nombre": "Confianza",
+      "descripcion": "Testimonios, casos por rubro y cifras solo con respaldo"
+    },
+    "EP-OA": {
+      "nombre": "Referidos O&A",
+      "descripcion": "Entrada /oa para los referidos y medición de los leads de la campaña"
+    },
+    "EP-DIA": {
+      "nombre": "Diagnóstico",
+      "descripcion": "El diagnóstico entrega un mapa de oportunidades en vez de ahorro en horas"
+    }
+  },
+  "componentes": [
+    {
+      "nombre": "Documentación y diseño",
+      "descripcion": "Historias, propuesta de valor (HDU-08), referencia visual y artefactos OpenSpec",
+      "peso": 0.2,
+      "avance": 0.9,
+      "nota": "HDU escritas, HDU-08 aprobada con su referencia visual y artefactos OpenSpec de las 9 historias; faltan las preguntas abiertas (fecha del correo, agenda, testimonio y texto legal de privacidad)"
+    },
+    {
+      "nombre": "Construcción",
+      "descripcion": "Historias en producción, por puntos de historia",
+      "peso": 0.65,
+      "calculado": true
+    },
+    {
+      "nombre": "Puesta en marcha",
+      "descripcion": "Preview y aprobación de cada cambio, textos en el admin y envío del correo de O&A",
+      "peso": 0.15,
+      "avance": 0.4,
+      "nota": "Sitio, dominio, Vercel, Firebase y Resend ya operan; HDU-01 cumplió su parte (publicada y hero con los textos recomendados, 30 % → 35 %); HDU-03 y HDU-02 con preview aprobado y publicadas el 2026-10-22 (35 % → 40 %), pero falta cargar sus textos en el admin (Servicios y Ejemplos), la URL de agenda y la validación legal de /privacidad; faltan el preview y la aprobación de los otros 6 cambios y enviar el correo de O&A"
+    }
+  ],
+  "historias": [
+    {
+      "id": "HDU-01",
+      "titulo": "Mensaje principal orientado al dueño de pyme",
+      "epica": "EP-MSJ",
+      "fase": "Fase 1",
+      "entrega": "Fase 1",
+      "sp": 3,
+      "estado": "produccion",
+      "fecha": "2026-10-22",
+      "entregadaEn": "Fase 1",
+      "nota": "Mezclada a main (aa6f4c3) y publicada por el deploy automático de Vercel; hero nuevo y panel «Tu negocio hoy» comprobados en www.nubolabs.cl"
+    },
+    {
+      "id": "HDU-02",
+      "titulo": "Toda la landing en lenguaje de pyme",
+      "epica": "EP-MSJ",
+      "fase": "Fase 1",
+      "entrega": "Fase 1",
+      "sp": 5,
+      "estado": "produccion",
+      "nota": "Mezclada a main (2f7f795) y publicada por el deploy automático de Vercel; portada sin jerga con «Lo que ganas» y admin por sección comprobados en www.nubolabs.cl. Pendiente del dueño: «Usar los textos recomendados» en Servicios y Ejemplos (textos viejos guardados en Firestore)",
+      "fecha": "2026-10-22",
+      "entregadaEn": "Fase 1"
+    },
+    {
+      "id": "HDU-03",
+      "titulo": "Formulario mínimo con consentimiento y agenda",
+      "epica": "EP-CAP",
+      "fase": "Fase 1",
+      "entrega": "Fase 1",
+      "sp": 5,
+      "estado": "produccion",
+      "nota": "Mezclada a main (e547a82 y 48671ee) y publicada por el deploy automático de Vercel; formulario de 2 pasos con consentimiento y /privacidad en www.nubolabs.cl. Pendiente del dueño: URL de agenda, lead de prueba y validación legal de /privacidad",
+      "fecha": "2026-10-22",
+      "entregadaEn": "Fase 1"
+    },
+    {
+      "id": "HDU-04",
+      "titulo": "Confianza: «Nos recomiendan» y testimonios",
+      "epica": "EP-CNF",
+      "fase": "Fase 2",
+      "entrega": "Fase 2",
+      "sp": 5,
+      "estado": "pendiente",
+      "nota": "Artefactos OpenSpec creados (confianza-recomendacion)"
+    },
+    {
+      "id": "HDU-05",
+      "titulo": "Casos de uso por rubro",
+      "epica": "EP-CNF",
+      "fase": "Fase 2",
+      "entrega": "Fase 2",
+      "sp": 5,
+      "estado": "pendiente",
+      "nota": "Artefactos OpenSpec creados (casos-por-rubro)"
+    },
+    {
+      "id": "HDU-06",
+      "titulo": "Cifras con respaldo",
+      "epica": "EP-CNF",
+      "fase": "Fase 2",
+      "entrega": "Fase 2",
+      "sp": 3,
+      "estado": "pendiente",
+      "nota": "Artefactos OpenSpec creados (cifras-con-respaldo)"
+    },
+    {
+      "id": "HDU-07",
+      "titulo": "Entrada /oa y medición de la campaña",
+      "epica": "EP-OA",
+      "fase": "Fase 2",
+      "entrega": "Fase 2",
+      "sp": 5,
+      "estado": "pendiente",
+      "nota": "Artefactos OpenSpec creados (landing-referidos-oa); opcional y recomendada"
+    },
+    {
+      "id": "HDU-09",
+      "titulo": "Diagnóstico con mapa de oportunidades",
+      "epica": "EP-DIA",
+      "fase": "Fase 2",
+      "entrega": "Fase 2",
+      "sp": 5,
+      "estado": "pendiente",
+      "nota": "Artefactos OpenSpec creados (diagnostico-mapa-oportunidades)"
+    },
+    {
+      "id": "HDU-10",
+      "titulo": "Cierre: preguntas frecuentes, CTA y footer",
+      "epica": "EP-CAP",
+      "fase": "Fase 2",
+      "entrega": "Fase 2",
+      "sp": 3,
+      "estado": "pendiente",
+      "nota": "Artefactos OpenSpec creados (cierre-landing-faq-cta), con el WhatsApp de contacto configurable"
+    }
+  ]
+}
