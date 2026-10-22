@@ -16,9 +16,11 @@ export default async function HomePage() {
 
   return (
     <>
-      <Nav showEquipo={visible.equipo} showMision={visible.nosotros} />
+      <Nav showEquipo={visible.equipo} showMision={visible.nosotros} showContact={visible.contacto} />
       <main>
-        {visible.hero && <Hero content={content.hero} />}
+        {visible.hero && (
+          <Hero content={content.hero} contactVisible={visible.contacto} processVisible={visible.proceso} />
+        )}
         {visible.problema && <Problem />}
         {visible.enfoque && <Approach />}
         {visible.servicios && <Services content={content.servicios} />}

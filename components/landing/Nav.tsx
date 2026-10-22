@@ -4,8 +4,16 @@ import { useState } from "react";
 import { Logo } from "@/components/Logo";
 import { nav as baseNav } from "@/lib/content";
 
-export function Nav({ showEquipo = true, showMision = true }: { showEquipo?: boolean; showMision?: boolean }) {
+interface NavProps {
+  showEquipo?: boolean;
+  showMision?: boolean;
+  // Con la sección de contacto oculta, "Diagnóstico gratis" lleva al cuestionario (spec landing/hero).
+  showContact?: boolean;
+}
+
+export function Nav({ showEquipo = true, showMision = true, showContact = true }: NavProps) {
   const [open, setOpen] = useState(false);
+  const ctaHref = showContact ? "/#contacto" : "/diagnostico";
 
   // "Nosotros" agrupa las páginas Misión y visión + Equipo (según visibilidad).
   const nosotros = [
@@ -64,14 +72,18 @@ export function Nav({ showEquipo = true, showMision = true }: { showEquipo?: boo
             </div>
           )}
 
-          <a href="/diagnostico" className="rounded-full bg-brand px-5 py-[11px] text-sm text-white transition hover:brightness-95">
-            Agendar diagnóstico →
+          {/* CTA hacia el formulario de la portada (cambio mensaje-principal-pyme, decisión 5). */}
+          <a
+            href={ctaHref}
+            className="inline-flex min-h-11 items-center rounded-full bg-brand px-5 text-sm text-white transition hover:bg-brand-dark"
+          >
+            Diagnóstico gratis
           </a>
         </nav>
 
         <button
           onClick={() => setOpen((v) => !v)}
-          className="lg:hidden"
+          className="-mr-2 grid h-11 w-11 place-items-center lg:hidden"
           aria-label="Abrir menú"
           aria-expanded={open}
         >
@@ -112,11 +124,11 @@ export function Nav({ showEquipo = true, showMision = true }: { showEquipo?: boo
             )}
 
             <a
-              href="/diagnostico"
+              href={ctaHref}
               onClick={() => setOpen(false)}
-              className="mt-2 rounded-lg bg-brand px-3 py-3 text-center text-sm font-semibold text-white"
+              className="mt-2 flex min-h-11 items-center justify-center rounded-lg bg-brand px-3 text-center text-sm font-semibold text-white"
             >
-              Agendar diagnóstico →
+              Diagnóstico gratis
             </a>
           </nav>
         </div>

@@ -29,7 +29,7 @@ Tres superficies: la **landing** (`/`) compuesta por secciones de `components/la
 app/
   layout.tsx              fuentes, metadata global, <html lang="es">
   page.tsx                landing: Nav + secciones según `visible` + Footer   (server, force-dynamic)
-  globals.css             @tailwind + primitivas (.container-page, .btn-primary, .btn-ghost, .pill, .card, .field)
+  globals.css             @tailwind + primitivas (.container-page, .btn-primary, .btn-ghost, .pill, .card, .field, .text-gradient-brand, .bg-dots)
   diagnostico/page.tsx    monta <DiagnosticoFlow />
   equipo/page.tsx         lista integrantes (getTeamMembers); notFound() si visible.equipo es false
   mision-vision/page.tsx  misión, visión y objetivos desde content.nosotros
@@ -37,12 +37,13 @@ app/
   admin/(panel)/layout.tsx  server: redirect a /admin/login si no hay sesión; sidebar
   admin/(panel)/{page,leads,leads/[id],config,equipo}/page.tsx
 components/
-  landing/   Nav (client), Hero, HeroGraphic, Problem, Approach, Services, Process, UseCases, ContactForm (client), Footer
+  landing/   Nav (client), Hero, HeroPanel (client), Problem, Approach, Services, Process, UseCases, ContactForm (client), Footer
   diagnostico/  DiagnosticoFlow.tsx (client), AhorroEstimator.tsx (client), cuestionario.ts, ahorro.ts
   admin/     ConfigEditor, TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
   Logo.tsx (Logo, LogoMark) · icons.tsx · LinkedInIcon.tsx
-lib/content.ts   textos por defecto (nav, heroTags, problems, approach, services, useCases…)
-lib/site.ts      SECTIONS, defaultSiteConfig(), getSiteConfig(), getTeamMembers(), renderHighlight()  (server-only)
+lib/content.ts      textos por defecto (nav, heroFeed/heroFeedMore del panel del hero, problems, approach, services, useCases…)
+lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig(), mergeConfig(), normalizeTags(), renderHighlight()  (puro: tests y admin)
+lib/site.ts         getSiteConfig(), getTeamMembers() + re-exports de lib/siteConfig.ts  (server-only)
 ```
 
 Regla: una sección de landing = un componente en `components/landing/`; un editor del admin = un componente en `components/admin/`; lógica pura del diagnóstico en archivos `.ts` junto a sus componentes.
@@ -62,10 +63,10 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 - Los componentes de sección aceptan `content?` y caen a `defaultSiteConfig()` si no viene (patrón de `Hero`, `Services`, `UseCases`).
 
 ### CMS y visibilidad
-- Cada sección o página tiene toggle en `SECTIONS` (`lib/site.ts`). Se renderiza solo si `visible[key]`; las páginas ocultas devuelven `notFound()`.
+- Cada sección o página tiene toggle en `SECTIONS` (`lib/siteConfig.ts`, re-exportado por `lib/site.ts`). Se renderiza solo si `visible[key]`; las páginas ocultas devuelven `notFound()`.
 - Sección nueva editable: agregar clave a `SECTIONS`, default en `defaultSiteConfig()`, mezcla en `mergeConfig()`, tipo en `SiteContent`, editor en `components/admin/ConfigEditor.tsx` y fila en `docs/data-model.md`.
 - Textos fijos que no son del CMS viven en `lib/content.ts`, nunca hardcodeados en el JSX.
-- `title` del hero admite `**resalte**` → `renderHighlight()` produce `<span className="text-brand">`.
+- `title` del hero admite `**resalte**` → `renderHighlight()` devuelve las partes y `Hero.tsx` pinta el resalte con `.text-gradient-brand`. Los textos del CMS se mezclan con `mergeConfig()`: un campo que no sea texto o quede vacío cae al default (no confiar en la forma de lo guardado).
 
 ### Estado y datos
 - Estado local con `useState`; sin librerías de estado global.
@@ -74,9 +75,12 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 - Los formularios públicos no deben bloquearse por fallos secundarios (`DiagnosticoFlow` confirma aunque el backend falle).
 
 ### Estilos y diseño
-- Solo tokens de `tailwind.config.ts`: colores `navy`, `brand`, `brand-light`, `accent`, `ink`/`ink-muted`/`ink-soft`, `surface`/`surface-soft`/`surface-muted`, `line`; sombras `shadow-card`, `shadow-float`, `shadow-cta`; ancho `max-w-content` (1200 px). **No introducir hex nuevos**; si hace falta un color, agregarlo como token.
-- Primitivas antes que clases repetidas: `.container-page`, `.btn-primary`, `.btn-ghost`, `.pill`, `.card`, `.field`.
-- Tipografía: títulos `font-extrabold` con `tracking` negativo y `text-balance`; cuerpo `text-ink-muted leading-relaxed`; eyebrows `text-xs font-bold tracking-[2.5px] text-brand`.
+- Solo tokens de `tailwind.config.ts`: colores `navy` (+ `navy-950/800/700`), `brand` (+ `brand-dark` para hover, `brand-deep` para texto y degradados cian sobre blanco, `brand-50/100`), `brand-light` (+ `brand-light-50`), `accent` (+ `accent-strong` para texto chico, `accent-50`), `success` (+ `success-strong`, `success-50`, `success-live`), `ink`/`ink-muted`/`ink-soft`/`ink-faint` (este último solo decorativo: no cumple contraste para texto), `surface`/`surface-soft`/`surface-muted`, `line`/`line-strong`; sombras `shadow-card`, `shadow-float`, `shadow-cta`, `shadow-lift`, `shadow-form`; animaciones `animate-feed-in`, `animate-bob`, `animate-bob-slow`, `animate-live-pulse` (siempre con `motion-safe:`); ancho `max-w-content` (1200 px). Los tonos nuevos son los de la HDU-08 §7. **No introducir hex nuevos**; si hace falta un color, agregarlo como token.
+- No usar `brand-light` (`#00C2FF`, 2,1:1) para texto sobre blanco; para eso está `brand-deep` (3,5:1, solo texto grande).
+- Primitivas antes que clases repetidas: `.container-page`, `.btn-primary`, `.btn-ghost`, `.pill`, `.card`, `.field`, `.text-gradient-brand` (resalte con degradado `brand` → `brand-deep`; sin soporte de `background-clip` queda en `brand`) y `.bg-dots` (trama de puntos; la máscara la pone cada sección).
+- En grids que mezclan texto con paneles de ancho mínimo grande, usar columnas `minmax(0, …)` para que en móvil no crezcan más que el contenedor.
+- Tipografía: títulos `font-extrabold` con `tracking` negativo y `text-balance`; cuerpo `text-ink-muted leading-relaxed`; eyebrows de sección `text-xs font-bold tracking-[2.5px] text-brand`. El eyebrow del hero (desde HDU-01) es una píldora blanca con check: `font-mono text-xs font-semibold tracking-[1.6px] text-navy`.
+- `success` (`#138A4D`) es para íconos y marcas de completado; para texto chico sobre `success-50` usar `success-strong` (5,02:1; `success` da 4,09:1 y no cumple).
 - Responsive mobile-first con breakpoints `md`/`lg`; el sidebar del admin se oculta bajo `md`.
 - Dirección de diseño "1b claro & azul": fondo blanco/`surface-soft`, acento azul `brand`, detalles cian y naranjo puntuales.
 

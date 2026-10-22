@@ -144,7 +144,7 @@ app/
   api/leads/route.ts · api/diagnostico/report/route.ts
   api/admin/session · config · team · team/[id] · leads/[id] · leads/[id]/pdf · upload · test-email
 components/
-  landing/  Nav, Hero, HeroGraphic, Problem, Approach, Services, Process, UseCases, ContactForm, Footer
+  landing/  Nav, Hero, HeroPanel, Problem, Approach, Services, Process, UseCases, ContactForm, Footer
   diagnostico/  DiagnosticoFlow.tsx, AhorroEstimator.tsx, cuestionario.ts, ahorro.ts
   admin/  ConfigEditor, TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton
   Logo.tsx · icons.tsx · LinkedInIcon.tsx

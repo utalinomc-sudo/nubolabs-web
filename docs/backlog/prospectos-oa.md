@@ -2,6 +2,8 @@
 
 > Historias de usuario enriquecidas el 2026-10-16 a partir del documento interno "Preparar la web para los prospectos de O&A" (septiembre 2026). Estado: **listas para `/opsx:ff`**, una por una, en el orden de la sección 2.
 > Fuente única de textos y decisiones de producto: este archivo. Copia de lectura en el Escritorio de Mauro.
+>
+> **Actualización 2026-10-21 — HDU-08 aprobada** (`docs/backlog/propuesta-valor-hdu-08.md`): la propuesta de valor deja de centrarse en el ahorro de horas y pasa a cuatro resultados de negocio (vendes más, tienes el control, nada se olvida, creces sin desordenarte); cambian el formulario (HDU-03) y el proceso. **Cuando un texto de este archivo choque con la HDU-08, manda la HDU-08.** Referencia visual: `docs/design/propuesta-web-hdu-08.html`. Se suman dos historias nuevas: **HDU-09** `diagnostico-mapa-oportunidades` y **HDU-10** `cierre-landing-faq-cta`.
 
 ## 1. Resumen ejecutivo
 
@@ -20,6 +22,10 @@
 | HDU-05 | `casos-por-rubro` | Casos de uso reconocibles por rubro, con filtro | 2 | M | HDU-02 |
 | HDU-06 | `cifras-con-respaldo` | Cifras editables desde el CMS y ocultas hasta tener datos reales | 2 | S | — |
 | HDU-07 | `landing-referidos-oa` | Entrada `/oa` que confirma la recomendación y mide cuántos leads trae el correo | 2 (opcional, recomendada) | M | HDU-04 |
+| HDU-09 | `diagnostico-mapa-oportunidades` | El diagnóstico entrega un "mapa de oportunidades" en vez de ahorro en horas/CLP; el estimador pasa al admin | 2 | M | HDU-02 |
+| HDU-10 | `cierre-landing-faq-cta` | Preguntas frecuentes editables, CTA final, CTA fija en móvil y footer nuevo | 2 | S | HDU-02, HDU-03 |
+
+**Orden aprobado el 2026-10-21 (HDU-08 §15):** HDU-01 → HDU-03 → HDU-02 → HDU-10 → HDU-04 → HDU-06 → HDU-05 → HDU-07 → HDU-09. Desde la HDU-08, cada cambio implementa sus secciones con el diseño de `docs/design/propuesta-web-hdu-08.html`; los tokens de diseño nuevos entran en HDU-01.
 
 **Tamaños:** S = una sesión corta, M = una sesión completa con pruebas en preview. Todas pasan por el flujo `/opsx:ff` → `/opsx:apply` → `/opsx:verify` → `/adversarial-review` → `/opsx:archive` → `/commit`, con preview de Vercel revisado por Mauro antes de mezclar.
 
@@ -34,7 +40,7 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 ## 3. Restricciones globales (lo que no se toca y cómo se trabaja)
 
 - **Se mantiene** (sección 04 del documento): el diferenciador "Rediseñamos antes de automatizar", el diagnóstico gratuito de 30 minutos sin compromiso, la estructura problema → enfoque → servicios → casos → agendar, y el diagnóstico interactivo de `/diagnostico` (solo se simplifica su lenguaje, no su lógica).
-- **Mismo esqueleto:** no se agregan ni reordenan secciones salvo las que estas HDU indican (confianza, cifras). No cambian colores, tipografías ni componentes de marca.
+- **Mismo esqueleto:** no se agregan ni reordenan secciones salvo las que estas HDU indican (confianza, cifras). ~~No cambian colores, tipografías ni componentes de marca.~~ *Reemplazado por la HDU-08 (2026-10-21):* se mantienen paleta, tipografías y logo, se suman los tokens de la HDU-08 §7 y las secciones nuevas "Lo que ganas", preguntas frecuentes y CTA final.
 - **CMS primero:** todo texto nuevo que el dueño pueda querer ajustar queda editable desde `/admin/config` (`lib/site.ts`, `components/admin/ConfigEditor.tsx`). Los valores por defecto en código (`lib/content.ts`, `defaultSiteConfig()`) también cambian, para que producción muestre lo nuevo aunque Firestore no tenga overrides.
 - **Idioma:** español de Chile, tuteo, frases cortas, sin siglas. Los textos finales los propone Claude en cada cambio y los aprueba Mauro en el preview antes de mezclar.
 - **Datos personales:** nada nuevo se guarda sin decirlo en `docs/data-model.md` y `docs/api-spec.yml`; el consentimiento se registra con fecha y texto mostrado (HDU-03).
@@ -54,6 +60,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 **Contexto.** El hero es editable desde el CMS (`content.hero`: `eyebrow`, `title`, `subtitle`, `ctaPrimary`, `ctaSecondary`), con defaults en `defaultSiteConfig()` de `lib/site.ts` y render en `components/landing/Hero.tsx` (el título admite `**resalte**`). Hoy: eyebrow "◈ AI & AUTOMATION AGENCY", título "Rediseñamos procesos y los convertimos en **automatizaciones con IA** que trabajan en la nube.", subtítulo técnico, CTA "Solicitar diagnóstico →" / "Ver servicios". Los tres `heroTags` ("Rediseño antes de automatizar", "Soluciones a medida", "Impacto medible") viven en `lib/content.ts` y no son editables.
 
 **Objetivo.** Que en los primeros 5 segundos un dueño de pyme entienda qué gana, en su idioma.
+
+> **Ajuste HDU-08 (aprobado 2026-10-21):** título **"Que tu negocio **trabaje para ti**, no al revés."**; bajada de HDU-08 §2; CTA "Quiero mi diagnóstico gratis" (lleva al formulario de la portada, ancla `#contacto`, no a `/diagnostico`; si la sección de contacto está oculta, a `/diagnostico`) y "Ver cómo trabajamos"; tags (como en la referencia visual aprobada) "30 minutos, gratis y sin compromiso" · "Sin cambiar tus sistemas" · "Respuesta en menos de 24 horas". Se descarta "Te devolvemos las horas…". El criterio "promesa en términos de horas, errores o tiempo" pasa a **"promesa de resultado de negocio"**. El alcance suma los tokens de diseño (HDU-08 §7) y el panel "Tu negocio hoy" que reemplaza a `HeroGraphic.tsx`.
 
 **Alcance.**
 - Nuevos textos por defecto del hero (propuesta; Mauro elige o ajusta en el preview):
@@ -91,6 +99,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 **Contexto.** El vocabulario técnico está repartido: `lib/content.ts` (`approach`: "Flujos, reportes y agentes IA"; `services`: "Sistemas y agentes IA a medida", "CRM, ERP, WhatsApp y bases de datos"; `steps`: "Automatizaciones, reportes y agentes"; `useCases`: "Agentes IA conectados", "Correos con IA"), `lib/site.ts` (hero subtitle; `casos.subtitle`: "Ejemplos que implementamos con n8n, Make, APIs e IA"), `components/landing/HeroGraphic.tsx` (nodo "CRM"), `components/landing/ContactForm.tsx` (texto lateral) y `/diagnostico` (textos de `DiagnosticoFlow.tsx`). Problemas, Enfoque y Proceso solo son visibles/ocultables; sus textos viven en código (pendiente 2 de `ESTADO-PROYECTO.md`).
 
 **Objetivo.** Que ninguna sección obligue al visitante a conocer una herramienta o sigla para entender qué gana; el "cómo lo hacemos" queda en una línea pequeña, al final de Servicios.
+
+> **Ajuste HDU-08 (aprobado 2026-10-21):** textos de servicios, proceso y "¿Te suena?" de HDU-08 §2, §3 y §5.1; nueva sección **"Lo que ganas"** (4 resultados) entre Problemas y Enfoque; "horas ahorradas" y "ROI estimado" también salen del vocabulario; el paso 4 del proceso es "Medimos y mejoramos — tú defines qué es éxito". Cada sección tocada se rediseña según `docs/design/propuesta-web-hdu-08.html`.
 
 **Alcance.**
 - Barrido de textos con esta tabla de reemplazos (propuesta base; se completa en el cambio):
@@ -137,6 +147,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 **Objetivo.** Que dejar el correo y agendar cueste lo mínimo, que el prospecto empiece a pensar en su dolor, y que Nubolabs tenga permiso explícito para seguir escribiéndole.
 
+> **⚠ Alcance reemplazado por HDU-08 §6 (aprobado 2026-10-21).** Formulario de **2 pasos**: (1) "¿Qué te gustaría lograr?" con chips de objetivos (`goals[]`) y rubro (`industry`), se puede saltar; (2) nombre, correo y **WhatsApp obligatorios**, empresa y "¿Algo que quieras contarnos antes de la llamada?" opcionales, consentimiento **obligatorio** de contacto (`contactConsent`) y opcional de novedades (`marketingConsent`). Se elimina la pregunta "¿Qué tarea te gustaría dejar de hacer a mano?". Pantalla de éxito con agenda inmediata. El resto de esta sección (privacidad, admin, correo de aviso, datos con prueba de consentimiento) sigue vigente con esos campos.
+
 **Alcance.**
 - **Paso 1 (siempre visible, 3 campos + botón):** Nombre, Correo, casilla `Quiero recibir información y novedades de Nubolabs` (desmarcada por defecto, no obligatoria, con enlace "Cómo cuidamos tus datos" a `/privacidad`) y botón `Agendar mi diagnóstico gratis →`.
 - **Paso 1b (desplegable "Cuéntanos un poco más (opcional)")**: Teléfono / WhatsApp, Empresa, Rubro (selector: Gastronomía, Automotriz, Construcción, Servicios profesionales, Comercio, Otro) y la pregunta abierta `¿Qué tarea te gustaría dejar de hacer a mano?` (2 líneas). Todo opcional. Decisión: un solo envío con los campos que el prospecto quiso llenar; no se crea un segundo endpoint para completar datos (evita exponer leads por id).
@@ -176,6 +188,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 **Objetivo.** Que inmediatamente después del hero el visitante vea que empresas y estudios contables serios confían en Nubolabs, y que Mauro pueda cargar testimonios reales a medida que lleguen.
 
+> **Ajuste HDU-08 (aprobado 2026-10-21):** el bloque sigue el diseño de la referencia (testimonio a la izquierda + "Nuestro compromiso contigo" a la derecha). Testimonio de Mauricio O. revisado en HDU-08 §8, **solo se carga cuando él lo apruebe**; mientras, el texto puente.
+
 **Alcance.**
 - Nueva sección `confianza` en `SECTIONS` (entre `hero` y `problema`), visible por defecto, con `content.confianza`:
   - `eyebrow` ("NOS RECOMIENDAN"), `titulo`, `textoPuente` (default: "Trabajamos con estudios contables y empresas que nos recomiendan a sus clientes.") y `testimonios[]` (`nombre`, `cargo`, `empresa`, `texto`, `destacado: boolean`).
@@ -210,6 +224,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 **Contexto.** `content.casos.items` (`title`, `body`) es editable desde el CMS y se renderiza en `components/landing/UseCases.tsx` en una grilla única. No hay noción de rubro.
 
 **Objetivo.** Que un dueño de restaurante, taller o constructora encuentre en segundos un ejemplo que suene a su negocio.
+
+> **Ajuste HDU-08 (aprobado 2026-10-21):** los casos por defecto son los de HDU-08 §4 (incluye "Comercio" con ejemplos propios). La lista de rubros es la misma constante que usa el formulario (HDU-03).
 
 **Alcance.**
 - `CaseItem` gana `rubro` (valores: `todos`, `gastronomia`, `automotriz`, `construccion`, `servicios`, `comercio`), editable en el CMS con un selector por ítem.
@@ -267,6 +283,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 **Decisión a confirmar con Mauro.** Ocultar las cifras de inmediato (recomendado por el documento) o dejarlas visibles hasta tener las reales.
 
+> **Ajuste HDU-08 (aprobado 2026-10-21):** se ocultan de inmediato. Cuando haya datos del piloto, preferir cifras de resultado (por ejemplo "cotizaciones el mismo día") antes que horas.
+
 ---
 
 ## HDU-07 · Entrada `/oa` para los referidos de O&A y medición de la campaña
@@ -285,6 +303,8 @@ Derivada de "Usar la recomendación de O&A" y del contexto: el correo lleva el l
 **Alcance.**
 - Ruta `/oa` (y alias `?ref=oa` en la portada) que renderiza la misma landing con una franja superior editable desde el CMS (`content.referidos.oa.titulo`, `texto`): default "Bienvenido, cliente de Osorio & Asociados. Tu contador nos recomendó porque ayudamos a empresas como la tuya a dejar de perder horas en tareas manuales."
 - El formulario y el diagnóstico iniciados desde `/oa` envían `source: "oa"` (campo oculto / estado persistido en `sessionStorage` para que se mantenga al pasar a `/diagnostico`).
+
+> **Ajuste al crear el cambio OpenSpec (2026-10-21):** en vez de `source: "oa"`, el lead guarda un campo aparte **`referral: "oa"`** y `source` sigue indicando el formulario (`landing` o `diagnostico`). Motivo: con `source: "oa"`, un diagnóstico hecho vía O&A dejaría de recibir su informe PDF (se envía solo si `source === "diagnostico"`) y se perdería el conteo por formulario. Detalle en `openspec/changes/landing-referidos-oa/design.md`, decisión 1. Donde abajo dice `source: "oa"`, léase `referral: "oa"`.
 - Admin: la lista de leads muestra el origen con una etiqueta y permite filtrar por "oa"; el dashboard agrega "Leads por origen (últimos 30 días)".
 - El correo de aviso ya incluye "Origen"; se mantiene.
 - Documentación: `docs/api-spec.yml` (valores de `source`), `docs/data-model.md`, `docs/ESTADO-PROYECTO.md` (cómo medir la campaña).
@@ -303,7 +323,21 @@ Derivada de "Usar la recomendación de O&A" y del contexto: el correo lleva el l
 
 ---
 
+## HDU-09 · Diagnóstico con mapa de oportunidades (sin ahorro en horas)
+
+**Cambio OpenSpec:** `diagnostico-mapa-oportunidades` · Fase 2 · Tamaño M · Depende de HDU-02 · Detalle completo en HDU-08 §5.3.
+
+**Resumen.** El resultado de `/diagnostico` deja de ser "índice de fricción + ahorro estimado" y pasa a **"Tu mapa de oportunidades"**: 4 dimensiones (Ventas y clientes, Control y números, Orden y seguimiento, Equipo y crecimiento) que agrupan las 6 áreas actuales sin cambiar preguntas ni escala, con nivel de oportunidad alta/media/baja. El estimador de ahorro sale del flujo público y queda como herramienta interna del admin (el cálculo de `ahorro.ts` y sus tests no cambian). El informe PDF muestra las 3 oportunidades principales y el próximo paso. La landing suma el bloque "Autodiagnóstico · 5 minutos" con un ejemplo del mapa.
+
+## HDU-10 · Cierre de la landing: preguntas frecuentes, CTA final y CTA fija en móvil
+
+**Cambio OpenSpec:** `cierre-landing-faq-cta` · Fase 2 · Tamaño S · Depende de HDU-02 y HDU-03 · Diseño en `docs/design/propuesta-web-hdu-08.html`.
+
+**Resumen.** Sección de preguntas frecuentes editable desde el CMS (6 preguntas por defecto de la referencia, incluida "¿Qué hacen con mis datos?" con enlace a `/privacidad`), banda de CTA final, botón fijo "Quiero mi diagnóstico gratis" en móvil (visible tras el hero y oculto cerca del formulario) y footer nuevo con columnas de servicios, Nubolabs, contacto y privacidad.
+
 ## 4. Preguntas abiertas para Mauro
+
+> **Resueltas el 2026-10-21 con la aprobación de la HDU-08:** 5 (rubros, se agrega "Comercio"), 6 (cifras ocultas de inmediato) y 7 (eyebrow "PARA DUEÑOS DE PYMES"). Siguen abiertas 1, 2, 3 y 4 (ver HDU-08 §14).
 
 1. **¿Cuándo sale el correo de O&A y qué link llevará?** Define la fase (1 o completa) y si conviene adelantar HDU-07 para usar `nubolabs.cl/oa`.
 2. **¿Tenemos ya un testimonio o una frase autorizada de O&A?** Si sí, HDU-04 sube de prioridad; si no, se usa el texto puente.
@@ -325,10 +359,12 @@ Claude crea propuesta, diseño y tareas; Mauro revisa; `/opsx:apply`; verificaci
 
 | HDU | Estado |
 |---|---|
-| HDU-01 mensaje-principal-pyme | pendiente |
-| HDU-02 lenguaje-sin-jerga | pendiente |
-| HDU-03 formulario-minimo-consentimiento | pendiente |
-| HDU-04 confianza-recomendacion | pendiente |
-| HDU-05 casos-por-rubro | pendiente |
-| HDU-06 cifras-con-respaldo | pendiente |
-| HDU-07 landing-referidos-oa | pendiente |
+| HDU-01 mensaje-principal-pyme | en curso: implementado en `feature/mensaje-principal-pyme` (2026-10-22); lint, tipos, 37 tests, build y E2E a 1280/375 px en verde (`openspec/changes/mensaje-principal-pyme/reports/`). Falta: revisión adversaria, preview de Vercel, archivar, commit y mezcla; después, en producción, "Usar los textos recomendados" en `/admin/config` → Hero |
+| HDU-02 lenguaje-sin-jerga | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-03 formulario-minimo-consentimiento | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-04 confianza-recomendacion | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-05 casos-por-rubro | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-06 cifras-con-respaldo | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-07 landing-referidos-oa | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-09 diagnostico-mapa-oportunidades | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-10 cierre-landing-faq-cta | en curso: artefactos OpenSpec creados (2026-10-21); actualizados el 2026-10-22 con el WhatsApp de contacto configurable (`content.contact`, apagado por defecto; HDU-08 §14 fila 8) |

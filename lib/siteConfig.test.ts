@@ -1,0 +1,114 @@
+// Tests de la configuración pura del sitio (cambio mensaje-principal-pyme, design.md decisiones 2 y 3).
+import { describe, expect, it } from "vitest";
+import { defaultSiteConfig, mergeConfig, normalizeTags } from "@/lib/siteConfig";
+
+const DEFAULT_TAGS = [
+  "30 minutos, gratis y sin compromiso",
+  "Sin cambiar tus sistemas",
+  "Respuesta en menos de 24 horas",
+];
+
+// Palabras que el mensaje principal no puede usar (spec landing/hero, "Vocabulario prohibido").
+const FORBIDDEN = new Set(["horas", "ia", "nube", "automatización", "automatizaciones"]);
+function forbiddenWordsIn(text: string): string[] {
+  return (text.match(/\p{L}+/gu) ?? []).map((w) => w.toLowerCase()).filter((w) => FORBIDDEN.has(w));
+}
+
+describe("normalizeTags", () => {
+  it("devuelve null si el valor no es un arreglo", () => {
+    expect(normalizeTags(undefined)).toBeNull();
+    expect(normalizeTags(null)).toBeNull();
+    expect(normalizeTags("Sin cambiar tus sistemas")).toBeNull();
+    expect(normalizeTags({ 0: "a" })).toBeNull();
+  });
+
+  it("recorta los textos y descarta vacíos y no-strings", () => {
+    expect(normalizeTags(["  Primera sesión sin costo ", "  ", 42, null, "Te respondemos hoy"])).toEqual([
+      "Primera sesión sin costo",
+      "Te respondemos hoy",
+    ]);
+  });
+
+  it("toma como máximo 3 etiquetas", () => {
+    expect(normalizeTags(["a", "b", "c", "d", "e"])).toEqual(["a", "b", "c"]);
+  });
+
+  it("devuelve null si no queda ninguna etiqueta", () => {
+    expect(normalizeTags([])).toBeNull();
+    expect(normalizeTags(["", "   ", 7])).toBeNull();
+  });
+});
+
+describe("mergeConfig — hero", () => {
+  it("sin content.hero usa todos los defaults", () => {
+    const base = defaultSiteConfig();
+    expect(mergeConfig(base, {}).content.hero).toEqual(base.content.hero);
+    expect(mergeConfig(base, { content: {} }).content.hero).toEqual(base.content.hero);
+  });
+
+  it("un override parcial solo reemplaza el campo guardado", () => {
+    const base = defaultSiteConfig();
+    const hero = mergeConfig(base, { content: { hero: { title: "Otro título" } } }).content.hero;
+    expect(hero.title).toBe("Otro título");
+    expect({ ...hero, title: base.content.hero.title }).toEqual(base.content.hero);
+  });
+
+  it("con tags ausente o vacío usa las etiquetas por defecto", () => {
+    const base = defaultSiteConfig();
+    expect(mergeConfig(base, { content: { hero: { title: "x" } } }).content.hero.tags).toEqual(DEFAULT_TAGS);
+    expect(mergeConfig(base, { content: { hero: { tags: [] } } }).content.hero.tags).toEqual(DEFAULT_TAGS);
+  });
+
+  it("muestra solo las etiquetas con texto y como máximo 3", () => {
+    const base = defaultSiteConfig();
+    const edited = mergeConfig(base, {
+      content: { hero: { tags: ["Primera sesión sin costo", "  ", "Te respondemos hoy"] } },
+    });
+    expect(edited.content.hero.tags).toEqual(["Primera sesión sin costo", "Te respondemos hoy"]);
+    const five = mergeConfig(base, { content: { hero: { tags: ["1", "2", "3", "4", "5"] } } });
+    expect(five.content.hero.tags).toEqual(["1", "2", "3"]);
+  });
+
+  it("ignora campos que no son texto o quedan vacíos y usa el default (spec: datos inválidos)", () => {
+    const base = defaultSiteConfig();
+    const hero = mergeConfig(base, {
+      content: { hero: { title: null, subtitle: { a: 1 }, ctaPrimary: "  ", eyebrow: 42, ctaSecondary: "Ver más" } },
+    }).content.hero;
+    expect(hero.title).toBe(base.content.hero.title);
+    expect(hero.subtitle).toBe(base.content.hero.subtitle);
+    expect(hero.ctaPrimary).toBe(base.content.hero.ctaPrimary);
+    expect(hero.eyebrow).toBe(base.content.hero.eyebrow);
+    expect(hero.ctaSecondary).toBe("Ver más");
+  });
+
+  it("con content.hero de tipo texto usa los defaults sin claves extra", () => {
+    const base = defaultSiteConfig();
+    const hero = mergeConfig(base, { content: { hero: "abc" } }).content.hero;
+    expect(hero).toEqual(base.content.hero);
+    expect(Object.keys(hero).sort()).toEqual(Object.keys(base.content.hero).sort());
+  });
+
+  it("no altera el resto de las secciones", () => {
+    const base = defaultSiteConfig();
+    const merged = mergeConfig(base, { content: { hero: { title: "x" } } });
+    expect(merged.content.servicios).toEqual(base.content.servicios);
+    expect(merged.visible).toEqual(base.visible);
+  });
+});
+
+describe("defaults del hero", () => {
+  const hero = defaultSiteConfig().content.hero;
+
+  it("tienen el mensaje de la HDU-08", () => {
+    expect(hero.eyebrow).toBe("PARA DUEÑOS DE PYMES");
+    expect(hero.title).toBe("Que tu negocio **trabaje para ti**, no al revés.");
+    expect(hero.ctaPrimary).toBe("Quiero mi diagnóstico gratis");
+    expect(hero.ctaSecondary).toBe("Ver cómo trabajamos");
+    expect(hero.tags).toEqual(DEFAULT_TAGS);
+  });
+
+  it("título y bajada no usan horas, IA, nube ni automatización", () => {
+    expect(forbiddenWordsIn(hero.title)).toEqual([]);
+    expect(forbiddenWordsIn(hero.subtitle)).toEqual([]);
+  });
+});

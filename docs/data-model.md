@@ -58,12 +58,13 @@ Escribe `POST /api/admin/team` (crea con `add` o actualiza con `set merge`); bor
 
 ### `config/site` — configuración del CMS (documento único)
 
-Escribe `POST /api/admin/config` con `set(patch, { merge: true })`; lee `getSiteConfig()` en `lib/site.ts`, que mezcla el documento **sobre los defaults** de `defaultSiteConfig()` (los textos por defecto vienen de `lib/content.ts`). Tipos `SiteConfig`, `SiteContent` en `lib/site.ts`.
+Escribe `POST /api/admin/config` con `set(patch, { merge: true })`; lee `getSiteConfig()` en `lib/site.ts`, que mezcla el documento con `mergeConfig()` **sobre los defaults** de `defaultSiteConfig()`. Los tipos (`SiteConfig`, `SiteContent`), los defaults y la mezcla viven en `lib/siteConfig.ts` (módulo puro, testeado en `lib/siteConfig.test.ts`); `lib/site.ts` los re-exporta.
 
 | Campo | Tipo | Descripción |
 |---|---|---|
 | `visible` | `Record<string, boolean>` | Visibilidad por sección. Claves válidas = `SECTIONS[].key`: `hero`, `problema`, `enfoque`, `servicios`, `proceso`, `casos`, `nosotros`, `equipo`, `contacto` |
-| `content.hero` | `{ eyebrow, title, subtitle, ctaPrimary, ctaSecondary }` | `title` admite `**resalte**` → texto azul (`renderHighlight`) |
+| `content.hero` | `{ eyebrow, title, subtitle, ctaPrimary, ctaSecondary, tags? }` | `title` admite `**resalte**` → texto con el degradado de marca (`renderHighlight` + `.text-gradient-brand`). Cada campo guardado gana sobre su default |
+| `content.hero.tags` | `string[]` (opcional) | Etiquetas bajo los botones del hero (cambio mensaje-principal-pyme). Al leer se normalizan con `normalizeTags()`: se recortan, se descartan vacías y no-strings y se toman las 3 primeras; si no es arreglo o queda vacía se usan los defaults ("30 minutos, gratis y sin compromiso", "Sin cambiar tus sistemas", "Respuesta en menos de 24 horas"). Documentos sin `tags` siguen siendo válidos |
 | `content.servicios` | `{ eyebrow, title, items[] { title, body, result } }` | |
 | `content.casos` | `{ eyebrow, title, subtitle, items[] { title, body } }` | |
 | `content.nosotros` | `{ eyebrow, title, mision, vision, objetivos[] }` | Página `/mision-vision` |

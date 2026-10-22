@@ -1,22 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { defaultSiteConfig, type CaseItem, type ServiceItem, type SiteContent } from "@/lib/siteConfig";
 
-interface ServiceItem {
-  title: string;
-  body: string;
-  result: string;
-}
-interface CaseItem {
-  title: string;
-  body: string;
-}
-interface Content {
-  hero: { eyebrow: string; title: string; subtitle: string; ctaPrimary: string; ctaSecondary: string };
-  servicios: { eyebrow: string; title: string; items: ServiceItem[] };
-  casos: { eyebrow: string; title: string; subtitle: string; items: CaseItem[] };
-  nosotros: { eyebrow: string; title: string; mision: string; vision: string; objetivos: string[] };
-}
+// Secciones que edita esta pantalla (los tipos vienen de lib/siteConfig.ts, sin duplicarlos).
+type Content = Pick<SiteContent, "hero" | "servicios" | "casos" | "nosotros">;
+type HeroTextKey = Exclude<keyof Content["hero"], "tags">;
+
+const HERO_TAG_SLOTS = 3;
+
 interface Props {
   sections: { key: string; label: string; hint: string }[];
   initialVisible: Record<string, boolean>;
@@ -48,9 +40,23 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
   const [content, setContent] = useState<Content>(initialContent);
   const [status, setStatus] = useState<"idle" | "saving" | "ok" | "error">("idle");
   const [error, setError] = useState("");
+  const [heroReset, setHeroReset] = useState(false);
 
-  function setHero<K extends keyof Content["hero"]>(k: K, v: string) {
+  function setHero(k: HeroTextKey, v: string) {
     setContent((c) => ({ ...c, hero: { ...c.hero, [k]: v } }));
+  }
+  // Etiquetas del hero: siempre 3 casillas; las vacías no se muestran en la portada (normalizeTags).
+  function setHeroTag(i: number, v: string) {
+    setContent((c) => {
+      const tags = Array.from({ length: HERO_TAG_SLOTS }, (_, idx) => c.hero.tags[idx] ?? "");
+      tags[i] = v;
+      return { ...c, hero: { ...c.hero, tags } };
+    });
+  }
+  // Carga en el formulario los textos recomendados del hero sin guardar (design.md decisión 6).
+  function loadRecommendedHero() {
+    setContent((c) => ({ ...c, hero: defaultSiteConfig().content.hero }));
+    setHeroReset(true);
   }
   function setServiciosMeta(k: "eyebrow" | "title", v: string) {
     setContent((c) => ({ ...c, servicios: { ...c.servicios, [k]: v } }));
@@ -94,6 +100,7 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
       });
       if (!res.ok) throw new Error();
       setStatus("ok");
+      setHeroReset(false); // el aviso de "textos recomendados cargados" ya no aplica tras guardar
       setTimeout(() => setStatus("idle"), 2500);
     } catch {
       setStatus("error");
@@ -141,7 +148,21 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
 
       {/* Hero */}
       <section className="card p-6">
-        <h2 className="font-extrabold">Inicio (Hero)</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-extrabold">Inicio (Hero)</h2>
+          <button
+            type="button"
+            onClick={loadRecommendedHero}
+            className="rounded-lg border border-line-strong px-3 py-2 text-[13px] font-semibold text-ink-soft transition hover:border-brand hover:text-brand"
+          >
+            Usar los textos recomendados
+          </button>
+        </div>
+        {heroReset && (
+          <p role="status" className="mt-2 text-[12px] font-semibold text-brand">
+            Textos recomendados cargados. Revísalos y pulsa “Guardar cambios” para publicarlos.
+          </p>
+        )}
         <div className="mt-4 space-y-4">
           <Field label="Etiqueta superior" value={content.hero.eyebrow} onChange={(v) => setHero("eyebrow", v)} />
           <Field
@@ -149,12 +170,27 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
             value={content.hero.title}
             onChange={(v) => setHero("title", v)}
             textarea
-            hint="Envuelve texto en **dobles asteriscos** para resaltarlo en azul."
+            hint="Envuelve texto en **dobles asteriscos** para destacarlo con el degradado de marca."
           />
           <Field label="Subtítulo" value={content.hero.subtitle} onChange={(v) => setHero("subtitle", v)} textarea />
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Botón principal" value={content.hero.ctaPrimary} onChange={(v) => setHero("ctaPrimary", v)} />
             <Field label="Botón secundario" value={content.hero.ctaSecondary} onChange={(v) => setHero("ctaSecondary", v)} />
+          </div>
+          <div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {Array.from({ length: HERO_TAG_SLOTS }, (_, i) => (
+                <Field
+                  key={i}
+                  label={`Etiqueta ${i + 1}`}
+                  value={content.hero.tags[i] ?? ""}
+                  onChange={(v) => setHeroTag(i, v)}
+                />
+              ))}
+            </div>
+            <span className="mt-1 block text-[11px] text-ink-muted">
+              Frases cortas bajo los botones, con un ✓. Deja una vacía para ocultarla; si las tres quedan vacías se usan las recomendadas.
+            </span>
           </div>
         </div>
       </section>

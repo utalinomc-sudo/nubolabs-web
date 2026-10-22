@@ -7,10 +7,35 @@ export const nav = [
   { label: "Casos de uso", href: "/#casos" },
 ];
 
-export const heroTags = [
-  { label: "Rediseño antes de automatizar", color: "#FF6B5E" },
-  { label: "Soluciones a medida", color: "#00C2FF" },
-  { label: "Impacto medible", color: "#1565FF" },
+// Panel "Tu negocio hoy" del hero (cambio mensaje-principal-pyme, design.md decisión 4).
+// Ejemplos ilustrativos de producto: sin cifras de resultados, montos ni clientes reales. No van al CMS.
+export type HeroFeedIcon = "file" | "wallet" | "chat" | "package" | "chart" | "calendar" | "bell";
+export type HeroFeedTone = "brand" | "accent" | "cyan" | "success";
+export interface HeroFeedItem {
+  icon: HeroFeedIcon;
+  tone: HeroFeedTone;
+  title: string;
+  detail: string;
+}
+
+// Las 5 tareas iniciales (render del servidor y versión estática con "reducir movimiento").
+export const heroFeed: HeroFeedItem[] = [
+  { icon: "file", tone: "brand", title: "Cotización enviada al cliente", detail: "Ventas · el mismo día que la pidió" },
+  { icon: "wallet", tone: "accent", title: "Recordatorio de pago enviado", detail: "Cobranza · factura por vencer" },
+  { icon: "chat", tone: "cyan", title: "Consulta de WhatsApp respondida", detail: "Clientes · 23:14, sin despertar a nadie" },
+  { icon: "package", tone: "success", title: "Pedido a proveedor generado", detail: "Bodega · según el stock real" },
+  { icon: "chart", tone: "brand", title: "Resumen del mes listo para tu contador", detail: "Números · enviado automáticamente" },
+];
+
+// Las que van entrando arriba mientras el panel está a la vista (en este orden, en ciclo).
+export const heroFeedMore: HeroFeedItem[] = [
+  { icon: "chat", tone: "cyan", title: "Reserva confirmada por WhatsApp", detail: "Clientes · con recordatorio para mañana" },
+  { icon: "file", tone: "brand", title: "Presupuesto de taller listo", detail: "Ventas · repuestos y mano de obra" },
+  { icon: "wallet", tone: "accent", title: "Pago recibido y registrado", detail: "Cobranza · conciliado con la factura" },
+  { icon: "calendar", tone: "success", title: "Estado de pago enviado", detail: "Obra · documentos adjuntos" },
+  { icon: "chart", tone: "brand", title: "Ventas del día en tu celular", detail: "Números · cierre de caja" },
+  { icon: "bell", tone: "cyan", title: "Aviso: el auto del cliente está listo", detail: "Clientes · mensaje enviado" },
+  { icon: "package", tone: "success", title: "Stock bajo: pedido sugerido", detail: "Bodega · esperando tu visto bueno" },
 ];
 
 export const problems = [
