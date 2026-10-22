@@ -99,11 +99,12 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 | Término | Significado en este proyecto |
 |---|---|
 | Lead | Solicitud de contacto guardada en la colección `leads`. Origen (`source`) `landing` (formulario del home) o `diagnostico` |
-| Diagnóstico | Flujo de `/diagnostico`: cuestionario operativo obligatorio (18 preguntas, escala 1–5) + estimador de ahorro opcional (`components/diagnostico/DiagnosticoFlow.tsx`) |
-| Índice de fricción | Puntaje del cuestionario con un nivel en texto; se guarda en `meta.indiceFriccion` / `meta.nivelFriccion` del lead |
+| Diagnóstico | Flujo de `/diagnostico` (autodiagnóstico): cuestionario obligatorio (18 preguntas, escala 1–5) cuyo resultado es el mapa de oportunidades (`components/diagnostico/DiagnosticoFlow.tsx`) |
+| Mapa de oportunidades | Resultado del diagnóstico: 4 dimensiones de negocio (Ventas y clientes, Control y números, Orden y seguimiento, Equipo y crecimiento) con nivel alta/media/baja, hasta 3 oportunidades principales y un próximo paso (`components/diagnostico/oportunidades.ts`); se guarda en `meta.oportunidades` |
+| Índice de fricción | Puntaje global del cuestionario con un nivel en texto; se guarda en `meta.indiceFriccion` / `meta.nivelFriccion` del lead. Dato interno: el cliente ya no lo ve |
 | Área | Grupo de 3 preguntas del cuestionario (carga y capacidad, seguimiento y plazos, información y documentos, procesos y escala, …) definido en `components/diagnostico/cuestionario.ts` |
 | Proceso | Ítem del estimador de ahorro: personas × horas/semana por persona × sueldo × % repetitivo (`components/diagnostico/ahorro.ts`) |
-| Ahorro estimado | Horas y CLP por semana, mes y año que calcula `calcTotals` |
+| Ahorro estimado | Horas y CLP por semana, mes y año que calcula `calcTotals`. Herramienta interna del panel (`/admin/estimador`) para preparar propuestas: no se guarda ni se muestra al cliente; solo los leads anteriores a octubre de 2026 traen `meta.ahorro` |
 | Informe | PDF de marca con los resultados del diagnóstico para el cliente (`lib/report.ts`). La "ficha del lead" es el PDF interno del admin (`lib/leadReport.ts`) |
 | CMS | Documento `config/site` en Firestore con visibilidad de secciones y textos editables desde `/admin/config` (`lib/site.ts`) |
 | Sección | Bloque de la landing o página con toggle de visibilidad (`SECTIONS` en `lib/site.ts`) |

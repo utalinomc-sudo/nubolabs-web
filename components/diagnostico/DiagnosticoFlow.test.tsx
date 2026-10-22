@@ -1,9 +1,12 @@
 // @vitest-environment jsdom
 // Paso de contacto del diagnóstico (cambio formulario-minimo-consentimiento, spec "Consentimiento y WhatsApp en el
 // diagnóstico" y revisión adversarial: un 400 del servidor no puede terminar en una confirmación falsa).
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DiagnosticoFlow } from "@/components/diagnostico/DiagnosticoFlow";
+
+// Cada prueba hace clic en las 18 preguntas: con la máquina cargada pasan de los 5 s por defecto.
+vi.setConfig({ testTimeout: 20_000 });
 
 let fetchMock: ReturnType<typeof vi.fn>;
 beforeEach(() => {
@@ -117,5 +120,64 @@ describe("DiagnosticoFlow: encabezado", () => {
     expect(header).toHaveTextContent("18 preguntas, 5 minutos.");
     expect(header.textContent ?? "").not.toMatch(/automatizaci[oó]n|fricci[oó]n operativa|ahorrar automatizando/i);
     expect(screen.getAllByText("Seguido")).toHaveLength(18);
+  });
+});
+
+// Cambio diagnostico-mapa-oportunidades (spec diagnostico/mapa-oportunidades, "Resultado visible en el diagnóstico").
+describe("DiagnosticoFlow: mapa de oportunidades", () => {
+  const panel = () => screen.getByRole("region", { name: "Tu mapa de oportunidades" });
+
+  it("parte con las 4 dimensiones sin datos y sin el estimador de ahorro", () => {
+    render(<DiagnosticoFlow />);
+    const p = panel();
+    for (const d of ["Ventas y clientes", "Control y números", "Orden y seguimiento", "Equipo y crecimiento"]) {
+      expect(p).toHaveTextContent(d);
+    }
+    expect(within(p).getAllByText("Sin datos")).toHaveLength(4);
+    expect(p).toHaveTextContent("0 de 18 preguntas respondidas");
+    expect(screen.queryByRole("button", { name: /Estimar mi ahorro/ })).toBeNull();
+  });
+
+  it("al responder solo 'Clientes y reportes' cambia solo 'Ventas y clientes'", () => {
+    render(<DiagnosticoFlow />);
+    screen.getAllByText("Seguido").slice(15).forEach((o) => fireEvent.click(o));
+    const p = panel();
+    expect(within(p).getAllByText("Sin datos")).toHaveLength(3);
+    expect(within(p).getByText("Oportunidad alta")).toBeInTheDocument();
+    expect(p).toHaveTextContent("3 de 18 preguntas respondidas");
+  });
+
+  it("con todo respondido la página no habla de fricción, ahorro, montos ni horas", () => {
+    render(<DiagnosticoFlow />);
+    answerAll();
+    const text = document.body.textContent ?? "";
+    expect(text).not.toMatch(/fricci|ahorro|\$|h\/mes|automatizaci/i);
+    expect(within(panel()).getAllByText("Oportunidad alta")).toHaveLength(4);
+  });
+
+  it("las preguntas abiertas son la de mejorar este año y la de la solución mágica, en ese orden", () => {
+    render(<DiagnosticoFlow />);
+    const labels = ["¿Qué es lo que más te gustaría mejorar en tu negocio este año?", "Si pudieras resolver un solo problema del día a día con una solución mágica, ¿cuál sería?"];
+    const positions = labels.map((l) => document.body.textContent?.indexOf(l) ?? -1);
+    expect(positions.every((i) => i >= 0)).toBe(true);
+    expect(positions[0]).toBeLessThan(positions[1]);
+  });
+
+  it("envía areas con id y el mapa, sin ahorro; la confirmación habla del mapa", async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ ok: true, persisted: false }) });
+    render(<DiagnosticoFlow />);
+    answerAll();
+    fillContact();
+    fireEvent.click(consent());
+    send();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body as string);
+    expect(body.meta).not.toHaveProperty("ahorro");
+    expect(body.meta.areas.map((a: { id: string }) => a.id)).toEqual(["carga", "plazos", "info", "procesos", "conocimiento", "clientes"]);
+    expect(body.meta.oportunidades.principales).toEqual(["ventas", "control", "orden"]);
+    expect(body.message).toContain("Mayor oportunidad: Ventas y clientes");
+    expect(body.message).not.toMatch(/ahorro/i);
+    expect(await screen.findByText(/con tu mapa de oportunidades está listo/)).toBeInTheDocument();
+    expect(document.body.textContent ?? "").not.toMatch(/fricci|ahorro|\$|h\/mes|automatizaci/i);
   });
 });

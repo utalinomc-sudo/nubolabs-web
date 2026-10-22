@@ -3,9 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { LogoMark } from "@/components/Logo";
-import { AhorroEstimator } from "./AhorroEstimator";
-import { type Proceso, blank, calc, calcTotals, fmtCLP } from "./ahorro";
 import { AREAS, ESCALA, ABIERTAS, TOTAL_Q, nivelFriccion } from "./cuestionario";
+import { OPPORTUNITY_LABELS, areaScore, buildOpportunityMap, dimensionName, type AreaId } from "./oportunidades";
 import { contactSection } from "@/lib/content";
 import { CONSENT_TEXTS, INDUSTRIES, isIndustryKey, type IndustryKey } from "@/lib/leadOptions";
 import { leadIndustryText } from "@/lib/leadSummary";
@@ -29,7 +28,7 @@ type Resp = (number | null)[][];
 
 export function DiagnosticoFlow() {
   const [resp, setResp] = useState<Resp>(() => AREAS.map((a) => a.preguntas.map(() => null)));
-  const [abiertas, setAbiertas] = useState({ mayorProblema: "", solucionMagica: "" });
+  const [abiertas, setAbiertas] = useState<Record<(typeof ABIERTAS)[number]["id"], string>>({ mejorar: "", solucionMagica: "" });
   // Paso de contacto (cambio formulario-minimo-consentimiento, design.md decisión 5): WhatsApp obligatorio,
   // rubro de la lista compartida y los mismos consentimientos que el formulario de la portada.
   const [contact, setContact] = useState<{
@@ -42,8 +41,6 @@ export function DiagnosticoFlow() {
   }>({ nombre: "", email: "", telefono: "", empresa: "", industry: "", industryOther: "" });
   const [contactConsent, setContactConsent] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
-  const [ahorroActivo, setAhorroActivo] = useState(false);
-  const [procesos, setProcesos] = useState<Proceso[]>(() => [blank()]);
   const [status, setStatus] = useState<"idle" | "loading" | "ok">("idle");
   const [error, setError] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -72,17 +69,15 @@ export function DiagnosticoFlow() {
 
   const nivel = indice === null ? null : nivelFriccion(indice);
 
-  const areaBars = useMemo(
-    () =>
-      AREAS.map((a, ai) => {
-        const p = promArea(ai);
-        return { corto: a.corto, pct: p === null ? null : Math.round(((p - 1) / 4) * 100) };
-      }).sort((x, y) => (y.pct ?? -1) - (x.pct ?? -1)),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [resp],
-  );
-
-  const ahorroTotals = useMemo(() => calcTotals(procesos), [procesos]);
+  // Mapa de oportunidades (cambio diagnostico-mapa-oportunidades): se actualiza a medida que se responde.
+  const mapa = useMemo(() => {
+    const scores: Partial<Record<AreaId, number>> = {};
+    AREAS.forEach((a, ai) => {
+      const v = areaScore(resp[ai]);
+      if (v !== null) scores[a.id as AreaId] = v;
+    });
+    return buildOpportunityMap(scores);
+  }, [resp]);
 
   // ── Envío ──────────────────────────────────────────────────────────────
   function marcar(ai: number, qi: number, v: number) {
@@ -116,6 +111,7 @@ export function DiagnosticoFlow() {
     const areas = AREAS.map((a, ai) => {
       const p = promArea(ai);
       return {
+        id: a.id, // el servidor calcula el mapa por id (meta.areas[].id)
         area: a.nombre,
         corto: a.corto,
         promedio: p === null ? null : Math.round(p * 100) / 100,
@@ -124,35 +120,13 @@ export function DiagnosticoFlow() {
       };
     });
 
-    const abiertasArr = ABIERTAS.map((p) => ({ pregunta: p.label, respuesta: abiertas[p.id as keyof typeof abiertas].trim() }));
+    const abiertasArr = ABIERTAS.map((p) => ({ pregunta: p.label, respuesta: abiertas[p.id].trim() }));
 
-    const ahorro = ahorroActivo
-      ? {
-          totales: ahorroTotals,
-          procesos: procesos.map((p) => {
-            const c = calc(p);
-            return {
-              nombre: p.nombre || "Proceso sin nombre",
-              descripcion: p.descripcion,
-              herramientas: p.herramientas,
-              personas: p.personas,
-              horasSemanaPorPersona: p.horas,
-              sueldo: p.sueldo,
-              repetitivo: p.repetitivo,
-              errores: p.errores,
-              horasMes: Math.round(c.horasMes),
-              ahorroHorasMes: Math.round(c.ahorroHoras),
-              ahorroCLPMes: Math.round(c.ahorroMes),
-            };
-          }),
-        }
-      : null;
-
-    const topArea = areaBars[0];
+    // Mensaje interno para el equipo (panel y aviso por correo). Sin ahorro: el estimador ahora es interno.
+    const mayor = dimensionName(mapa.principales[0]);
     const message =
-      `Cuestionario operativo — Índice de fricción ${indice} (${nivel?.txt.toLowerCase()}).` +
-      (topArea?.pct != null ? ` Área más crítica: ${topArea.corto} (${topArea.pct}).` : "") +
-      (ahorro ? ` + Estimación de ahorro: ${fmtCLP.format(ahorro.totales.mes)}/mes (${ahorro.procesos.length} procesos).` : " Sin estimación de ahorro.");
+      `Autodiagnóstico — Mayor oportunidad: ${mayor ?? "sin datos"}.` +
+      (indice !== null ? ` Índice de fricción ${indice} (${nivel?.txt.toLowerCase()}).` : "");
 
     const empresa = contact.empresa.trim();
     const meta = {
@@ -162,7 +136,8 @@ export function DiagnosticoFlow() {
       nivelFriccion: nivel?.txt,
       areas,
       abiertas: abiertasArr,
-      ahorro,
+      // Para la pantalla y el PDF de descarga; el servidor lo recalcula antes de guardar.
+      oportunidades: { version: 1, ...mapa },
     };
 
     // Si el servidor rechaza los datos (400) se muestra su mensaje y no se confirma: antes el lead se perdía en
@@ -231,17 +206,18 @@ export function DiagnosticoFlow() {
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: C.bg, color: C.navy }}>
       {/* NAV */}
       <nav style={{ background: "#fff", borderBottom: "1px solid #EEF2F8" }}>
-        <div style={wrap} className="flex items-center justify-between">
+        {/* En celular la etiqueta se oculta y el enlace puede bajar de línea: antes había scroll horizontal a 375 px. */}
+        <div style={wrap} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <div className="flex items-center gap-[11px]">
             <LogoMark width={36} height={30} variant="gradient" />
             <span style={{ fontSize: 20, fontWeight: 800, letterSpacing: "-0.5px" }}>
               Nubo<b style={{ color: C.blue }}>labs</b>
             </span>
-            <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: C.faint, marginLeft: 10, borderLeft: `1px solid ${C.border}`, paddingLeft: 14 }}>
+            <span className="max-sm:hidden" style={{ fontSize: 12, fontWeight: 700, letterSpacing: 2, color: C.faint, marginLeft: 10, borderLeft: `1px solid ${C.border}`, paddingLeft: 14 }}>
               DIAGNÓSTICO
             </span>
           </div>
-          <Link href="/" style={{ fontSize: 13.5, fontWeight: 600, color: C.muted }}>
+          <Link href="/" className="whitespace-nowrap" style={{ fontSize: 13.5, fontWeight: 600, color: C.muted }}>
             ← Volver a nubolabs.cl
           </Link>
         </div>
@@ -249,14 +225,14 @@ export function DiagnosticoFlow() {
 
       {/* HEADER */}
       <header style={{ ...wrap, paddingTop: 48, paddingBottom: 8 }}>
-        {/* Textos sin jerga (cambio lenguaje-sin-jerga, design.md decisión 6). El panel de resultados es HDU-09. */}
-        <span style={badge}>◈&nbsp;AUTODIAGNÓSTICO</span>
+        {/* Textos sin jerga (cambios lenguaje-sin-jerga y diagnostico-mapa-oportunidades). */}
+        <span style={badge}>◈&nbsp;AUTODIAGNÓSTICO · 5 MINUTOS</span>
         <h1 style={{ margin: "18px 0 12px", fontSize: 38, fontWeight: 800, letterSpacing: "-1.4px", lineHeight: 1.1, maxWidth: 720 }}>
           ¿Dónde está la mayor oportunidad de tu negocio?
         </h1>
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: C.muted, maxWidth: 640 }}>
           18 preguntas, 5 minutos. Marca con qué frecuencia ocurre cada situación en tu equipo hoy; no hay respuestas
-          correctas. Al final verás en qué áreas tu negocio puede mejorar más.
+          correctas. Al final verás tu mapa de oportunidades: dónde tu negocio puede mejorar más y por dónde partir.
         </p>
       </header>
 
@@ -334,7 +310,7 @@ export function DiagnosticoFlow() {
                     rows={2}
                     style={{ ...field, resize: "none" }}
                     placeholder="Escribe libremente…"
-                    value={abiertas[p.id as keyof typeof abiertas]}
+                    value={abiertas[p.id]}
                     onChange={(e) => setAbiertas((prev) => ({ ...prev, [p.id]: e.target.value }))}
                   />
                 </div>
@@ -342,98 +318,51 @@ export function DiagnosticoFlow() {
             </div>
           </div>
 
-          {/* Paso opcional: estimación de ahorro */}
-          {!ahorroActivo ? (
-            <div style={{ ...card, borderStyle: "dashed", borderColor: "#C9D6EC", background: "#FBFCFF", textAlign: "center", padding: 24 }}>
-              <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "2px", color: C.blue, marginBottom: 6 }}>PASO OPCIONAL</div>
-              <div style={{ fontSize: 17, fontWeight: 800, marginBottom: 6 }}>¿Quieres estimar tu ahorro?</div>
-              <p style={{ margin: "0 auto 16px", fontSize: 13.5, lineHeight: 1.55, color: C.muted, maxWidth: 440 }}>
-                Agrega 1-2 procesos concretos y calculamos, en 2 minutos, cuántas horas y pesos podrías ahorrar automatizándolos.
-                Puedes enviar el diagnóstico con o sin este paso.
-              </p>
-              <button onClick={() => setAhorroActivo(true)} style={{ ...btn, width: "auto", padding: "12px 22px" }}>
-                Estimar mi ahorro (opcional)
-              </button>
-            </div>
-          ) : (
-            <div style={{ ...card, padding: 24 }}>
-              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 16 }}>
-                <div>
-                  <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "2px", color: C.blue }}>PASO OPCIONAL</div>
-                  <div style={{ fontSize: 17, fontWeight: 800 }}>Estimación de ahorro</div>
-                </div>
-                <button onClick={() => setAhorroActivo(false)} style={{ background: "none", border: "none", color: C.faint, fontSize: 13, fontWeight: 600, cursor: "pointer", textDecoration: "underline" }}>
-                  Quitar este paso
-                </button>
-              </div>
-              <AhorroEstimator procesos={procesos} setProcesos={setProcesos} />
-            </div>
-          )}
         </div>
 
         {/* Aside */}
         <aside className="dx-aside">
-          {/* Panel de fricción */}
-          <div style={{ background: C.navy, color: "#fff", borderRadius: 20, padding: 28 }}>
-            <div style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "2.5px", color: C.cyan, marginBottom: 18 }}>TU ÍNDICE DE FRICCIÓN</div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-              <div style={{ fontSize: 34, fontWeight: 800, letterSpacing: "-1px", lineHeight: 1 }}>{indice ?? "—"}</div>
-              {nivel && <div style={{ fontSize: 14, fontWeight: 700, color: nivel.color }}>{nivel.txt}</div>}
-            </div>
-            <div style={{ fontSize: 12.5, color: C.faint, marginTop: 4 }}>{contestadas} de {TOTAL_Q} preguntas respondidas</div>
-
-            <div style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.14)" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "1.5px", color: "#5A7699", marginBottom: 10 }}>FRICCIÓN POR ÁREA</div>
-              {areaBars.map((d) => (
-                <div key={d.corto} style={{ marginTop: 12 }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, fontWeight: 600, marginBottom: 5 }}>
-                    <b style={{ fontWeight: 700, color: "#fff" }}>{d.corto}</b>
-                    <span className="font-mono" style={{ color: "#5A7699" }}>{d.pct ?? "—"}</span>
+          {/* Panel "Tu mapa de oportunidades" (spec diagnostico/mapa-oportunidades): nivel en texto, sin puntajes ni montos. */}
+          <section aria-labelledby="dx-mapa" style={{ background: C.navy, color: "#fff", borderRadius: 20, padding: 28 }}>
+            <h2 id="dx-mapa" style={{ margin: 0, fontSize: 11.5, fontWeight: 700, letterSpacing: "2.5px", color: C.cyan, textTransform: "uppercase" }}>
+              Tu mapa de oportunidades
+            </h2>
+            <div style={{ fontSize: 12.5, color: C.faint, marginTop: 6 }}>{contestadas} de {TOTAL_Q} preguntas respondidas</div>
+            <ul style={{ listStyle: "none", margin: "14px 0 0", padding: 0 }}>
+              {mapa.dimensiones.map((d) => (
+                <li key={d.id} style={{ paddingTop: 12, marginTop: 12, borderTop: "1px solid rgba(255,255,255,.12)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, fontSize: 13.5, fontWeight: 700 }}>
+                    <span>{d.nombre}</span>
+                    <span
+                      className={d.nivel === "alta" ? "text-accent" : d.nivel ? "text-brand-light" : "text-inverse-muted"}
+                      style={{ fontSize: 12, fontWeight: 700, whiteSpace: "nowrap" }}
+                    >
+                      {d.nivel ? OPPORTUNITY_LABELS[d.nivel] : "Sin datos"}
+                    </span>
                   </div>
-                  <div style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,.1)", overflow: "hidden" }}>
+                  <div aria-hidden="true" style={{ height: 6, borderRadius: 99, background: "rgba(255,255,255,.1)", overflow: "hidden", marginTop: 7 }}>
                     <div
                       style={{
                         height: "100%",
                         borderRadius: 99,
-                        width: `${d.pct ?? 0}%`,
-                        background: (d.pct ?? 0) >= 60 ? C.orange : C.cyan,
+                        width: `${d.puntaje ?? 0}%`,
+                        background: d.nivel === "alta" ? C.orange : C.cyan,
                         transition: "width .25s",
                       }}
                     />
                   </div>
-                </div>
+                </li>
               ))}
-            </div>
-
-            {ahorroActivo && (
-              <div style={{ marginTop: 18, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,.14)" }}>
-                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, letterSpacing: "1.5px", color: "#5A7699" }}>AHORRO ESTIMADO (TOTAL)</span>
-                  <span className="font-mono" style={{ fontSize: 10.5, color: "#5A7699" }}>
-                    {procesos.length} {procesos.length === 1 ? "PROCESO" : "PROCESOS"}
-                  </span>
-                </div>
-                <div style={{ fontSize: 28, fontWeight: 800, color: C.cyan, lineHeight: 1 }}>{fmtCLP.format(ahorroTotals.mes)}</div>
-                <div style={{ fontSize: 12, color: C.faint, marginTop: 3 }}>ahorro estimado mensual</div>
-                <div style={{ display: "flex", gap: 20, marginTop: 12 }}>
-                  <div>
-                    <div style={{ fontSize: 15, fontWeight: 800 }}>{fmtCLP.format(ahorroTotals.semana)}</div>
-                    <div style={{ fontSize: 11, color: C.faint }}>a la semana</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 15, fontWeight: 800, color: C.orange }}>{fmtCLP.format(ahorroTotals.anual)}</div>
-                    <div style={{ fontSize: 11, color: C.faint }}>proyección anual</div>
-                  </div>
-                </div>
-                <div style={{ fontSize: 12, color: C.faint, marginTop: 10 }}>{ahorroTotals.horas} h/mes automatizables</div>
-              </div>
+            </ul>
+            {mapa.proximoPaso && (
+              <p className="text-inverse-strong" style={{ margin: "18px 0 0", paddingTop: 14, borderTop: "1px solid rgba(255,255,255,.14)", fontSize: 13, lineHeight: 1.5 }}>
+                <b style={{ color: "#fff" }}>Próximo paso sugerido:</b> {mapa.proximoPaso}
+              </p>
             )}
-
-            <div style={{ marginTop: 16, fontSize: 11, lineHeight: 1.5, color: "#5A7699" }}>
-              * Resultado referencial. En la sesión de diagnóstico lo revisamos contigo y lo traducimos a oportunidades
-              concretas de automatización.
+            <div style={{ marginTop: 16, fontSize: 11, lineHeight: 1.5, color: C.faint }}>
+              * Resultado referencial. En la sesión lo revisamos contigo y lo convertimos en un plan concreto.
             </div>
-          </div>
+          </section>
 
           {/* Contacto / confirmación */}
           {status === "ok" ? (
@@ -443,9 +372,8 @@ export function DiagnosticoFlow() {
               </span>
               <div style={{ fontSize: 16, fontWeight: 800, margin: "14px 0 6px" }}>¡Listo, {firstName}!</div>
               <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6 }}>
-                Tu <b style={{ color: C.navy }}>informe en PDF</b> está listo, con tu índice de fricción
-                {ahorroActivo ? " y tu estimación de ahorro" : ""}. Descárgalo aquí. Además te contactaremos en menos
-                de 24 horas.
+                Tu <b style={{ color: C.navy }}>informe en PDF</b> con tu mapa de oportunidades está listo. Descárgalo aquí.
+                Además te contactaremos en menos de 24 horas.
               </div>
               <button
                 onClick={descargarInforme}
@@ -529,7 +457,7 @@ export function DiagnosticoFlow() {
             <Link href="/privacidad" style={{ color: C.muted, textDecoration: "underline" }}>
               Privacidad
             </Link>{" "}
-            {/* Sin hola@nubolabs.ai: dominio sin verificar (cambio cierre-landing-faq-cta). El rediseño del diagnóstico es HDU-09. */}
+            {/* Sin hola@nubolabs.ai: dominio sin verificar (cambio cierre-landing-faq-cta). */}
             · © {new Date().getFullYear()} Nubolabs
           </span>
         </div>
@@ -541,8 +469,6 @@ export function DiagnosticoFlow() {
         @media (max-width:960px){
           .dx-grid{grid-template-columns:1fr}
           .dx-aside{position:static}
-          .dx-row3{grid-template-columns:1fr!important}
-          .dx-row2{grid-template-columns:1fr!important}
         }
       `}</style>
     </div>

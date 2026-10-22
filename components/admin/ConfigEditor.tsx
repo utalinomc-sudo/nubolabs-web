@@ -3,6 +3,7 @@
 // Contenedor de /admin/config: visibilidad, un editor por sección y guardado único (cambio lenguaje-sin-jerga,
 // design.md decisión 5). Cada editor vive en components/admin/config/.
 import { useState } from "react";
+import { AutodiagnosticoEditor } from "@/components/admin/config/AutodiagnosticoEditor";
 import { CasosEditor } from "@/components/admin/config/CasosEditor";
 import { CifrasEditor } from "@/components/admin/config/CifrasEditor";
 import { CierreEditor } from "@/components/admin/config/CierreEditor";
@@ -33,6 +34,7 @@ export const MANAGED_KEYS = [
   "casos",
   "cifras",
   "proceso",
+  "autodiagnostico",
   "contact",
   "faq",
   "cierre",
@@ -140,6 +142,7 @@ export function ConfigEditor({ sections, initialVisible, initialContent, default
         <CasosEditor {...bind("casos")} />
         <CifrasEditor {...bind("cifras")} />
         <ProcesoEditor {...bind("proceso")} />
+        <AutodiagnosticoEditor {...bind("autodiagnostico")} />
         <ContactEditor {...bind("contact")} />
         <FaqEditor {...bind("faq")} />
         <CierreEditor {...bind("cierre")} />

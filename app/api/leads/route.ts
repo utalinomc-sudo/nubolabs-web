@@ -3,13 +3,14 @@ import { getDb, isAdminConfigured } from "@/lib/firebaseAdmin";
 import { sendLeadNotification, sendClientReport } from "@/lib/email";
 import { isHoneypotFilled, normalizeLead } from "@/lib/leads";
 import { buildReportPdf, reportDataFromLead } from "@/lib/report";
+import { diagnosticSummary, dimensionName, normalizeDiagnosticMeta } from "@/components/diagnostico/oportunidades";
 import type { LeadRecord } from "@/types/lead";
 
 export const runtime = "nodejs";
 
 /**
  * Genera el informe en PDF y lo envía por correo al cliente.
- * Solo aplica a leads de diagnóstico con índice de fricción. No bloquea ni lanza:
+ * Solo aplica a leads de diagnóstico con respuestas por área (mapa de oportunidades). No bloquea ni lanza:
  * cualquier error se registra y se ignora (el lead ya quedó guardado).
  */
 async function maybeSendClientReport(lead: LeadRecord) {
@@ -17,7 +18,7 @@ async function maybeSendClientReport(lead: LeadRecord) {
   if (!lead.email) return;
 
   const data = reportDataFromLead({ name: lead.name, company: lead.company, meta: lead.meta ?? null });
-  if (!data) return; // sin índice de fricción → no hay informe
+  if (!data) return; // sin áreas con puntaje → no hay informe
 
   try {
     const pdf = await buildReportPdf(data);
@@ -26,9 +27,8 @@ async function maybeSendClientReport(lead: LeadRecord) {
         name: data.name,
         email: lead.email,
         company: data.company,
-        indice: data.indice,
-        nivel: data.nivel,
-        ahorroMes: data.ahorro?.mes ?? null,
+        oportunidadPrincipal: dimensionName(data.mapa.principales[0]) ?? undefined,
+        proximoPaso: data.mapa.proximoPaso || undefined,
       },
       pdf,
     );
@@ -58,6 +58,12 @@ export async function POST(req: Request) {
   const result = normalizeLead(body);
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: 400 });
   const lead = result.lead;
+  // El servidor rearma el meta del diagnóstico (áreas completas, respuestas válidas, mapa calculado, sin `ahorro`) y el
+  // resumen interno, sin confiar en lo que mande el cliente (cambio diagnostico-mapa-oportunidades, design.md decisión 3).
+  if (lead.source === "diagnostico" && lead.meta) {
+    lead.meta = normalizeDiagnosticMeta(lead.meta);
+    lead.message = diagnosticSummary(lead.meta);
+  }
 
   // Sin Firebase Admin (ej. desarrollo local) respondemos OK para no bloquear el flujo.
   // El log no lleva datos personales (base-standards §9): solo origen, cantidad de objetivos y rubro.
@@ -65,7 +71,14 @@ export async function POST(req: Request) {
   if (!db || !isAdminConfigured) {
     console.warn(
       "[leads] Firebase Admin no configurado. Lead válido no persistido:",
-      JSON.stringify({ source: lead.source, referral: lead.referral ?? null, goals: lead.goals?.length ?? 0, industry: lead.industry ?? null }),
+      JSON.stringify({
+        source: lead.source,
+        referral: lead.referral ?? null,
+        goals: lead.goals?.length ?? 0,
+        industry: lead.industry ?? null,
+        oportunidades: (lead.meta?.oportunidades as { principales?: unknown } | undefined)?.principales ?? null,
+        ahorro: lead.meta ? "ahorro" in lead.meta : false,
+      }),
     );
     await Promise.all([sendLeadNotification(lead), maybeSendClientReport(lead)]);
     return NextResponse.json({ ok: true, persisted: false });

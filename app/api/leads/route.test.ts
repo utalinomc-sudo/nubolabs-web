@@ -27,6 +27,7 @@ vi.mock("@/lib/report", () => ({
 }));
 
 const { POST } = await import("@/app/api/leads/route");
+const { buildOpportunityMap } = await import("@/components/diagnostico/oportunidades");
 
 const VALID = {
   name: "Carolina Rojas",
@@ -100,14 +101,52 @@ describe("POST /api/leads", () => {
 
   // Cambio landing-referidos-oa (spec "Diagnóstico referido recibe su informe").
   it("un diagnóstico referido se guarda con referral y source, recibe su informe y el aviso lleva el referido", async () => {
-    mocks.reportData.mockReturnValue({ name: "Carolina Rojas", company: "", indice: 62, nivel: "Alta", ahorro: null, areas: [] });
+    mocks.reportData.mockReturnValue({
+      name: "Carolina Rojas",
+      company: "",
+      fecha: "22 de octubre de 2026",
+      mapa: buildOpportunityMap({ clientes: 80 }),
+      abiertas: [],
+      scheduleUrl: "https://www.nubolabs.cl",
+    });
     const res = await post({ ...VALID, source: "diagnostico", referral: "oa", meta: { indiceFriccion: 62 } });
     expect(res.status).toBe(200);
     const saved = mocks.add.mock.calls[0][0];
     expect(saved).toMatchObject({ source: "diagnostico", referral: "oa", meta: { indiceFriccion: 62 } });
     expect(mocks.clientReport).toHaveBeenCalledTimes(1);
-    expect(mocks.clientReport.mock.calls[0][0]).toMatchObject({ email: VALID.email, indice: 62 });
+    expect(mocks.clientReport.mock.calls[0][0]).toMatchObject({ email: VALID.email, oportunidadPrincipal: "Ventas y clientes" });
     expect(mocks.notify).toHaveBeenCalledWith(expect.objectContaining({ source: "diagnostico", referral: "oa" }));
+  });
+
+  // Cambio diagnostico-mapa-oportunidades (spec "Mapa guardado en el lead"): el servidor manda.
+  it("un diagnóstico se guarda con el mapa recalculado en el servidor y sin ahorro", async () => {
+    const res = await post({
+      ...VALID,
+      source: "diagnostico",
+      meta: {
+        areas: [{ id: "clientes", friccion: 80 }, { id: "info", friccion: 10 }],
+        oportunidades: { principales: ["equipo", "control", "orden"], proximoPaso: "inventado" },
+        ahorro: { totales: { mes: 999999 } },
+      },
+    });
+    expect(res.status).toBe(200);
+    const saved = mocks.add.mock.calls[0][0];
+    expect(saved.meta).not.toHaveProperty("ahorro");
+    expect(saved.meta.oportunidades).toMatchObject({ version: 1, principales: ["ventas"] });
+    expect(saved.meta.oportunidades.proximoPaso).not.toBe("inventado");
+  });
+
+  it("un diagnóstico mínimo se guarda con las 6 áreas completas y el resumen armado en el servidor", async () => {
+    await post({ ...VALID, source: "diagnostico", message: "Mayor oportunidad: inventada", meta: { areas: [{ id: "clientes", friccion: 80 }] } });
+    const saved = mocks.add.mock.calls[0][0];
+    expect(saved.meta.areas).toHaveLength(6);
+    expect(saved.meta.areas.find((a: { id: string }) => a.id === "clientes")).toMatchObject({ area: "Clientes y reportes", friccion: 80 });
+    expect(saved.message).toBe("Autodiagnóstico — Mayor oportunidad: Ventas y clientes.");
+  });
+
+  it("un lead del formulario no recibe mapa aunque mande meta", async () => {
+    await post({ ...VALID, source: "landing", meta: { areas: [{ id: "clientes", friccion: 80 }] } });
+    expect(mocks.add.mock.calls[0][0]).not.toHaveProperty("meta");
   });
 
   it("un referido no permitido se guarda sin referral y sin error", async () => {

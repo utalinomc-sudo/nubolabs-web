@@ -37,12 +37,12 @@ app/
   privacidad/page.tsx     política de privacidad desde content.privacidad (siempre visible; texto plano en párrafos)
   admin/login/page.tsx    client: Firebase Auth → POST /api/admin/session
   admin/(panel)/layout.tsx  server: redirect a /admin/login si no hay sesión; sidebar
-  admin/(panel)/{page,leads,leads/[id],config,equipo}/page.tsx
+  admin/(panel)/{page,leads,leads/[id],config,equipo,estimador}/page.tsx
 components/
-  landing/   LandingPage (composición de / y /oa), ReferralBanner (client), ReferralTracker (client), Nav (client), Hero, HeroPanel (client), Trust, MiniQuote, SectionHead, Problem, Results, Approach, Services, UseCases (+ UseCasesFilter client y casesFilter.ts), Metrics, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
-  diagnostico/  DiagnosticoFlow.tsx (client), AhorroEstimator.tsx (client), cuestionario.ts, ahorro.ts
-  admin/     ConfigEditor (contenedor de /admin/config), TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
-  admin/config/  Field (+ SelectField), SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Confianza, Problema, Resultados, Enfoque, Servicios, Casos, Cifras, Proceso, Contact, Faq, Cierre, Nosotros, Privacidad y Referidos, la franja de /oa)
+  landing/   LandingPage (composición de / y /oa), ReferralBanner (client), ReferralTracker (client), SelfDiagnosis (bloque Autodiagnóstico), Nav (client), Hero, HeroPanel (client), Trust, MiniQuote, SectionHead, Problem, Results, Approach, Services, UseCases (+ UseCasesFilter client y casesFilter.ts), Metrics, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
+  diagnostico/  DiagnosticoFlow.tsx (client), AhorroEstimator.tsx (client, lo usa solo el estimador interno), cuestionario.ts, oportunidades.ts (mapa de oportunidades, puro), ahorro.ts
+  admin/     ConfigEditor (contenedor de /admin/config), EstimadorInterno (estimador de ahorro de /admin/estimador), TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
+  admin/config/  Field (+ SelectField), SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Confianza, Problema, Resultados, Enfoque, Servicios, Casos, Cifras, Proceso, Autodiagnostico, Contact, Faq, Cierre, Nosotros, Privacidad y Referidos, la franja de /oa)
   Logo.tsx (Logo, LogoMark) · icons.tsx · LinkedInIcon.tsx
 lib/content.ts      textos fijos fuera del CMS (nav, trustLabels, metricsLabels, casesLabels, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, contactSection, contact, ctaNote, footerLinks, whatsappCard, newTabNote)
 lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig() (todos los textos editables por defecto), mergeConfig(), mergeFixedList(), mergeList(), normalizeTags(), renderHighlight(), normalizeContact(), formatWhatsapp(), whatsappLink(), normalizeTestimonios(), pickTestimonios(), contactQuote(), initials(), normalizeCifras(), visibleCifras(), hasContent(), CASE_RUBROS, normalizeCaseRubro()  (puro: tests y admin)
@@ -121,7 +121,7 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 | Página que oculta con `notFound()` y lista datos de Firestore | `app/equipo/page.tsx` |
 | Sección con contenido del CMS y fallback a defaults | `components/landing/Hero.tsx` |
 | Formulario cliente con estados y manejo de `{ error }` | `components/landing/ContactForm.tsx` |
-| Flujo multi-paso con cálculo puro separado | `components/diagnostico/DiagnosticoFlow.tsx` + `ahorro.ts` / `cuestionario.ts` |
+| Flujo multi-paso con cálculo puro separado | `components/diagnostico/DiagnosticoFlow.tsx` + `oportunidades.ts` / `cuestionario.ts` |
 | Filtro en el cliente con lógica pura testeada (el servidor entrega todo; sin JavaScript se ve completo) | `components/landing/UseCases.tsx` (server) + `UseCasesFilter.tsx` (client) + `casesFilter.ts` |
 | Editor del admin que hace POST y refresca | `components/admin/TeamEditor.tsx`, `ConfigEditor.tsx` |
 | Acción destructiva con confirmación escrita | `components/admin/DeleteLeadButton.tsx` |

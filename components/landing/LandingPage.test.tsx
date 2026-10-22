@@ -19,7 +19,7 @@ describe("LandingPage", () => {
     const root = await renderLanding();
     expect(root.querySelector('[aria-label="Recomendación"]')).toBeNull();
     const ids = [...root.querySelectorAll("main > section[id]")].map((s) => s.id);
-    expect(ids).toEqual(["inicio", "problema", "resultados", "enfoque", "servicios", "casos", "modelo", "contacto", "preguntas"]);
+    expect(ids).toEqual(["inicio", "problema", "resultados", "enfoque", "servicios", "casos", "modelo", "autodiagnostico", "contacto", "preguntas"]);
     expect(root.firstElementChild?.tagName).toBe("HEADER");
   });
 

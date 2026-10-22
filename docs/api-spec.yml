@@ -26,8 +26,10 @@ paths:
       summary: Registra un lead (formulario de contacto o diagnóstico)
       description: |
         Valida y normaliza el cuerpo con `normalizeLead()` (`lib/leads.ts`), guarda el lead en Firestore (`leads`),
-        envía el aviso por correo al equipo (Resend) y, si `source` es `diagnostico` y `meta` trae `indiceFriccion`,
-        genera y envía el informe PDF al cliente. Correo e informe no bloquean la respuesta. Sin Firebase Admin
+        envía el aviso por correo al equipo (Resend) y, si `source` es `diagnostico` y `meta.areas` trae al menos un área
+        con puntaje, genera y envía el informe PDF al cliente (mapa de oportunidades, desde diagnostico-mapa-oportunidades).
+        En los diagnósticos, el servidor rearma `meta` (`normalizeDiagnosticMeta`: 6 áreas con respuestas válidas, puntajes
+        recalculados, solo preguntas abiertas conocidas, mapa calculado, sin `ahorro`) y el `message` (`diagnosticSummary`). Correo e informe no bloquean la respuesta. Sin Firebase Admin
         configurado responde `persisted: false`.
 
         Desde `landing-referidos-oa`: acepta `referral` opcional (hoy solo `oa`, para los leads que llegan por la
@@ -93,7 +95,7 @@ paths:
             application/pdf:
               schema: { type: string, format: binary }
         "400":
-          description: JSON inválido o `meta` sin `indiceFriccion`
+          description: "JSON inválido o `meta` sin áreas con puntaje: `{ error: \"Faltan datos del diagnóstico para generar el informe.\" }`"
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
@@ -352,20 +354,36 @@ components:
 
     DiagnosticoMeta:
       type: object
-      description: Detalle estructurado del diagnóstico. Lo arma `components/diagnostico/DiagnosticoFlow.tsx`; lo lee `lib/report.ts`.
+      description: Detalle estructurado del diagnóstico. Lo arma `components/diagnostico/DiagnosticoFlow.tsx`; lo lee `lib/report.ts`. Desde diagnostico-mapa-oportunidades el informe sale del mapa de oportunidades (calculado desde `areas`), sin índice ni ahorro.
       properties:
         rubro: { type: string }
-        indiceFriccion: { type: number, description: "Requerido para generar el informe" }
+        indiceFriccion: { type: number, description: "Dato interno (panel y ficha). Ya no es requerido para el informe" }
         nivelFriccion: { type: string }
         areas:
           type: array
           items:
             type: object
             properties:
+              id: { type: string, enum: [carga, plazos, info, procesos, conocimiento, clientes], description: "Desde diagnostico-mapa-oportunidades; los leads antiguos se identifican por `area`/`corto`" }
               area: { type: string }
               corto: { type: string }
-              friccion: { type: number }
-              pct: { type: string }
+              friccion: { type: number, minimum: 0, maximum: 100, description: "Puntaje del área; sin un área con puntaje válido no hay informe (400)" }
+        oportunidades:
+          type: object
+          description: "Mapa de oportunidades. `POST /api/leads` lo recalcula en el servidor e ignora el del cliente"
+          properties:
+            version: { type: integer, example: 1 }
+            dimensiones:
+              type: array
+              items:
+                type: object
+                properties:
+                  id: { type: string, enum: [ventas, control, orden, equipo] }
+                  nombre: { type: string }
+                  puntaje: { type: integer, nullable: true }
+                  nivel: { type: string, enum: [alta, media, baja], nullable: true }
+            principales: { type: array, items: { type: string }, maxItems: 3 }
+            proximoPaso: { type: string }
         abiertas:
           type: array
           items:
@@ -376,6 +394,7 @@ components:
         ahorro:
           nullable: true
           type: object
+          description: "Solo leads anteriores a octubre de 2026. `POST /api/leads` lo descarta y el informe al cliente lo ignora"
           properties:
             totales:
               type: object
@@ -594,6 +613,14 @@ components:
             whatsappNumber: { type: string, description: "Con código de país; al leer se dejan solo los dígitos (8 a 15)", example: "+56 9 3259 0783" }
             showWhatsapp: { type: boolean, description: "Número en el pie de página. Solo true exacto lo activa" }
             showWhatsappQr: { type: boolean, description: "Tarjeta con QR junto al formulario. Solo true exacto lo activa" }
+        autodiagnostico:
+          type: object
+          description: "Bloque de la portada que invita al autodiagnóstico (cambio diagnostico-mapa-oportunidades). Un texto vacío toma su default"
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            body: { type: string }
+            cta: { type: string, example: "Hacer el autodiagnóstico" }
         referidos:
           type: object
           description: "Franja de bienvenida de /oa y /?ref=oa (cambio landing-referidos-oa). Un texto vacío toma su default"

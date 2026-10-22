@@ -19,6 +19,7 @@ import { Services } from "@/components/landing/Services";
 import { UseCases } from "@/components/landing/UseCases";
 import { Metrics } from "@/components/landing/Metrics";
 import { ReferralBanner } from "@/components/landing/ReferralBanner";
+import { SelfDiagnosis } from "@/components/landing/SelfDiagnosis";
 import { defaultSiteConfig } from "@/lib/siteConfig";
 
 // Regex de la decisión 7 de design.md más "nube" (propuesta). "Make" e "IA" con mayúsculas exactas.
@@ -41,6 +42,7 @@ function renderHome(): HTMLElement {
         <UseCases />
         <Metrics />
         <Process />
+        <SelfDiagnosis />
         <ContactForm />
         <Faq />
         <FinalCta />
@@ -67,7 +69,7 @@ describe("portada: vocabulario", () => {
     root.querySelectorAll("[data-nota-tecnica]").forEach((n) => n.remove());
     const text = visibleText(root);
     // El barrido no es vacío: incluye menú, panel del hero, secciones, rótulos fijos, formulario y pie.
-    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "Nuestro compromiso contigo", "Medimos cada proyecto", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por una conversación", "Hecho en Chile", "Para todos", "Servicios profesionales", "Bienvenido, cliente de Osorio"]) {
+    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "Nuestro compromiso contigo", "Medimos cada proyecto", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por una conversación", "Hecho en Chile", "Para todos", "Servicios profesionales", "Bienvenido, cliente de Osorio", "Hacer el autodiagnóstico", "Tu mapa de oportunidades"]) {
       expect(text).toContain(s);
     }
     expect([...(text.match(FORBIDDEN_CI) ?? []), ...(text.match(FORBIDDEN_CS) ?? [])]).toEqual([]);

@@ -341,6 +341,8 @@ Derivada de "Usar la recomendación de O&A" y del contexto: el correo lleva el l
 
 ## HDU-09 · Diagnóstico con mapa de oportunidades (sin ahorro en horas)
 
+**Estado (2026-10-22):** implementada en la rama `feature/diagnostico-mapa-oportunidades`, en preview; pendiente de aprobación y mezcla.
+
 **Cambio OpenSpec:** `diagnostico-mapa-oportunidades` · Fase 2 · Tamaño M · Depende de HDU-02 · Detalle completo en HDU-08 §5.3.
 
 **Resumen.** El resultado de `/diagnostico` deja de ser "índice de fricción + ahorro estimado" y pasa a **"Tu mapa de oportunidades"**: 4 dimensiones (Ventas y clientes, Control y números, Orden y seguimiento, Equipo y crecimiento) que agrupan las 6 áreas actuales sin cambiar preguntas ni escala, con nivel de oportunidad alta/media/baja. El estimador de ahorro sale del flujo público y queda como herramienta interna del admin (el cálculo de `ahorro.ts` y sus tests no cambian). El informe PDF muestra las 3 oportunidades principales y el próximo paso. La landing suma el bloque "Autodiagnóstico · 5 minutos" con un ejemplo del mapa.
@@ -384,5 +386,5 @@ Claude crea propuesta, diseño y tareas; Mauro revisa; `/opsx:apply`; verificaci
 | HDU-05 casos-por-rubro | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-casos-por-rubro/`, spec `openspec/specs/landing/casos-por-rubro/`) |
 | HDU-06 cifras-con-respaldo | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-cifras-con-respaldo/`, spec `openspec/specs/landing/cifras/`) |
 | HDU-07 landing-referidos-oa | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-landing-referidos-oa/`, spec `openspec/specs/leads/origen-referidos/`) |
-| HDU-09 diagnostico-mapa-oportunidades | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-09 diagnostico-mapa-oportunidades | en preview (2026-10-22): implementada en `feature/diagnostico-mapa-oportunidades`; pendiente de aprobación y mezcla |
 | HDU-10 cierre-landing-faq-cta | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-cierre-landing-faq-cta/`, spec `openspec/specs/landing/cierre/`) |

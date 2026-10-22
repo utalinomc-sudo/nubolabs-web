@@ -5,6 +5,7 @@ import { Results } from "@/components/landing/Results";
 import { Approach } from "@/components/landing/Approach";
 import { Services } from "@/components/landing/Services";
 import { Process } from "@/components/landing/Process";
+import { SelfDiagnosis } from "@/components/landing/SelfDiagnosis";
 import { UseCases } from "@/components/landing/UseCases";
 import { Metrics } from "@/components/landing/Metrics";
 import { ContactForm } from "@/components/landing/ContactForm";
@@ -53,6 +54,8 @@ export async function LandingPage({ referral }: { referral?: Referral }) {
         {visible.casos && <UseCases content={content.casos} />}
         {visible.cifras && <Metrics content={content.cifras} />}
         {visible.proceso && <Process content={content.proceso} />}
+        {/* Invitación al autodiagnóstico (cambio diagnostico-mapa-oportunidades). */}
+        {visible.autodiagnostico && <SelfDiagnosis content={content.autodiagnostico} spaced={!visible.proceso} />}
         {visible.contacto && (
           <ContactForm
             scheduleUrl={safeScheduleUrl(process.env.NEXT_PUBLIC_SCHEDULE_URL)}

@@ -97,6 +97,8 @@ export interface SiteContent {
     items: ProcessStep[]; // siempre 4
     exito: { title: string; items: string[] /* 1 a 6 */ };
   };
+  // Bloque que invita al autodiagnóstico (cambio diagnostico-mapa-oportunidades, design.md decisión 8).
+  autodiagnostico: { eyebrow: string; title: string; body: string; cta: string };
   // Cierre de la portada (cambio cierre-landing-faq-cta, design.md decisión 1).
   faq: { eyebrow: string; title: string; items: FaqItem[] /* 1 a 10 */ };
   cierre: { eyebrow: string; title: string; body: string; cta: string };
@@ -126,6 +128,7 @@ export const SECTIONS: { key: string; label: string; hint: string; defaultHidden
   { key: "casos", label: "Ejemplos", hint: "Ejemplos por rubro con filtro" },
   { key: "cifras", label: "Cifras de resultados", hint: "Oculta hasta tener datos reales con fuente", defaultHidden: true },
   { key: "proceso", label: "Cómo trabajamos", hint: "Los 4 pasos y lo que recibes" },
+  { key: "autodiagnostico", label: "Autodiagnóstico", hint: "Invitación al autodiagnóstico de 5 minutos, con un ejemplo del mapa" },
   { key: "contacto", label: "Contacto", hint: "Formulario de contacto del home" },
   { key: "faq", label: "Preguntas frecuentes", hint: "Dudas típicas antes de agendar" },
   { key: "cierre", label: "CTA final", hint: "Banda final con el botón para agendar" },
@@ -322,6 +325,12 @@ export function defaultSiteConfig(): SiteConfig {
           title: "Tú defines qué es éxito:",
           items: ["Más ventas", "Cobros al día", "Respuestas más rápidas", "Menos errores", "Más control"],
         },
+      },
+      autodiagnostico: {
+        eyebrow: "Autodiagnóstico · 5 minutos",
+        title: "¿No sabes por dónde partir? Descubre dónde está tu mayor oportunidad.",
+        body: "Responde unas preguntas simples sobre tu día a día y recibe tu mapa de oportunidades en PDF, al instante. Ideal para llegar con todo a la sesión gratuita.",
+        cta: "Hacer el autodiagnóstico",
       },
       // Textos de la referencia HDU-08. La respuesta sobre datos la valida O&A o un abogado junto con /privacidad.
       faq: {
@@ -631,6 +640,7 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
   const proceso = asRecord(c.proceso);
   const exito = asRecord(proceso.exito);
   const faq = asRecord(c.faq);
+  const autodiagnostico = asRecord(c.autodiagnostico);
   const confianza = asRecord(c.confianza);
   const cifras = asRecord(c.cifras);
   const cierre = asRecord(c.cierre);
@@ -719,6 +729,12 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
           title: pickText(exito.title, b.proceso.exito.title),
           items: mergeTextList(exito.items, b.proceso.exito.items, { min: 1, max: 6 }),
         },
+      },
+      autodiagnostico: {
+        eyebrow: pickText(autodiagnostico.eyebrow, b.autodiagnostico.eyebrow),
+        title: pickText(autodiagnostico.title, b.autodiagnostico.title),
+        body: pickText(autodiagnostico.body, b.autodiagnostico.body),
+        cta: pickText(autodiagnostico.cta, b.autodiagnostico.cta),
       },
       faq: {
         eyebrow: pickText(faq.eyebrow, b.faq.eyebrow),

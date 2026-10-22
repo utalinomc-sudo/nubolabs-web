@@ -11,6 +11,7 @@ const items = [
   { label: "Leads", href: "/admin/leads" },
   { label: "Contenido", href: "/admin/config" },
   { label: "Nuestro equipo", href: "/admin/equipo" },
+  { label: "Estimador de ahorro", href: "/admin/estimador" }, // interno (cambio diagnostico-mapa-oportunidades)
 ];
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {

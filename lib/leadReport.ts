@@ -2,6 +2,7 @@ import "server-only";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import { formatConsentDate, leadGoalsText, leadIndustryText, leadMarketingText, leadReferralLabel } from "@/lib/leadSummary";
 import { winAnsiDeep } from "@/lib/pdfText";
+import { DIMENSIONS, OPPORTUNITY_LABELS, mapFromMeta, storedAreas } from "@/components/diagnostico/oportunidades";
 
 // Informe interno (admin): ficha completa de un lead de diagnóstico.
 // Incluye contacto, índice de fricción, TODAS las preguntas con su respuesta,
@@ -79,7 +80,8 @@ export async function buildLeadDetailPdf(rawLead: LeadRecord): Promise<Uint8Arra
   // Helvetica solo dibuja WinAnsi: emojis o flechas en datos del cliente harían fallar el PDF completo.
   const lead = winAnsiDeep(rawLead);
   const meta = (lead.meta ?? {}) as Record<string, unknown>;
-  const areas = (meta.areas as AreaMeta[] | undefined) ?? [];
+  // Lectura defensiva: un área sin nombre ni respuestas no rompe la ficha (revisión adversarial de HDU-09).
+  const areas: AreaMeta[] = storedAreas(meta);
   const abiertas = ((meta.abiertas as { pregunta: string; respuesta: string }[] | undefined) ?? []).filter(
     (a) => a && a.respuesta && a.respuesta.trim(),
   );
@@ -231,7 +233,31 @@ export async function buildLeadDetailPdf(rawLead: LeadRecord): Promise<Uint8Arra
     y -= 24;
   };
 
-  // ── Índice de fricción ────────────────────────────────────────────────
+  // ── Mapa de oportunidades (cambio diagnostico-mapa-oportunidades; para leads antiguos, desde sus áreas) ──
+  const mapa = mapFromMeta(meta);
+  if (mapa) {
+    sectionTitle("MAPA DE OPORTUNIDADES");
+    mapa.dimensiones.forEach((d) => {
+      ensure(18);
+      text(page, d.nombre, M, y - 8, 10.5, font, C.ink);
+      const lvl = d.nivel ? OPPORTUNITY_LABELS[d.nivel] : "Sin datos";
+      const lw = bold.widthOfTextAtSize(lvl, 10);
+      text(page, lvl, M + CW - lw, y - 8, 10, bold, d.nivel === "alta" ? C.orange : d.nivel ? C.blue : C.muted);
+      y -= 18;
+    });
+    const nombres = mapa.principales.map((id) => DIMENSIONS.find((x) => x.id === id)?.nombre).filter(Boolean).join(" · ");
+    for (const [k, v] of [["Principales: ", nombres], ["Próximo paso sugerido: ", mapa.proximoPaso]] as const) {
+      if (!v) continue;
+      wrap(k + v, font, 10, CW).forEach((l) => {
+        ensure(14);
+        text(page, l, M, y - 6, 10, font, C.ink);
+        y -= 14;
+      });
+    }
+    y -= 14;
+  }
+
+  // ── Índice de fricción (dato interno) ─────────────────────────────────
   if (indice !== null) {
     const boxH = 62;
     ensure(boxH + 10);
@@ -383,12 +409,8 @@ export async function buildLeadDetailPdf(rawLead: LeadRecord): Promise<Uint8Arra
       }
       y -= 10;
     });
-  } else if (isDiag) {
-    sectionTitle("ESTIMACIÓN DE AHORRO");
-    ensure(16);
-    text(page, "El cliente no agregó el paso opcional de estimación de ahorro.", M, y, 10, font, C.muted);
-    y -= 18;
   }
+  // Sin estimación no se menciona el estimador: desde HDU-09 es una herramienta interna y los leads nuevos no la traen.
 
   // ── Mensaje del prospecto ─────────────────────────────────────────────
   // En leads del formulario es lo que escribió la persona. En los del diagnóstico es un resumen automático

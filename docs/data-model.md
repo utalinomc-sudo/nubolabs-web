@@ -22,7 +22,7 @@ Escribe `POST /api/leads`; lee el panel (`app/admin/(panel)/leads/**`); borra `D
 | `email` | string | Sí | Validado con regex simple |
 | `phone` | string | Sí desde 2026-10-22 (antes opcional) | WhatsApp, 8 a 15 dígitos, máx. 30 caracteres |
 | `company` | string | No (default `""`) | Empresa (máx. 120) |
-| `message` | string | No (default `""`) | Mensaje libre del formulario (máx. 1.000); en diagnósticos, resumen generado (índice, área crítica, ahorro) |
+| `message` | string | No (default `""`) | Mensaje libre del formulario (máx. 1.000); en diagnósticos, resumen generado para el equipo (mayor oportunidad e índice de fricción; los anteriores a octubre de 2026 incluían el ahorro) |
 | `source` | string | Sí (default `"landing"`) | `landing` (formulario del home) o `diagnostico` (`LEAD_SOURCES` en `lib/leads.ts`) |
 | `referral` | `Referral` | No | Referidor de la visita (cambio landing-referidos-oa): hoy solo `"oa"` (`REFERRALS` en `lib/leadOptions.ts`). Lo pone un lead enviado en una pestaña que entró por `/oa` o `/?ref=oa`; otro valor se omite sin error. No cambia `source` ni el informe del diagnóstico. Los leads anteriores no lo tienen |
 | `status` | string | Sí (siempre `"new"` hoy) | Reservado para el pipeline/mini-CRM del roadmap |
@@ -42,16 +42,17 @@ Los leads anteriores al 2026-10-22 no traen `goals`, `industry` ni los campos de
 
 #### 2.1 Forma de `meta` (diagnóstico)
 
-Lo arma `components/diagnostico/DiagnosticoFlow.tsx`; lo consumen `lib/report.ts` (`reportDataFromLead`) y `lib/leadReport.ts`.
+Lo arma `components/diagnostico/DiagnosticoFlow.tsx`; `POST /api/leads` recalcula `oportunidades` en el servidor (`withOpportunityMap` de `components/diagnostico/oportunidades.ts`) y quita `ahorro`. Lo consumen `lib/report.ts` (`reportDataFromLead`), `lib/leadReport.ts` y el panel; para leads antiguos el mapa se calcula desde `areas` (`mapFromMeta`).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
 | `rubro` | string | Rubro declarado por el contacto |
-| `indiceFriccion` | number | Índice de fricción global. **Sin este campo no se genera informe** |
+| `indiceFriccion` | number | Índice de fricción global (dato interno: panel y ficha; el cliente ya no lo ve) |
 | `nivelFriccion` | string | Nivel en texto (p. ej. "Alto") |
-| `areas[]` | `{ area, corto, friccion, pct }` | Fricción por área del cuestionario (`components/diagnostico/cuestionario.ts`) |
+| `areas[]` | `{ id, area, corto, promedio, friccion, respuestas[] }` | Puntaje 0–100 por área del cuestionario (`components/diagnostico/cuestionario.ts`). `id` (`carga`, `plazos`, `info`, `procesos`, `conocimiento`, `clientes`) desde el cambio diagnostico-mapa-oportunidades; los leads anteriores se identifican por `area`/`corto`. **Sin al menos un área con `friccion` válida no se genera informe** |
+| `oportunidades` | `{ version: 1, dimensiones[] { id, nombre, puntaje, nivel }, principales[], proximoPaso }` | Mapa de oportunidades (4 dimensiones: `ventas`, `control`, `orden`, `equipo`; nivel `alta`/`media`/`baja` o `null` sin datos; hasta 3 principales). Lo calcula el servidor; lo que mande el cliente se ignora. Solo en leads nuevos |
 | `abiertas[]` | `{ pregunta, respuesta }` | Preguntas abiertas respondidas |
-| `ahorro` | objeto \| null | Estimación opcional: `totales { horas, semana, mes, anual }` y `procesos[] { nombre, ahorroCLPMes, … }` (cálculo en `components/diagnostico/ahorro.ts`) |
+| `ahorro` | objeto \| null | **Solo en leads anteriores a octubre de 2026** (los nuevos no lo guardan): `totales { horas, semana, mes, anual }` y `procesos[] { nombre, ahorroCLPMes, … }`. Se muestra solo en el detalle y la ficha internos; el estimador quedó en `/admin/estimador` y no guarda nada |
 
 ### `team/{id}` — integrantes del equipo
 
@@ -76,7 +77,7 @@ Escribe `POST /api/admin/config` con `set(patch, { merge: true })`; lee `getSite
 
 | Campo | Tipo | Descripción |
 |---|---|---|
-| `visible` | `Record<string, boolean>` | Visibilidad por sección. Claves válidas = `SECTIONS[].key`, en el orden de la portada: `hero`, `confianza`, `problema`, `resultados`, `enfoque`, `servicios`, `casos`, `cifras`, `proceso`, `contacto`, `faq`, `cierre`, `nosotros`, `equipo`. Una clave ausente toma su default: visible, salvo `cifras`, que parte oculta (`defaultHidden` en `SECTIONS`); por eso `resultados` apareció sin migrar documentos y solo los valores booleanos guardados ganan (un `null` o un texto usan el default). Ocultar una sección también quita su ítem del menú |
+| `visible` | `Record<string, boolean>` | Visibilidad por sección. Claves válidas = `SECTIONS[].key`, en el orden de la portada: `hero`, `confianza`, `problema`, `resultados`, `enfoque`, `servicios`, `casos`, `cifras`, `proceso`, `autodiagnostico`, `contacto`, `faq`, `cierre`, `nosotros`, `equipo`. Una clave ausente toma su default: visible, salvo `cifras`, que parte oculta (`defaultHidden` en `SECTIONS`); por eso `resultados` apareció sin migrar documentos y solo los valores booleanos guardados ganan (un `null` o un texto usan el default). Ocultar una sección también quita su ítem del menú |
 | `content.hero` | `{ eyebrow, title, subtitle, ctaPrimary, ctaSecondary, tags? }` | `eyebrow` es opcional: por defecto vacío (sin etiqueta sobre el título). `title` admite `**resalte**` → texto con el degradado de marca (`renderHighlight` + `.text-gradient-brand`). Cada campo guardado gana sobre su default |
 | `content.hero.tags` | `string[]` (opcional) | Etiquetas bajo los botones del hero (cambio mensaje-principal-pyme). Al leer se normalizan con `normalizeTags()`: se recortan, se descartan vacías y no-strings y se toman las 3 primeras; si no es arreglo o queda vacía se usan los defaults ("30 minutos, gratis y sin compromiso", "Sin cambiar tus sistemas", "Respuesta en menos de 24 horas"). Documentos sin `tags` siguen siendo válidos |
 | `content.confianza` | `{ eyebrow, textoPuente, testimonios[] { nombre, cargo, empresa, texto, destacado }, compromisos[] { titulo, texto } }` | Bloque "Nos recomiendan" bajo el hero (cambio confianza-recomendacion). **Sin testimonios por defecto:** solo se publican los que Mauro carga con autorización escrita del cliente. Al leer, `normalizeTestimonios()` recorta y descarta los que no tienen `nombre` o `texto` (`destacado` solo con `true` exacto); una lista vacía es válida y muestra `textoPuente`. Se muestran hasta 3: el primer destacado (o el primero) en el panel y los siguientes como tarjetas; el principal también aparece como cita breve en `#contacto`. `compromisos`: siempre 3 por posición (`mergeFixedList`; un título o texto vacío toma el de esa posición). Si hay varios `destacado`, solo cuenta el primero |
@@ -92,6 +93,7 @@ Escribe `POST /api/admin/config` con `set(patch, { merge: true })`; lee `getSite
 | `content.faq` | `{ eyebrow, title, items[] { pregunta, respuesta } }` | Preguntas frecuentes (cambio cierre-landing-faq-cta, ancla `#preguntas`). `items`: 1 a 10; solo se publican las que tienen pregunta y respuesta. `respuesta` admite enlaces internos `[texto](/ruta)` o `[texto](#ancla)` (`lib/inlineLinks.ts`); otros destinos se muestran como texto |
 | `content.cierre` | `{ eyebrow, title, body, cta }` | CTA final. El botón lleva a `#contacto` (o a `/diagnostico` si el contacto está oculto) |
 | `content.contact` | `{ whatsappNumber, showWhatsapp, showWhatsappQr }` | WhatsApp de contacto de Nubolabs (decisión de Mauro del 2026-10-22). Por defecto `56932590783` y ambos interruptores en `false`. Al leer, `normalizeContact()` deja solo dígitos (un número guardado sin dígitos queda vacío y no se muestra; el default solo aplica si no hay número guardado) y cada interruptor es `true` solo si se guardó exactamente `true`. Con un número de menos de 8 o más de 15 dígitos no se muestra nada. `showWhatsapp` = número en el pie; `showWhatsappQr` = tarjeta con QR junto al formulario |
+| `content.autodiagnostico` | `{ eyebrow, title, body, cta }` | Bloque "Autodiagnóstico" de la portada, entre "Cómo trabajamos" y el formulario (cambio diagnostico-mapa-oportunidades). Clave `autodiagnostico` en `visible`, visible por defecto. El ejemplo del mapa es fijo y el botón lleva a `/diagnostico` |
 | `content.referidos` | `{ oa { titulo, texto } }` | Franja de bienvenida de `/oa` (cambio landing-referidos-oa). Sin clave en `visible` ni en `SECTIONS`: solo se muestra en las visitas referidas. Un texto vacío o que no es texto toma su default |
 | `content.privacidad` | `{ titulo, texto }` | Página `/privacidad` (siempre visible, sin clave en `visible`). `texto` en párrafos separados por línea en blanco, mostrado como texto plano. Un campo vacío cae al borrador por defecto de `lib/siteConfig.ts` |
 

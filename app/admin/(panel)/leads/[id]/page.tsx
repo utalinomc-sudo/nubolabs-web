@@ -5,6 +5,7 @@ import { DeleteLeadButton } from "@/components/admin/DeleteLeadButton";
 import { LeadPdfButton } from "@/components/admin/LeadPdfButton";
 import { goalLabel } from "@/lib/leadOptions";
 import { formatConsentDate, leadIndustryText, leadMarketingText, leadReferralLabel } from "@/lib/leadSummary";
+import { DIMENSIONS, OPPORTUNITY_LABELS, mapFromMeta, storedAreas } from "@/components/diagnostico/oportunidades";
 
 export const dynamic = "force-dynamic";
 
@@ -78,10 +79,13 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
   if (!lead) notFound();
 
   const meta = (lead.meta ?? {}) as Record<string, unknown>;
-  const areas = (meta.areas as AreaMeta[] | undefined) ?? [];
+  // Lectura defensiva: un área sin nombre ni respuestas no rompe la página (revisión adversarial de HDU-09).
+  const areas: AreaMeta[] = storedAreas(meta);
   const abiertas = (meta.abiertas as { pregunta: string; respuesta: string }[] | undefined) ?? [];
   const ahorro = meta.ahorro as AhorroMeta | null | undefined;
   const indice = typeof meta.indiceFriccion === "number" ? meta.indiceFriccion : null;
+  // Mapa de oportunidades, también para leads antiguos (se calcula desde sus áreas).
+  const mapa = mapFromMeta(meta);
   // Datos del formulario nuevo (cambio formulario-minimo-consentimiento). Los leads antiguos no los traen.
   const isDiag = lead.source === "diagnostico";
   const referral = leadReferralLabel(lead); // cambio landing-referidos-oa (leads antiguos: null)
@@ -180,7 +184,40 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
         </div>
       )}
 
-      {/* Índice de fricción */}
+      {/* Mapa de oportunidades (cambio diagnostico-mapa-oportunidades): lo que vio el cliente */}
+      {mapa && (
+        <div className="mt-6 card p-6">
+          <h2 className="font-bold">Mapa de oportunidades</h2>
+          <ul className="mt-4 space-y-3">
+            {mapa.dimensiones.map((d) => (
+              <li key={d.id} className="flex items-center justify-between gap-3 text-sm">
+                <span className="font-medium">{d.nombre}</span>
+                <span
+                  className={`whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                    d.nivel === "alta" ? "border border-accent/30 bg-white text-accent-strong" : d.nivel === "media" ? "bg-brand-50 text-brand-dark" : "bg-surface-muted text-ink-soft"
+                  }`}
+                >
+                  {d.nivel ? OPPORTUNITY_LABELS[d.nivel] : "Sin datos"}
+                </span>
+              </li>
+            ))}
+          </ul>
+          {mapa.principales.length > 0 && (
+            <p className="mt-4 text-sm text-ink-soft">
+              <span className="font-semibold text-ink">Principales: </span>
+              {mapa.principales.map((id) => DIMENSIONS.find((x) => x.id === id)?.nombre).join(" · ")}
+            </p>
+          )}
+          {mapa.proximoPaso && (
+            <p className="mt-1 text-sm text-ink-soft">
+              <span className="font-semibold text-ink">Próximo paso sugerido: </span>
+              {mapa.proximoPaso}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Índice de fricción (dato interno) */}
       {indice !== null && (
         <div className="mt-6 card p-6">
           <div className="flex items-baseline gap-3">
@@ -192,8 +229,8 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
           </div>
           {areas.length > 0 && (
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
-              {[...areas].sort((a, b) => (b.friccion ?? -1) - (a.friccion ?? -1)).map((a) => (
-                <div key={a.area} className="flex items-center justify-between gap-3">
+              {[...areas].sort((a, b) => (b.friccion ?? -1) - (a.friccion ?? -1)).map((a, i) => (
+                <div key={i} className="flex items-center justify-between gap-3">
                   <span className="text-sm font-medium">{a.corto ?? a.area}</span>
                   <Barra pct={a.friccion} />
                 </div>
@@ -206,8 +243,8 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
       {/* Respuestas del cuestionario */}
       {areas.length > 0 && (
         <div className="mt-6 space-y-4">
-          {areas.map((a) => (
-            <div key={a.area} className="card p-5">
+          {areas.map((a, ai) => (
+            <div key={ai} className="card p-5">
               <div className="mb-3 flex items-baseline justify-between">
                 <h2 className="font-bold">{a.area}</h2>
                 <span className="font-mono text-xs text-ink-muted">fricción {a.friccion ?? "—"}</span>
@@ -251,7 +288,7 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
       {/* Estimación de ahorro (opcional) */}
       {ahorro?.totales ? (
         <div className="mt-6 card p-5">
-          <h2 className="mb-1 font-bold">Estimación de ahorro (paso opcional)</h2>
+          <h2 className="mb-1 font-bold">Estimación de ahorro (paso opcional, leads anteriores a octubre de 2026)</h2>
           <div className="mb-4 flex flex-wrap gap-6">
             {ahorro.totales.semana != null && (
               <div>
@@ -311,8 +348,6 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
             })}
           </div>
         </div>
-      ) : lead.source === "diagnostico" ? (
-        <p className="mt-6 text-sm text-ink-muted">El cliente no agregó el paso opcional de estimación de ahorro.</p>
       ) : null}
 
       {/* Mensaje de diagnósticos sin áreas (los del formulario se muestran en "Lo que quiere lograr") */}

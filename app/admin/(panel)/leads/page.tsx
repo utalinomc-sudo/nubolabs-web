@@ -3,6 +3,7 @@ import { getDb } from "@/lib/firebaseAdmin";
 import { REFERRAL_LABELS, isReferral, type Referral } from "@/lib/leadOptions";
 import { LEAD_ORIGINS, filterLeadsByOrigin, parseLeadOrigin } from "@/lib/leadStats";
 import { leadIndustryText } from "@/lib/leadSummary";
+import { dimensionName, mapFromMeta } from "@/components/diagnostico/oportunidades";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,7 @@ interface LeadRow {
   referral: Referral | null;
   createdAt: string;
   indice: number | null;
-  ahorroMes: number | null;
+  oportunidad: string | null; // mayor oportunidad del mapa (cambio diagnostico-mapa-oportunidades)
   industry: string | null; // texto del rubro (o el rubro libre de leads antiguos)
   marketingConsent: boolean;
 }
@@ -29,7 +30,6 @@ async function getLeads(): Promise<{ configured: boolean; leads: LeadRow[] }> {
   const leads = snap.docs.map((d) => {
     const x = d.data();
     const meta = (x.meta ?? {}) as Record<string, unknown>;
-    const ahorro = meta.ahorro as { totales?: { mes?: number } } | null | undefined;
     return {
       id: d.id,
       name: x.name ?? "",
@@ -39,7 +39,7 @@ async function getLeads(): Promise<{ configured: boolean; leads: LeadRow[] }> {
       referral: isReferral(x.referral) ? x.referral : null,
       createdAt: x.createdAt ?? "",
       indice: typeof meta.indiceFriccion === "number" ? meta.indiceFriccion : null,
-      ahorroMes: ahorro?.totales?.mes ?? null,
+      oportunidad: dimensionName(mapFromMeta(meta)?.principales[0]),
       industry: leadIndustryText({ industry: x.industry, industryOther: x.industryOther, meta }),
       marketingConsent: x.marketingConsent === true,
     };
@@ -57,7 +57,6 @@ function fmtDate(iso: string) {
     timeZone: "America/Santiago",
   });
 }
-const clp = new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
 
 export default async function AdminLeads({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const origen = parseLeadOrigin((await searchParams).origen);
@@ -105,7 +104,7 @@ export default async function AdminLeads({ searchParams }: { searchParams: Promi
                 <th className="px-5 py-3 font-semibold">Empresa</th>
                 <th className="px-5 py-3 font-semibold">Origen</th>
                 <th className="px-5 py-3 font-semibold">Fricción</th>
-                <th className="px-5 py-3 font-semibold">Ahorro/mes</th>
+                <th className="px-5 py-3 font-semibold">Mayor oportunidad</th>
                 <th className="px-5 py-3 font-semibold">Fecha</th>
                 <th className="px-5 py-3 font-semibold"></th>
               </tr>
@@ -158,7 +157,7 @@ export default async function AdminLeads({ searchParams }: { searchParams: Promi
                       )}
                     </td>
                     <td className="px-5 py-3 font-semibold">{l.indice ?? "—"}</td>
-                    <td className="px-5 py-3 text-ink-soft">{l.ahorroMes != null ? clp.format(l.ahorroMes) : "—"}</td>
+                    <td className="px-5 py-3 text-ink-soft">{l.oportunidad ?? "—"}</td>
                     <td className="px-5 py-3 whitespace-nowrap text-ink-muted">{fmtDate(l.createdAt)}</td>
                     <td className="px-5 py-3">
                       <Link href={`/admin/leads/${l.id}`} className="text-sm font-semibold text-brand hover:underline">

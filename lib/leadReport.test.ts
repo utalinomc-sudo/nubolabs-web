@@ -5,6 +5,7 @@ vi.mock("server-only", () => ({})); // lib/leadReport.ts es server-only; en Vite
 
 const { buildLeadDetailPdf } = await import("@/lib/leadReport");
 const { buildReportPdf, reportDataFromLead } = await import("@/lib/report");
+const { pdfTestText } = await import("@/lib/pdfTestText");
 
 function isPdf(bytes: Uint8Array) {
   return new TextDecoder().decode(bytes.slice(0, 5)) === "%PDF-";
@@ -28,6 +29,43 @@ describe("buildLeadDetailPdf", () => {
     });
     expect(isPdf(pdf)).toBe(true);
     expect(pdf.length).toBeGreaterThan(1000);
+  });
+
+  // Cambio diagnostico-mapa-oportunidades: la ficha suma el mapa (también para leads antiguos) y conserva el ahorro.
+  it("ficha de un diagnóstico antiguo: mapa calculado desde sus áreas, índice y estimación de ahorro", async () => {
+    const pdf = await buildLeadDetailPdf({
+      name: "Lead antiguo",
+      email: "x@y.cl",
+      source: "diagnostico",
+      createdAt: "2026-09-15T12:00:00.000Z",
+      meta: {
+        indiceFriccion: 62,
+        nivelFriccion: "Fricción alta",
+        areas: [{ area: "Clientes y reportes", corto: "Clientes y reportes", friccion: 75, respuestas: [] }],
+        ahorro: { totales: { horas: 40, semana: 35840, mes: 155187, anual: 1862244 }, procesos: [] },
+      },
+    });
+    const text = pdfTestText(pdf);
+    expect(text).toContain("MAPA DE OPORTUNIDADES");
+    expect(text).toContain("Ventas y clientes");
+    expect(text).toContain("Oportunidad alta");
+    expect(text).toContain("ESTIMACIÓN DE AHORRO");
+  });
+
+  // Revisión adversarial (Major): un área guardada sin nombre ni respuestas no rompe la ficha; sin estimación no se
+  // menciona el estimador.
+  it("ficha de un diagnóstico con un área mínima y sin estimación", async () => {
+    const pdf = await buildLeadDetailPdf({
+      name: "Lead mínimo",
+      email: "x@y.cl",
+      source: "diagnostico",
+      createdAt: "2026-10-22T15:30:00.000Z",
+      meta: { indiceFriccion: 75, areas: [{ id: "clientes", friccion: 80 }] },
+    });
+    const text = pdfTestText(pdf);
+    expect(text).toContain("MAPA DE OPORTUNIDADES");
+    expect(text).toContain("Clientes y reportes");
+    expect(text).not.toMatch(/paso opcional|ESTIMACI/);
   });
 
   // Cambio landing-referidos-oa: etiqueta "DIAGNOSTICO · O&A" en la ficha.
@@ -71,7 +109,7 @@ describe("buildReportPdf (informe al cliente)", () => {
       meta: {
         indiceFriccion: 62,
         nivelFriccion: "Media",
-        areas: [{ area: "Clientes", corto: "Clientes → ventas", friccion: 70 }],
+        areas: [{ id: "clientes", area: "Clientes y reportes", corto: "Clientes → ventas", friccion: 70 }],
         abiertas: [{ pregunta: "¿Qué te frena?", respuesta: "Todo 😩 → cotizar" }],
       },
     });

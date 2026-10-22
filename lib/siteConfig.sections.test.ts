@@ -182,7 +182,8 @@ describe("defaults de la HDU-08", () => {
 
 describe("orden y navegación", () => {
   it("SECTIONS sigue el orden de la portada con 'resultados' después de 'problema'", () => {
-    expect(SECTIONS.map((s) => s.key).filter((k) => k !== "confianza" && k !== "cifras").slice(0, 8)).toEqual(["hero", "problema", "resultados", "enfoque", "servicios", "casos", "proceso", "contacto"]);
+    // Las secciones que suman otros cambios (confianza, cifras, autodiagnostico) se prueban en sus propios archivos.
+    expect(SECTIONS.map((s) => s.key).filter((k) => !["confianza", "cifras", "autodiagnostico"].includes(k)).slice(0, 8)).toEqual(["hero", "problema", "resultados", "enfoque", "servicios", "casos", "proceso", "contacto"]);
   });
   it("el menú ofrece Lo que ganas, Servicios, Ejemplos, Cómo trabajamos y Preguntas (HDU-10), sin 'Inicio'", () => {
     expect(nav.map((n) => [n.label, n.href])).toEqual([

@@ -5,6 +5,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { ConfigEditor, MANAGED_KEYS, changedKeys, pickManaged, type ManagedContent } from "@/components/admin/ConfigEditor";
 import { SECTIONS, defaultSiteConfig } from "@/lib/siteConfig";
 
+// El editor renderiza todas las secciones: con la máquina cargada algunas pruebas pasan de los 5 s por defecto.
+vi.setConfig({ testTimeout: 20_000 });
+
 const NOTICE = /Textos recomendados cargados/;
 
 afterEach(() => {
@@ -275,6 +278,25 @@ describe("ConfigEditor", () => {
     expect(repuestos[3]).toHaveValue("gastronomia");
     expect(within(casos).getByText(NOTICE)).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  // Cambio diagnostico-mapa-oportunidades: bloque de la portada que invita al autodiagnóstico.
+  it("autodiagnóstico: textos editables, recomendados sin guardar y payload solo con su sección", async () => {
+    const { fetchMock, lastBody } = renderEditor();
+    const { autodiagnostico } = defaultSiteConfig().content;
+    const region = screen.getByRole("region", { name: "Autodiagnóstico" });
+    const titulo = within(region).getByRole("textbox", { name: "Título" });
+    expect(titulo).toHaveValue(autodiagnostico.title);
+    expect(within(region).getByRole("textbox", { name: "Botón" })).toHaveValue(autodiagnostico.cta);
+    fireEvent.change(titulo, { target: { value: "Otro" } });
+    fireEvent.click(within(region).getByRole("button", { name: "Usar los textos recomendados" }));
+    expect(titulo).toHaveValue(autodiagnostico.title);
+    expect(fetchMock).not.toHaveBeenCalled();
+    fireEvent.change(titulo, { target: { value: "Otro título" } });
+    await save(fetchMock, 1);
+    expect(Object.keys(lastBody().content)).toEqual(["autodiagnostico"]);
+    expect(lastBody().content.autodiagnostico.title).toBe("Otro título");
+    expect(screen.getByRole("checkbox", { name: /Autodiagnóstico/ })).toBeChecked();
   });
 
   // Cambio landing-referidos-oa: franja de /oa, editable y con textos recomendados.

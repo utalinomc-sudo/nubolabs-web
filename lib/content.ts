@@ -150,6 +150,14 @@ export const metricsLabels = {
   source: "Fuente: ",
 };
 
+// Bloque Autodiagnóstico de la portada (cambio diagnostico-mapa-oportunidades): textos fijos de la tarjeta de ejemplo.
+export const selfDiagnosisLabels = {
+  exampleLabel: "Ejemplo de resultado del autodiagnóstico", // nombre de la tarjeta para lectores de pantalla
+  mapTitle: "Tu mapa de oportunidades",
+  example: "Ejemplo",
+  nextStep: "Próximo paso sugerido:",
+};
+
 // Franja de /oa (cambio landing-referidos-oa): textos fijos para lectores de pantalla. Título y texto van en el CMS.
 export const referralLabels = {
   region: "Recomendación",

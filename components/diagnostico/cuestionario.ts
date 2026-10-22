@@ -86,7 +86,8 @@ export const AREAS: Area[] = [
 ];
 
 export const ABIERTAS = [
-  { id: "mayorProblema", label: "De todo lo anterior, ¿cuál es el problema que más tiempo le quita al equipo hoy?" },
+  // Cambio diagnostico-mapa-oportunidades: la primera pregunta habla de lo que quiere mejorar, no del tiempo que se pierde.
+  { id: "mejorar", label: "¿Qué es lo que más te gustaría mejorar en tu negocio este año?" },
   { id: "solucionMagica", label: "Si pudieras resolver un solo problema del día a día con una solución mágica, ¿cuál sería?" },
 ] as const;
 
