@@ -9,6 +9,7 @@ import { ContactSuccess } from "@/components/landing/ContactSuccess";
 import { contactSection as copy } from "@/lib/content";
 import { CONSENT_TEXTS, GOALS, INDUSTRIES, describeGoals, type GoalKey, type IndustryKey } from "@/lib/leadOptions";
 import { LEAD_MAX, isValidEmail, isValidPhone, type LeadSource } from "@/lib/leads";
+import { readStoredReferral } from "@/lib/referral";
 
 type Status = "idle" | "loading" | "ok";
 type RequiredField = "name" | "phone" | "email";
@@ -106,6 +107,8 @@ export function ContactForm({ source = "landing", scheduleUrl = null, aside = nu
       contactConsent: true,
       marketingConsent,
       source,
+      // Referido de la visita (/oa), leído al enviar (cambio landing-referidos-oa, design.md decisión 4).
+      referral: readStoredReferral() ?? undefined,
       website: honeypot.current?.value ?? "",
     };
     // Solo se muestra el mensaje del servidor ({ error }); sin red o sin respuesta legible, el texto propio

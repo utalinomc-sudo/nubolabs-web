@@ -105,6 +105,9 @@ export interface SiteContent {
   equipo: { eyebrow: string; title: string; historia: string };
   // Página /privacidad (cambio formulario-minimo-consentimiento, design.md decisión 6). Párrafos separados por línea en blanco.
   privacidad: { titulo: string; texto: string };
+  // Franja de bienvenida de /oa (cambio landing-referidos-oa, design.md decisión 6). No es una sección de SECTIONS:
+  // solo se muestra en las visitas referidas.
+  referidos: { oa: { titulo: string; texto: string } };
 }
 export interface SiteConfig {
   visible: Record<string, boolean>;
@@ -135,7 +138,7 @@ export const SECTIONS: { key: string; label: string; hint: string; defaultHidden
 const PRIVACY_DRAFT = [
   "Esta página explica cómo Nubolabs cuida los datos que nos entregas en nubolabs.cl. Es un borrador en revisión legal.",
   "Responsable. Nubolabs es responsable del tratamiento de tus datos. Para cualquier consulta sobre privacidad, escríbenos a mauricio.nubolabs@gmail.com.",
-  "Qué datos guardamos. Tu nombre, correo, WhatsApp, empresa, rubro, lo que quieres lograr y el mensaje que nos dejes. Si haces el diagnóstico, también tus respuestas.",
+  "Qué datos guardamos. Tu nombre, correo, WhatsApp, empresa, rubro, lo que quieres lograr y el mensaje que nos dejes. Si haces el diagnóstico, también tus respuestas. Si llegaste recomendado por un aliado (por ejemplo, tu estudio contable), guardamos también de quién vino la recomendación.",
   "Para qué los usamos. Para responder tu solicitud y coordinar tu diagnóstico. Solo te enviaremos ideas y novedades si marcas esa casilla.",
   "Quién más los trata. El sitio está alojado en Vercel, guardamos los datos en Google Firebase y enviamos los correos con Resend. Los tres tienen servidores fuera de Chile, así que tus datos se transfieren al extranjero para prestar el servicio.",
   "Cuánto tiempo los guardamos. Hasta 24 meses desde nuestro último contacto, o antes si nos pides borrarlos.",
@@ -388,6 +391,12 @@ export function defaultSiteConfig(): SiteConfig {
       privacidad: {
         titulo: "Cómo cuidamos tus datos",
         texto: PRIVACY_DRAFT,
+      },
+      referidos: {
+        oa: {
+          titulo: "Bienvenido, cliente de Osorio & Asociados.",
+          texto: "Tu contador nos recomendó porque ayudamos a empresas como la tuya a ordenarse y crecer.",
+        },
       },
     },
   };
@@ -733,6 +742,13 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
       privacidad: {
         titulo: pickText(asRecord(c.privacidad).titulo, b.privacidad.titulo),
         texto: pickText(asRecord(c.privacidad).texto, b.privacidad.texto),
+      },
+      // Cada texto vacío o que no es texto toma su default (franja de /oa).
+      referidos: {
+        oa: {
+          titulo: pickText(asRecord(asRecord(c.referidos).oa).titulo, b.referidos.oa.titulo),
+          texto: pickText(asRecord(asRecord(c.referidos).oa).texto, b.referidos.oa.texto),
+        },
       },
     },
   };

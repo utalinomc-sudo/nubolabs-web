@@ -215,6 +215,13 @@ export const IconGrid = ({ className }: P) => (
   </svg>
 );
 
+// Cerrar (franja de referidos de /oa, cambio landing-referidos-oa).
+export const IconX = ({ className }: P) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <path {...stroke} d="M18 6 6 18M6 6l12 12" />
+  </svg>
+);
+
 // Ícono de cada compromiso del bloque de confianza, por posición.
 export const promiseIcons = [IconCalendar, IconGrid, IconShield];
 

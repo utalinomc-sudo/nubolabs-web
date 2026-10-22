@@ -1,7 +1,7 @@
 // Resumen de un lead para el equipo: lo comparten el aviso por correo, la ficha PDF y el admin.
 // Pura (sin server-only). Acepta leads antiguos: todo campo nuevo se lee con chequeo de tipo.
 // Cambio formulario-minimo-consentimiento, design.md decisión 7.
-import { goalLabel, industryLabel } from "@/lib/leadOptions";
+import { REFERRAL_LABELS, goalLabel, industryLabel, isReferral } from "@/lib/leadOptions";
 
 type LeadLike = {
   industry?: unknown;
@@ -11,7 +11,21 @@ type LeadLike = {
   marketingConsent?: unknown;
   consentAt?: unknown;
   meta?: unknown;
+  source?: unknown;
+  referral?: unknown;
 };
+
+// Referido del lead (cambio landing-referidos-oa): etiqueta si el valor guardado está en REFERRALS; si no, null.
+export function leadReferralLabel(lead: LeadLike): string | null {
+  return isReferral(lead.referral) ? REFERRAL_LABELS[lead.referral] : null;
+}
+
+// Origen para el equipo: el formulario y, si hay, el referido ("landing · referido O&A").
+export function leadOriginText(lead: LeadLike): string {
+  const source = typeof lead.source === "string" && lead.source.trim() ? lead.source.trim() : "landing";
+  const referral = leadReferralLabel(lead);
+  return referral ? `${source} · referido ${referral}` : source;
+}
 
 // Rubro con su texto en español; en leads antiguos del diagnóstico, el rubro libre de meta.rubro.
 export function leadIndustryText(lead: LeadLike): string | null {

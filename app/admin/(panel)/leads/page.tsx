@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { getDb } from "@/lib/firebaseAdmin";
+import { REFERRAL_LABELS, isReferral, type Referral } from "@/lib/leadOptions";
+import { LEAD_ORIGINS, filterLeadsByOrigin, parseLeadOrigin } from "@/lib/leadStats";
 import { leadIndustryText } from "@/lib/leadSummary";
 
 export const dynamic = "force-dynamic";
@@ -10,6 +12,7 @@ interface LeadRow {
   email: string;
   company: string;
   source: string;
+  referral: Referral | null;
   createdAt: string;
   indice: number | null;
   ahorroMes: number | null;
@@ -21,7 +24,8 @@ async function getLeads(): Promise<{ configured: boolean; leads: LeadRow[] }> {
   const db = getDb();
   if (!db) return { configured: false, leads: [] };
 
-  const snap = await db.collection("leads").orderBy("createdAt", "desc").limit(100).get();
+  // Últimos 200, filtrados en memoria por origen (sin índice compuesto; design.md decisión 7).
+  const snap = await db.collection("leads").orderBy("createdAt", "desc").limit(200).get();
   const leads = snap.docs.map((d) => {
     const x = d.data();
     const meta = (x.meta ?? {}) as Record<string, unknown>;
@@ -32,6 +36,7 @@ async function getLeads(): Promise<{ configured: boolean; leads: LeadRow[] }> {
       email: x.email ?? "",
       company: x.company ?? "",
       source: x.source ?? "landing",
+      referral: isReferral(x.referral) ? x.referral : null,
       createdAt: x.createdAt ?? "",
       indice: typeof meta.indiceFriccion === "number" ? meta.indiceFriccion : null,
       ahorroMes: ahorro?.totales?.mes ?? null,
@@ -54,18 +59,43 @@ function fmtDate(iso: string) {
 }
 const clp = new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP", maximumFractionDigits: 0 });
 
-export default async function AdminLeads() {
-  const { configured, leads } = await getLeads();
+export default async function AdminLeads({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const origen = parseLeadOrigin((await searchParams).origen);
+  const { configured, leads: all } = await getLeads();
+  const leads = filterLeadsByOrigin(all, origen);
 
   return (
     <div>
       <div className="flex items-baseline justify-between">
         <h1 className="text-2xl font-extrabold tracking-[-0.5px]">Leads</h1>
-        {configured && <span className="text-sm text-ink-muted">{leads.length} en total</span>}
+        {configured && (
+          <span className="text-sm text-ink-muted">
+            {origen === "todos" ? `${leads.length} en total` : `${leads.length} entre los últimos 200`}
+          </span>
+        )}
       </div>
       <p className="mt-1 text-sm text-ink-muted">Solicitudes desde la landing y el diagnóstico operativo.</p>
 
-      <div className="mt-8 card overflow-hidden">
+      {/* Filtro por origen en la URL (?origen=oa), para poder compartirlo (cambio landing-referidos-oa). */}
+      <nav aria-label="Filtrar por origen" className="mt-6 flex flex-wrap gap-2">
+        {LEAD_ORIGINS.map((o) => {
+          const active = o.key === origen;
+          return (
+            <Link
+              key={o.key}
+              href={o.key === "todos" ? "/admin/leads" : `/admin/leads?origen=${o.key}`}
+              aria-current={active ? "page" : undefined}
+              className={`inline-flex min-h-11 items-center rounded-full border-[1.5px] px-4 text-sm font-semibold transition ${
+                active ? "border-navy bg-navy text-white" : "border-line-strong bg-white text-ink-soft hover:border-brand hover:text-brand"
+              }`}
+            >
+              {o.label}
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="mt-6 card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="border-b border-line bg-surface-soft text-[12px] uppercase tracking-wide text-ink-muted">
@@ -90,7 +120,7 @@ export default async function AdminLeads() {
               ) : leads.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-5 py-10 text-center text-ink-muted">
-                    No hay leads todavía.
+                    {origen === "todos" ? "No hay leads todavía." : "No hay leads con este origen entre los últimos 200."}
                   </td>
                 </tr>
               ) : (
@@ -121,6 +151,11 @@ export default async function AdminLeads() {
                       >
                         {l.source}
                       </span>
+                      {l.referral && (
+                        <span className="ml-1.5 whitespace-nowrap rounded-full bg-navy px-2.5 py-1 text-[11px] font-semibold text-white">
+                          {REFERRAL_LABELS[l.referral]}
+                        </span>
+                      )}
                     </td>
                     <td className="px-5 py-3 font-semibold">{l.indice ?? "—"}</td>
                     <td className="px-5 py-3 text-ink-soft">{l.ahorroMes != null ? clp.format(l.ahorroMes) : "—"}</td>

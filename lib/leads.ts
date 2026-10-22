@@ -1,6 +1,6 @@
 // Validación y normalización de leads, pura y testeable (cambio formulario-minimo-consentimiento, design.md decisión 2).
 // La usa POST /api/leads: todo lo que manda el cliente llega como `unknown` y se reconstruye aquí.
-import { CONSENT_TEXTS, CONSENT_VERSION, isGoalKey, isIndustryKey, type GoalKey } from "@/lib/leadOptions";
+import { CONSENT_TEXTS, CONSENT_VERSION, isGoalKey, isIndustryKey, isReferral, type GoalKey } from "@/lib/leadOptions";
 import type { LeadRecord } from "@/types/lead";
 
 // Orígenes permitidos. Los referidos de O&A (HDU-07) se marcan con un campo aparte, no con otro `source`.
@@ -107,6 +107,9 @@ export function normalizeLead(body: unknown, now: Date = new Date()): NormalizeR
     const industryOther = text(body.industryOther, MAX.industryOther);
     if (industryOther) lead.industryOther = industryOther;
   }
+  // Referido (cambio landing-referidos-oa): solo si está en REFERRALS; otro valor se omite sin error. No toca `source`.
+  const referral = typeof body.referral === "string" ? body.referral.trim() : "";
+  if (isReferral(referral)) lead.referral = referral;
   // `meta` (detalle del diagnóstico) solo en leads del diagnóstico y con tamaño acotado.
   if (lead.source === "diagnostico" && isPlainObject(body.meta)) {
     if (JSON.stringify(body.meta).length > META_MAX_BYTES) return { ok: false, error: LEAD_ERRORS.invalidBody };

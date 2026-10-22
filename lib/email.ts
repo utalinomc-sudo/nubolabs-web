@@ -1,5 +1,5 @@
 import "server-only";
-import { leadSummaryRows } from "@/lib/leadSummary";
+import { leadOriginText, leadSummaryRows } from "@/lib/leadSummary";
 
 interface LeadEmail {
   id?: string;
@@ -8,6 +8,7 @@ interface LeadEmail {
   phone?: string;
   company?: string;
   source?: string;
+  referral?: string; // cambio landing-referidos-oa
   message?: string;
   // Desde formulario-minimo-consentimiento (opcionales para no romper leads antiguos).
   goals?: string[];
@@ -92,7 +93,7 @@ export async function sendLeadNotification(lead: LeadEmail): Promise<EmailResult
     ["WhatsApp", lead.phone],
     ["Empresa", lead.company],
     ...leadSummaryRows(lead), // Rubro, Quiere lograr, Novedades (solo si hay dato)
-    ["Origen", lead.source],
+    ["Origen", leadOriginText(lead)], // con el referido: "landing · referido O&A"
   ];
   const rowsHtml = rows
     .filter(([, v]) => v)

@@ -1,4 +1,4 @@
-import type { GoalKey, IndustryKey } from "@/lib/leadOptions";
+import type { GoalKey, IndustryKey, Referral } from "@/lib/leadOptions";
 
 // Lo que envían los formularios a POST /api/leads (todo llega como `unknown` y se valida en lib/leads.ts).
 export interface LeadInput {
@@ -14,6 +14,7 @@ export interface LeadInput {
   industryOther?: string; // texto del rubro "Otro" (máx. 70), solo si industry es "otro"
   contactConsent?: boolean; // obligatorio: debe ser exactamente true
   marketingConsent?: boolean;
+  referral?: string; // referidor de la visita (cambio landing-referidos-oa); solo se guarda si está en REFERRALS
   website?: string; // campo trampa (honeypot): debe llegar vacío
   // Datos estructurados adicionales (ej. el detalle del diagnóstico de ahorro).
   meta?: Record<string, unknown>;
@@ -39,6 +40,7 @@ export interface LeadRecord {
   industry?: IndustryKey;
   goalOther?: string;
   industryOther?: string;
+  referral?: Referral; // solo en leads de una visita referida (ej. /oa)
   contactConsent: true;
   marketingConsent: boolean;
   consentAt: string; // ISO, hora del servidor

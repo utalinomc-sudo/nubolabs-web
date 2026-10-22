@@ -65,7 +65,7 @@ export async function POST(req: Request) {
   if (!db || !isAdminConfigured) {
     console.warn(
       "[leads] Firebase Admin no configurado. Lead válido no persistido:",
-      JSON.stringify({ source: lead.source, goals: lead.goals?.length ?? 0, industry: lead.industry ?? null }),
+      JSON.stringify({ source: lead.source, referral: lead.referral ?? null, goals: lead.goals?.length ?? 0, industry: lead.industry ?? null }),
     );
     await Promise.all([sendLeadNotification(lead), maybeSendClientReport(lead)]);
     return NextResponse.json({ ok: true, persisted: false });

@@ -5,7 +5,7 @@ Permite reconocer a los visitantes que llegan recomendados por un referidor (hoy
 ## ADDED Requirements
 
 ### Requirement: Entrada para referidos de O&A
-El sitio SHALL servir `/oa` con el mismo contenido y las mismas secciones visibles que `/`, más una franja de bienvenida al inicio de la página. `/?ref=oa` SHALL comportarse igual que `/oa`. Sin referido (`/` sin `ref`, o con un `ref` desconocido) la franja MUST NOT mostrarse. `/oa` MUST declarar que no debe indexarse (`noindex`).
+El sitio SHALL servir `/oa` con el mismo contenido y las mismas secciones visibles que `/`, más una franja de bienvenida al inicio de la página. `/?ref=oa` SHALL comportarse igual que `/oa`. Sin referido (`/` sin `ref`, o con un `ref` desconocido) la franja MUST NOT mostrarse. `/oa` y `/?ref=oa` MUST declarar que no deben indexarse (`noindex`) y MUST NOT declarar una URL canónica (señales contradictorias para los buscadores); `/` sin referido SHALL seguir indexable. Desde `/oa`, los enlaces del menú y del pie llevan a `/` (sin la franja); la visita sigue marcada como referida en esa pestaña.
 
 #### Scenario: Entrada por /oa
 - **WHEN** un visitante abre `/oa`
@@ -13,7 +13,7 @@ El sitio SHALL servir `/oa` con el mismo contenido y las mismas secciones visibl
 
 #### Scenario: Alias con parámetro
 - **WHEN** un visitante abre `/?ref=oa`
-- **THEN** ve la misma franja que en `/oa`
+- **THEN** ve la misma franja que en `/oa` y la página declara `noindex`; `/` sin `ref` sigue indexable
 
 #### Scenario: Referido desconocido
 - **WHEN** un visitante abre `/?ref=otro`
@@ -21,10 +21,14 @@ El sitio SHALL servir `/oa` con el mismo contenido y las mismas secciones visibl
 
 #### Scenario: No indexable
 - **WHEN** se inspecciona el HTML de `/oa`
-- **THEN** contiene una meta de robots con `noindex`
+- **THEN** contiene una meta de robots con `noindex` y no declara URL canónica
+
+#### Scenario: Del menú a la portada
+- **WHEN** desde `/oa` el visitante pulsa "Diagnóstico gratis" en el menú y envía el formulario en `/`
+- **THEN** el lead queda con `referral: "oa"`
 
 ### Requirement: Franja de bienvenida editable y cerrable
-La franja SHALL mostrar un título y un texto editables desde `/admin/config` (`content.referidos.oa.titulo` y `content.referidos.oa.texto`). Sin overrides SHALL usar el título "Bienvenido, cliente de Osorio & Asociados." y el texto "Tu contador nos recomendó porque ayudamos a empresas como la tuya a ordenarse y crecer." La franja SHALL tener un botón accesible "Cerrar aviso" (objetivo táctil de al menos 44 × 44 px); al cerrarla MUST NOT volver a mostrarse en la misma pestaña, y cerrarla MUST NOT borrar la marca de referido de la visita.
+La franja SHALL mostrar un título y un texto editables desde `/admin/config` (`content.referidos.oa.titulo` y `content.referidos.oa.texto`). Sin overrides SHALL usar el título "Bienvenido, cliente de Osorio & Asociados." y el texto "Tu contador nos recomendó porque ayudamos a empresas como la tuya a ordenarse y crecer." La franja SHALL tener un botón accesible "Cerrar aviso" (objetivo táctil de al menos 44 × 44 px); al cerrarla MUST NOT volver a mostrarse en la misma pestaña una vez cargada la página (al recargar puede verse un instante mientras carga, porque el servidor no conoce lo guardado en la pestaña), y cerrarla MUST NOT borrar la marca de referido de la visita. Al cerrarla, el foco SHALL pasar al menú.
 
 #### Scenario: Textos por defecto
 - **WHEN** `config/site` no tiene `content.referidos`

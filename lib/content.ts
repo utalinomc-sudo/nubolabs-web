@@ -150,6 +150,12 @@ export const metricsLabels = {
   source: "Fuente: ",
 };
 
+// Franja de /oa (cambio landing-referidos-oa): textos fijos para lectores de pantalla. Título y texto van en el CMS.
+export const referralLabels = {
+  region: "Recomendación",
+  close: "Cerrar aviso",
+};
+
 // Ejemplos por rubro (cambio casos-por-rubro): textos fijos del filtro. Las etiquetas de cada rubro vienen de
 // INDUSTRIES (lib/leadOptions.ts), las mismas del formulario.
 export const casesLabels = {

@@ -215,3 +215,26 @@ describe("normalizeLead: lead guardado", () => {
     expect(lead.status).toBe("new");
   });
 });
+
+// Cambio landing-referidos-oa (design.md decisiones 1 y 2): el referido es un campo aparte; `source` no cambia.
+describe("normalizeLead: referido", () => {
+  it("guarda referral 'oa' (también con espacios) y deja source como el formulario", () => {
+    expect(ok({ ...VALID, source: "landing", referral: "oa" })).toMatchObject({ source: "landing", referral: "oa" });
+    expect(ok({ ...VALID, source: "diagnostico", referral: " oa " })).toMatchObject({ source: "diagnostico", referral: "oa" });
+  });
+
+  it("omite sin error un referido desconocido, vacío, que no es texto o ausente", () => {
+    for (const referral of ["xyz", "OA", "", "  ", 123, null, ["oa"], { oa: true }]) {
+      const lead = ok({ ...VALID, source: "landing", referral });
+      expect(lead).not.toHaveProperty("referral");
+      expect(lead.source).toBe("landing");
+    }
+    expect(ok(VALID)).not.toHaveProperty("referral");
+  });
+
+  it("el referido no cambia el origen ni el meta del diagnóstico", () => {
+    const lead = ok({ ...VALID, source: "diagnostico", referral: "oa", meta: { indiceFriccion: 42 } });
+    expect(lead.source).toBe("diagnostico");
+    expect(lead.meta).toEqual({ indiceFriccion: 42 });
+  });
+});

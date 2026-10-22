@@ -43,6 +43,16 @@ export function isIndustryKey(value: unknown): value is IndustryKey {
   return typeof value === "string" && INDUSTRIES.some((i) => i.key === value);
 }
 
+// Referidores (cambio landing-referidos-oa, design.md decisión 1): lista cerrada en código. Un lead referido guarda
+// `referral` aparte de `source`, que sigue siendo el formulario. Para sumar otro, agregarlo aquí y su etiqueta.
+export const REFERRALS = ["oa"] as const;
+export type Referral = (typeof REFERRALS)[number];
+export const REFERRAL_LABELS: Record<Referral, string> = { oa: "O&A" };
+
+export function isReferral(value: unknown): value is Referral {
+  return typeof value === "string" && (REFERRALS as readonly string[]).includes(value);
+}
+
 export function goalLabel(key: unknown): string | null {
   return GOALS.find((g) => g.key === key)?.label ?? null;
 }

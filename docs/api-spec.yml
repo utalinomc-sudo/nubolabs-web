@@ -30,6 +30,9 @@ paths:
         genera y envía el informe PDF al cliente. Correo e informe no bloquean la respuesta. Sin Firebase Admin
         configurado responde `persisted: false`.
 
+        Desde `landing-referidos-oa`: acepta `referral` opcional (hoy solo `oa`, para los leads que llegan por la
+        entrada `/oa` del correo de Osorio & Asociados); cualquier otro valor se omite sin error.
+
         Desde `formulario-minimo-consentimiento` (**BREAKING**): `phone` (WhatsApp, 8 a 15 dígitos) y
         `contactConsent: true` son obligatorios. El servidor agrega la prueba del consentimiento (`consentAt` con su
         propia hora, `consentText` con el texto oficial de cada casilla aceptada y `consentVersion`); lo que mande el
@@ -343,6 +346,7 @@ components:
         contactConsent: { type: boolean, description: "Obligatorio y exactamente `true`" }
         marketingConsent: { type: boolean, description: "Opcional; solo `true` cuenta como aceptado" }
         website: { type: string, description: "Campo trampa (honeypot): debe llegar vacío o no venir" }
+        referral: { type: string, enum: [oa], description: "Referidor de la visita (cambio landing-referidos-oa; lo agregan los formularios si la pestaña entró por /oa o /?ref=oa). Se recorta; otro valor se omite sin error. No cambia `source` ni el informe" }
         meta: { $ref: "#/components/schemas/DiagnosticoMeta" }
       required: [name, email, phone, contactConsent]
 
@@ -590,6 +594,15 @@ components:
             whatsappNumber: { type: string, description: "Con código de país; al leer se dejan solo los dígitos (8 a 15)", example: "+56 9 3259 0783" }
             showWhatsapp: { type: boolean, description: "Número en el pie de página. Solo true exacto lo activa" }
             showWhatsappQr: { type: boolean, description: "Tarjeta con QR junto al formulario. Solo true exacto lo activa" }
+        referidos:
+          type: object
+          description: "Franja de bienvenida de /oa y /?ref=oa (cambio landing-referidos-oa). Un texto vacío toma su default"
+          properties:
+            oa:
+              type: object
+              properties:
+                titulo: { type: string, example: "Bienvenido, cliente de Osorio & Asociados." }
+                texto: { type: string }
         privacidad:
           type: object
           description: "Página /privacidad. Un campo vacío cae al borrador por defecto"

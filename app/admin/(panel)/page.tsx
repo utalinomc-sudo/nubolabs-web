@@ -1,11 +1,12 @@
 import { getDb } from "@/lib/firebaseAdmin";
+import { LEAD_ORIGINS, countLeadsByOrigin } from "@/lib/leadStats";
 import { getSiteConfig } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 async function getStats() {
   const db = getDb();
-  if (!db) return { configured: false, total: 0, mes: 0, diagnosticos: 0 };
+  if (!db) return { configured: false, total: 0, mes: 0, diagnosticos: 0, porOrigen: null };
 
   const snap = await db.collection("leads").get();
   const now = new Date();
@@ -19,7 +20,9 @@ async function getStats() {
       mes++;
     }
   });
-  return { configured: true, total: snap.size, mes, diagnosticos };
+  // Medición de la campaña de O&A (cambio landing-referidos-oa): últimos 30 días por formulario y referido.
+  const porOrigen = countLeadsByOrigin(snap.docs.map((d) => d.data()), now);
+  return { configured: true, total: snap.size, mes, diagnosticos, porOrigen };
 }
 
 export default async function AdminDashboard() {
@@ -49,6 +52,24 @@ export default async function AdminDashboard() {
           </div>
         ))}
       </div>
+
+      <section aria-labelledby="h-origen" className="mt-8 card p-6">
+        <h2 id="h-origen" className="text-lg font-bold">
+          Leads por origen (últimos 30 días)
+        </h2>
+        <dl className="mt-4 grid gap-4 sm:grid-cols-3">
+          {LEAD_ORIGINS.filter((o) => o.key !== "todos").map((o) => (
+            <div key={o.key} className="rounded-xl bg-surface-soft px-4 py-3">
+              <dt className="text-[13px] font-semibold text-ink-muted">{o.label}</dt>
+              <dd className="mt-1 text-2xl font-extrabold">{stats.porOrigen ? String(stats.porOrigen[o.key]) : "—"}</dd>
+            </div>
+          ))}
+        </dl>
+        <p className="mt-3 text-[12.5px] text-ink-muted">
+          «O&amp;A» cuenta los leads que entraron por /oa o /?ref=oa (el link del correo de Osorio &amp; Asociados), de cualquier formulario. Solo
+          se marcan si envían el formulario en la misma pestaña de esa visita.
+        </p>
+      </section>
 
       {!stats.configured && (
         <div className="mt-8 card p-6">

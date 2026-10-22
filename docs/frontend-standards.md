@@ -7,7 +7,7 @@ alwaysApply: true
 
 ## 1. Resumen
 
-Tres superficies: la **landing** (`/`) compuesta por secciones de `components/landing/*`; las páginas públicas **`/diagnostico`** (cuestionario + estimador de ahorro), **`/equipo`** y **`/mision-vision`**; y el **panel admin** (`/admin/login` + grupo protegido `app/admin/(panel)/**`). Las páginas son Server Components que leen el CMS desde Firestore y pasan datos por props; la interacción vive en Client Components explícitos.
+Tres superficies: la **landing** (`/`, y su entrada para referidos **`/oa`** con la franja de bienvenida de O&A) compuesta por secciones de `components/landing/*`; las páginas públicas **`/diagnostico`** (cuestionario + estimador de ahorro), **`/equipo`** y **`/mision-vision`**; y el **panel admin** (`/admin/login` + grupo protegido `app/admin/(panel)/**`). Las páginas son Server Components que leen el CMS desde Firestore y pasan datos por props; la interacción vive en Client Components explícitos.
 
 ## 2. Stack
 
@@ -28,7 +28,8 @@ Tres superficies: la **landing** (`/`) compuesta por secciones de `components/la
 ```
 app/
   layout.tsx              fuentes, metadata global, <html lang="es">
-  page.tsx                landing: Nav + secciones según `visible` + Footer   (server, force-dynamic)
+  page.tsx                landing: <LandingPage /> (Nav + secciones según `visible` + Footer); con ?ref=oa, franja y noindex   (server, force-dynamic)
+  oa/page.tsx             entrada de los referidos de O&A: <LandingPage referral="oa" />, noindex   (server, force-dynamic)
   globals.css             @tailwind + primitivas (.container-page, .btn-primary, .btn-ghost, .pill, .card, .field, .text-gradient-brand, .bg-dots)
   diagnostico/page.tsx    monta <DiagnosticoFlow />
   equipo/page.tsx         lista integrantes (getTeamMembers); notFound() si visible.equipo es false
@@ -38,10 +39,10 @@ app/
   admin/(panel)/layout.tsx  server: redirect a /admin/login si no hay sesión; sidebar
   admin/(panel)/{page,leads,leads/[id],config,equipo}/page.tsx
 components/
-  landing/   Nav (client), Hero, HeroPanel (client), Trust, MiniQuote, SectionHead, Problem, Results, Approach, Services, UseCases (+ UseCasesFilter client y casesFilter.ts), Metrics, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
+  landing/   LandingPage (composición de / y /oa), ReferralBanner (client), ReferralTracker (client), Nav (client), Hero, HeroPanel (client), Trust, MiniQuote, SectionHead, Problem, Results, Approach, Services, UseCases (+ UseCasesFilter client y casesFilter.ts), Metrics, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
   diagnostico/  DiagnosticoFlow.tsx (client), AhorroEstimator.tsx (client), cuestionario.ts, ahorro.ts
   admin/     ConfigEditor (contenedor de /admin/config), TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
-  admin/config/  Field (+ SelectField), SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Confianza, Problema, Resultados, Enfoque, Servicios, Casos, Cifras, Proceso, Contact, Faq, Cierre, Nosotros, Privacidad)
+  admin/config/  Field (+ SelectField), SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Confianza, Problema, Resultados, Enfoque, Servicios, Casos, Cifras, Proceso, Contact, Faq, Cierre, Nosotros, Privacidad y Referidos, la franja de /oa)
   Logo.tsx (Logo, LogoMark) · icons.tsx · LinkedInIcon.tsx
 lib/content.ts      textos fijos fuera del CMS (nav, trustLabels, metricsLabels, casesLabels, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, contactSection, contact, ctaNote, footerLinks, whatsappCard, newTabNote)
 lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig() (todos los textos editables por defecto), mergeConfig(), mergeFixedList(), mergeList(), normalizeTags(), renderHighlight(), normalizeContact(), formatWhatsapp(), whatsappLink(), normalizeTestimonios(), pickTestimonios(), contactQuote(), initials(), normalizeCifras(), visibleCifras(), hasContent(), CASE_RUBROS, normalizeCaseRubro()  (puro: tests y admin)
@@ -49,9 +50,11 @@ lib/inlineLinks.ts  parseInlineLinks(): enlaces internos [texto](/ruta) en texto
 lib/qrSvg.ts        qrPath()/qrSvg(): código QR dibujado en el servidor con qrcode-generator
 lib/brandColors.ts  colores de marca que se necesitan como valor (NAVY_950); tailwind.config.ts los importa
 lib/site.ts         getSiteConfig(), getTeamMembers() + re-exports de lib/siteConfig.ts  (server-only)
-lib/leadOptions.ts  GOALS, INDUSTRIES, CONSENT_TEXTS, CONSENT_VERSION y helpers  (puro: formulario, API, correo, PDF y admin)
+lib/leadOptions.ts  GOALS, INDUSTRIES, REFERRALS, CONSENT_TEXTS, CONSENT_VERSION y helpers  (puro: formulario, API, correo, PDF y admin)
 lib/leads.ts        normalizeLead(), validadores (correo, WhatsApp), honeypot, LEAD_SOURCES, safeScheduleUrl()  (puro)
-lib/leadSummary.ts  rubro, objetivos y novedades de un lead para el equipo (correo, ficha PDF y admin)  (puro)
+lib/leadSummary.ts  rubro, objetivos, novedades y origen con referido de un lead para el equipo (correo, ficha PDF y admin)  (puro)
+lib/referral.ts     referido de la visita: parseReferral() y sessionStorage con try/catch (rememberReferral, readStoredReferral, franja cerrada)  (puro/cliente)
+lib/leadStats.ts    leads por origen para el panel: countLeadsByOrigin() (30 días), filterLeadsByOrigin(), LEAD_ORIGINS  (puro)
 ```
 
 Regla: una sección de landing = un componente en `components/landing/`; un editor de sección del CMS = un `<Seccion>Editor.tsx` en `components/admin/config/`; otros editores del admin en `components/admin/`; lógica pura del diagnóstico en archivos `.ts` junto a sus componentes.

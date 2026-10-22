@@ -48,3 +48,17 @@ describe("leadSummary", () => {
     expect(leadSummaryRows({})).toEqual([]);
   });
 });
+
+// Cambio landing-referidos-oa (design.md decisión 7): origen con el referido para el correo, el detalle y la ficha.
+describe("origen y referido", () => {
+  it("leadOriginText: el formulario, más el referido si es válido", async () => {
+    const { leadOriginText, leadReferralLabel } = await import("@/lib/leadSummary");
+    expect(leadOriginText({ source: "landing" })).toBe("landing");
+    expect(leadOriginText({ source: "diagnostico", referral: "oa" })).toBe("diagnostico · referido O&A");
+    expect(leadOriginText({ source: "landing", referral: "xyz" })).toBe("landing");
+    expect(leadOriginText({})).toBe("landing");
+    expect(leadReferralLabel({ referral: "oa" })).toBe("O&A");
+    expect(leadReferralLabel({ referral: " oa" })).toBeNull();
+    expect(leadReferralLabel({})).toBeNull();
+  });
+});

@@ -10,6 +10,7 @@ import { contactSection } from "@/lib/content";
 import { CONSENT_TEXTS, INDUSTRIES, isIndustryKey, type IndustryKey } from "@/lib/leadOptions";
 import { leadIndustryText } from "@/lib/leadSummary";
 import { LEAD_MAX, isValidEmail, isValidPhone } from "@/lib/leads";
+import { readStoredReferral } from "@/lib/referral";
 
 const C = {
   navy: "#0B1D3A",
@@ -177,6 +178,7 @@ export function DiagnosticoFlow() {
           company: empresa,
           message,
           source: "diagnostico",
+          referral: readStoredReferral() ?? undefined, // visita que entró por /oa (cambio landing-referidos-oa)
           industry: contact.industry || undefined,
           industryOther: contact.industry === "otro" && contact.industryOther.trim() ? contact.industryOther.trim() : undefined,
           contactConsent: true,

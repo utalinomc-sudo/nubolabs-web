@@ -13,6 +13,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  sessionStorage.clear();
 });
 
 function answerAll() {
@@ -77,6 +78,21 @@ describe("DiagnosticoFlow: paso de contacto", () => {
     expect(body.meta.rubro).toBe("Otro: Transporte de carga");
   });
 
+  // Cambio landing-referidos-oa: una visita que entró por /oa marca también el diagnóstico.
+  it("incluye referral 'oa' si la pestaña viene de /oa, sin cambiar el origen", async () => {
+    fetchMock.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ ok: true, persisted: false }) });
+    sessionStorage.setItem("nubolabs_ref", "oa");
+    render(<DiagnosticoFlow />);
+    answerAll();
+    fillContact();
+    fireEvent.click(consent());
+    send();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body as string);
+    expect(body).toMatchObject({ source: "diagnostico", referral: "oa" });
+    expect(body.meta).toBeTruthy();
+  });
+
   it("si el servidor falla (500) confirma igual, como antes", async () => {
     fetchMock.mockResolvedValueOnce({ ok: false, status: 500, json: async () => ({ error: "No se pudo guardar la solicitud." }) });
     render(<DiagnosticoFlow />);
@@ -87,6 +103,7 @@ describe("DiagnosticoFlow: paso de contacto", () => {
     await waitFor(() => expect(screen.getByText(/Descargar mi informe/)).toBeInTheDocument());
     const body = JSON.parse(fetchMock.mock.calls[0][1].body as string);
     expect(body).toMatchObject({ source: "diagnostico", contactConsent: true, marketingConsent: false, phone: "+56 9 5555 1234" });
+    expect(body).not.toHaveProperty("referral");
   });
 });
 

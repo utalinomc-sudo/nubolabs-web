@@ -139,7 +139,7 @@ Nombra la **variable** de la credencial, nunca su valor. Valores solo en Vercel 
 ```
 app/
   layout.tsx · page.tsx · globals.css · icon.svg
-  diagnostico/page.tsx · equipo/page.tsx · mision-vision/page.tsx
+  oa/page.tsx (entrada de referidos de O&A) · diagnostico/page.tsx · equipo/page.tsx · mision-vision/page.tsx · privacidad/page.tsx
   admin/login/page.tsx
   admin/(panel)/layout.tsx · page.tsx · leads/ · leads/[id]/ · config/ · equipo/
   api/leads/route.ts · api/diagnostico/report/route.ts

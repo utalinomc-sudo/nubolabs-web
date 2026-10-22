@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   configured: true,
   notify: vi.fn(),
   clientReport: vi.fn(),
+  reportData: vi.fn(),
 }));
 
 vi.mock("@/lib/firebaseAdmin", () => ({
@@ -21,8 +22,8 @@ vi.mock("@/lib/email", () => ({
   sendClientReport: (...args: unknown[]) => mocks.clientReport(...args),
 }));
 vi.mock("@/lib/report", () => ({
-  reportDataFromLead: () => null, // sin informe: no es lo que se prueba aquí
-  buildReportPdf: vi.fn(),
+  reportDataFromLead: (...args: unknown[]) => mocks.reportData(...args), // por defecto sin informe (null)
+  buildReportPdf: async () => new Uint8Array([37, 80, 68, 70]),
 }));
 
 const { POST } = await import("@/app/api/leads/route");
@@ -47,7 +48,8 @@ function post(body: unknown) {
 beforeEach(() => {
   mocks.add.mockReset().mockResolvedValue({ id: "lead123" });
   mocks.notify.mockReset().mockResolvedValue({ skipped: true });
-  mocks.clientReport.mockReset();
+  mocks.clientReport.mockReset().mockResolvedValue({ ok: true });
+  mocks.reportData.mockReset().mockReturnValue(null);
   mocks.db = { collection: () => ({ add: mocks.add }) };
   mocks.configured = true;
   vi.spyOn(console, "warn").mockImplementation(() => {});
@@ -94,6 +96,24 @@ describe("POST /api/leads", () => {
     expect(mocks.notify).toHaveBeenCalledTimes(1);
     const logged = warn.mock.calls.flat().join(" ");
     expect(logged).not.toMatch(/Carolina|tallerrojas|5555/);
+  });
+
+  // Cambio landing-referidos-oa (spec "Diagnóstico referido recibe su informe").
+  it("un diagnóstico referido se guarda con referral y source, recibe su informe y el aviso lleva el referido", async () => {
+    mocks.reportData.mockReturnValue({ name: "Carolina Rojas", company: "", indice: 62, nivel: "Alta", ahorro: null, areas: [] });
+    const res = await post({ ...VALID, source: "diagnostico", referral: "oa", meta: { indiceFriccion: 62 } });
+    expect(res.status).toBe(200);
+    const saved = mocks.add.mock.calls[0][0];
+    expect(saved).toMatchObject({ source: "diagnostico", referral: "oa", meta: { indiceFriccion: 62 } });
+    expect(mocks.clientReport).toHaveBeenCalledTimes(1);
+    expect(mocks.clientReport.mock.calls[0][0]).toMatchObject({ email: VALID.email, indice: 62 });
+    expect(mocks.notify).toHaveBeenCalledWith(expect.objectContaining({ source: "diagnostico", referral: "oa" }));
+  });
+
+  it("un referido no permitido se guarda sin referral y sin error", async () => {
+    const res = await post({ ...VALID, referral: "xyz" });
+    expect(res.status).toBe(200);
+    expect(mocks.add.mock.calls[0][0]).not.toHaveProperty("referral");
   });
 
   it("si Firestore falla responde 500 con un mensaje para el usuario", async () => {

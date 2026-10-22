@@ -18,6 +18,8 @@ import { Trust } from "@/components/landing/Trust";
 import { Services } from "@/components/landing/Services";
 import { UseCases } from "@/components/landing/UseCases";
 import { Metrics } from "@/components/landing/Metrics";
+import { ReferralBanner } from "@/components/landing/ReferralBanner";
+import { defaultSiteConfig } from "@/lib/siteConfig";
 
 // Regex de la decisión 7 de design.md más "nube" (propuesta). "Make" e "IA" con mayúsculas exactas.
 const FORBIDDEN_CI = /\bn8n\b|\bAPIs?\b|\bCRM\b|\bERP\b|\bagentes?\b|\bROI\b|horas ahorradas|pymes?|\bnube\b/gi;
@@ -26,6 +28,8 @@ const FORBIDDEN_CS = /\bMake\b|\bIA\b/g;
 function renderHome(): HTMLElement {
   const html = renderToStaticMarkup(
     <>
+      {/* Franja de /oa (cambio landing-referidos-oa): también entra al barrido. */}
+      <ReferralBanner content={defaultSiteConfig().content.referidos.oa} />
       <Nav />
       <main>
         <Hero />
@@ -63,7 +67,7 @@ describe("portada: vocabulario", () => {
     root.querySelectorAll("[data-nota-tecnica]").forEach((n) => n.remove());
     const text = visibleText(root);
     // El barrido no es vacío: incluye menú, panel del hero, secciones, rótulos fijos, formulario y pie.
-    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "Nuestro compromiso contigo", "Medimos cada proyecto", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por una conversación", "Hecho en Chile", "Para todos", "Servicios profesionales"]) {
+    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "Nuestro compromiso contigo", "Medimos cada proyecto", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por una conversación", "Hecho en Chile", "Para todos", "Servicios profesionales", "Bienvenido, cliente de Osorio"]) {
       expect(text).toContain(s);
     }
     expect([...(text.match(FORBIDDEN_CI) ?? []), ...(text.match(FORBIDDEN_CS) ?? [])]).toEqual([]);

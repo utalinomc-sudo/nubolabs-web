@@ -1,6 +1,6 @@
 import "server-only";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
-import { formatConsentDate, leadGoalsText, leadIndustryText, leadMarketingText } from "@/lib/leadSummary";
+import { formatConsentDate, leadGoalsText, leadIndustryText, leadMarketingText, leadReferralLabel } from "@/lib/leadSummary";
 import { winAnsiDeep } from "@/lib/pdfText";
 
 // Informe interno (admin): ficha completa de un lead de diagnóstico.
@@ -60,6 +60,7 @@ export interface LeadRecord {
   phone?: unknown;
   company?: unknown;
   source?: unknown;
+  referral?: unknown; // cambio landing-referidos-oa
   message?: unknown;
   createdAt?: unknown;
   meta?: Record<string, unknown> | null;
@@ -176,9 +177,12 @@ export async function buildLeadDetailPdf(rawLead: LeadRecord): Promise<Uint8Arra
   // Etiqueta de origen a la derecha
   const src = s(lead.source) || "landing";
   const isDiag = src === "diagnostico";
-  const tagW = bold.widthOfTextAtSize(src.toUpperCase(), 9) + 18;
+  // Con referido (cambio landing-referidos-oa): "LANDING · O&A".
+  const referral = leadReferralLabel(lead);
+  const tag = (referral ? `${src} · ${referral}` : src).toUpperCase();
+  const tagW = bold.widthOfTextAtSize(tag, 9) + 18;
   page.drawRectangle({ x: M + CW - tagW, y: y - 3, width: tagW, height: 20, color: isDiag ? C.hot : C.soft });
-  text(page, src.toUpperCase(), M + CW - tagW + 9, y + 2, 9, bold, isDiag ? C.orange : C.blue);
+  text(page, tag, M + CW - tagW + 9, y + 2, 9, bold, isDiag ? C.orange : C.blue);
   y -= 30;
 
   const marketing = leadMarketingText(lead);

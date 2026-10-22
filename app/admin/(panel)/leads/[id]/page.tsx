@@ -4,7 +4,7 @@ import { getDb } from "@/lib/firebaseAdmin";
 import { DeleteLeadButton } from "@/components/admin/DeleteLeadButton";
 import { LeadPdfButton } from "@/components/admin/LeadPdfButton";
 import { goalLabel } from "@/lib/leadOptions";
-import { formatConsentDate, leadIndustryText, leadMarketingText } from "@/lib/leadSummary";
+import { formatConsentDate, leadIndustryText, leadMarketingText, leadReferralLabel } from "@/lib/leadSummary";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +84,7 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
   const indice = typeof meta.indiceFriccion === "number" ? meta.indiceFriccion : null;
   // Datos del formulario nuevo (cambio formulario-minimo-consentimiento). Los leads antiguos no los traen.
   const isDiag = lead.source === "diagnostico";
+  const referral = leadReferralLabel(lead); // cambio landing-referidos-oa (leads antiguos: null)
   const industry = leadIndustryText({ industry: lead.industry, industryOther: lead.industryOther, meta });
   const goalOther = typeof lead.goalOther === "string" ? lead.goalOther.trim() : "";
   const goals = (Array.isArray(lead.goals) ? lead.goals : [])
@@ -122,6 +123,9 @@ export default async function LeadDetail({ params }: { params: Promise<{ id: str
         >
           {String(lead.source ?? "landing")}
         </span>
+        {referral && (
+          <span className="rounded-full bg-navy px-2.5 py-1 text-[11px] font-semibold text-white">Referido: {referral}</span>
+        )}
       </div>
       <div className="mt-2 flex flex-wrap gap-x-6 gap-y-1 text-sm text-ink-soft">
         <span>

@@ -71,3 +71,16 @@ describe("consentimientos", () => {
     expect(CONSENT_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });
+
+// Cambio landing-referidos-oa: lista cerrada de referidos (hoy solo O&A).
+describe("referidos", () => {
+  it("REFERRALS solo trae 'oa', con su etiqueta, e isReferral valida exacto", async () => {
+    const { REFERRALS, REFERRAL_LABELS, isReferral } = await import("@/lib/leadOptions");
+    expect(REFERRALS).toEqual(["oa"]);
+    expect(REFERRAL_LABELS.oa).toBe("O&A");
+    expect(isReferral("oa")).toBe(true);
+    expect(isReferral(" oa")).toBe(false);
+    expect(isReferral("xyz")).toBe(false);
+    expect(isReferral(undefined)).toBe(false);
+  });
+});

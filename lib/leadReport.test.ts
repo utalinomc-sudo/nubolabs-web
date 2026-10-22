@@ -30,6 +30,12 @@ describe("buildLeadDetailPdf", () => {
     expect(pdf.length).toBeGreaterThan(1000);
   });
 
+  // Cambio landing-referidos-oa: etiqueta "DIAGNOSTICO · O&A" en la ficha.
+  it("genera la ficha de un lead referido por O&A", async () => {
+    const pdf = await buildLeadDetailPdf({ name: "Referido", email: "r@x.cl", source: "diagnostico", referral: "oa", createdAt: "2026-10-22T15:30:00.000Z" });
+    expect(isPdf(pdf)).toBe(true);
+  });
+
   it("genera la ficha de un lead antiguo sin los campos nuevos", async () => {
     const pdf = await buildLeadDetailPdf({
       name: "Lead antiguo",

@@ -277,6 +277,26 @@ describe("ConfigEditor", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
+  // Cambio landing-referidos-oa: franja de /oa, editable y con textos recomendados.
+  it("referidos: editar el título de la franja envía solo content.referidos; los recomendados reponen sin guardar", async () => {
+    const { fetchMock, lastBody } = renderEditor();
+    const { referidos } = defaultSiteConfig().content;
+    const region = screen.getByRole("region", { name: "Franja de referidos (O&A)" });
+    const titulo = within(region).getByRole("textbox", { name: "Título" });
+    expect(titulo).toHaveValue(referidos.oa.titulo);
+    expect(within(region).getByRole("textbox", { name: "Texto" })).toHaveValue(referidos.oa.texto);
+
+    fireEvent.change(titulo, { target: { value: "Hola, cliente de O&A." } });
+    fireEvent.click(within(region).getByRole("button", { name: "Usar los textos recomendados" }));
+    expect(titulo).toHaveValue(referidos.oa.titulo);
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    fireEvent.change(titulo, { target: { value: "Hola, cliente de O&A." } });
+    await save(fetchMock, 1);
+    expect(Object.keys(lastBody().content)).toEqual(["referidos"]);
+    expect(lastBody().content.referidos).toEqual({ oa: { titulo: "Hola, cliente de O&A.", texto: referidos.oa.texto } });
+  });
+
   it("restablecer Servicios guardados con la forma antigua envía la sección completa con el destacado", async () => {
     const base = defaultSiteConfig().content;
     const viejo = { ...base, servicios: { ...base.servicios, title: "Vendemos resultados", items: [{ title: "Sistemas y agentes IA", body: "x", result: "y" }] } };

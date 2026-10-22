@@ -18,6 +18,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  sessionStorage.clear();
 });
 
 const chip = (name: string) => screen.getByRole("button", { name });
@@ -174,6 +175,29 @@ describe("ContactForm: envío", () => {
       website: "",
     });
     expect(await screen.findByText("Conversamos 30 minutos sobre cómo vender más y cobrar a tiempo.")).toBeInTheDocument();
+  });
+
+  // Cambio landing-referidos-oa (design.md decisión 4): el referido se lee al enviar, no al montar.
+  it("incluye referral solo si la visita entró por /oa (leído al enviar)", async () => {
+    respond(200, { ok: true, persisted: false });
+    respond(200, { ok: true, persisted: false });
+    const { unmount } = render(<ContactForm source="landing" />);
+    goToStep2();
+    fillValid();
+    fireEvent.click(screen.getByRole("checkbox", { name: /Acepto que Nubolabs use mis datos/ }));
+    submit();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(sentBody()).not.toHaveProperty("referral");
+    unmount();
+
+    render(<ContactForm source="landing" />);
+    goToStep2();
+    fillValid();
+    fireEvent.click(screen.getByRole("checkbox", { name: /Acepto que Nubolabs use mis datos/ }));
+    sessionStorage.setItem("nubolabs_ref", "oa"); // después de montar: igual se incluye
+    submit();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body as string)).toMatchObject({ source: "landing", referral: "oa" });
   });
 
   it("si el servidor falla muestra su error, rehabilita el botón y conserva los datos", async () => {

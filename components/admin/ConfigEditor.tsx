@@ -15,6 +15,7 @@ import { NosotrosEditor } from "@/components/admin/config/NosotrosEditor";
 import { PrivacidadEditor } from "@/components/admin/config/PrivacidadEditor";
 import { ProblemaEditor } from "@/components/admin/config/ProblemaEditor";
 import { ProcesoEditor } from "@/components/admin/config/ProcesoEditor";
+import { ReferidosEditor } from "@/components/admin/config/ReferidosEditor";
 import { ResultadosEditor } from "@/components/admin/config/ResultadosEditor";
 import { SaveVersionContext } from "@/components/admin/config/SectionCard";
 import { ServiciosEditor } from "@/components/admin/config/ServiciosEditor";
@@ -37,6 +38,7 @@ export const MANAGED_KEYS = [
   "cierre",
   "nosotros",
   "privacidad",
+  "referidos",
 ] as const satisfies readonly (keyof SiteContent)[];
 
 export type ManagedKey = (typeof MANAGED_KEYS)[number];
@@ -143,6 +145,8 @@ export function ConfigEditor({ sections, initialVisible, initialContent, default
         <CierreEditor {...bind("cierre")} />
         <NosotrosEditor {...bind("nosotros")} />
         <PrivacidadEditor {...bind("privacidad")} />
+        {/* Fuera de SECTIONS: solo se ve en /oa (cambio landing-referidos-oa). */}
+        <ReferidosEditor {...bind("referidos")} />
 
         <div className="sticky bottom-4 rounded-xl border border-line bg-white/95 p-4 shadow-float backdrop-blur">
           <div className="flex items-center gap-3">

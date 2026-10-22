@@ -303,6 +303,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 ## HDU-07 · Entrada `/oa` para los referidos de O&A y medición de la campaña
 
+**Estado (2026-10-22):** implementada en la rama `feature/landing-referidos-oa`, en preview; pendiente de aprobación y mezcla.
+
 **Cambio OpenSpec:** `landing-referidos-oa` · Fase 2, opcional y recomendada · Tamaño M · Depende de HDU-04
 
 ### Original
@@ -381,6 +383,6 @@ Claude crea propuesta, diseño y tareas; Mauro revisa; `/opsx:apply`; verificaci
 | HDU-04 confianza-recomendacion | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-confianza-recomendacion/`, spec `openspec/specs/landing/confianza/`) |
 | HDU-05 casos-por-rubro | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-casos-por-rubro/`, spec `openspec/specs/landing/casos-por-rubro/`) |
 | HDU-06 cifras-con-respaldo | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-cifras-con-respaldo/`, spec `openspec/specs/landing/cifras/`) |
-| HDU-07 landing-referidos-oa | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-07 landing-referidos-oa | en preview (2026-10-22): implementada en `feature/landing-referidos-oa`; pendiente de aprobación y mezcla |
 | HDU-09 diagnostico-mapa-oportunidades | en curso: artefactos OpenSpec creados (2026-10-21) |
 | HDU-10 cierre-landing-faq-cta | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-cierre-landing-faq-cta/`, spec `openspec/specs/landing/cierre/`) |
