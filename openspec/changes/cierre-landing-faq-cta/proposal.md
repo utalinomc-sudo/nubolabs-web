@@ -43,8 +43,8 @@ Con HDU-01, 03 y 02 la portada ya habla el idioma del dueño de pyme, pero termi
 - **THEN** aparece el botón fijo "Quiero mi diagnóstico gratis", y desaparece cuando el formulario entra en pantalla
 
 #### Scenario: Footer sin correo inválido
-- **WHEN** se abre cualquier página pública
-- **THEN** el footer muestra web, agendar y Privacidad, y no muestra `hola@nubolabs.ai`
+- **WHEN** se abre `/`, `/equipo`, `/mision-vision` o `/privacidad`
+- **THEN** el footer muestra web, agendar y Privacidad, y no muestra `hola@nubolabs.ai` (tampoco el pie propio de `/diagnostico`)
 
 #### Scenario: WhatsApp apagado por defecto
 - **WHEN** `content.contact` no existe en `config/site` o tiene ambos interruptores apagados

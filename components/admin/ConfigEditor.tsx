@@ -4,7 +4,10 @@
 // design.md decisión 5). Cada editor vive en components/admin/config/.
 import { useState } from "react";
 import { CasosEditor } from "@/components/admin/config/CasosEditor";
+import { CierreEditor } from "@/components/admin/config/CierreEditor";
+import { ContactEditor } from "@/components/admin/config/ContactEditor";
 import { EnfoqueEditor } from "@/components/admin/config/EnfoqueEditor";
+import { FaqEditor } from "@/components/admin/config/FaqEditor";
 import { HeroEditor } from "@/components/admin/config/HeroEditor";
 import { NosotrosEditor } from "@/components/admin/config/NosotrosEditor";
 import { PrivacidadEditor } from "@/components/admin/config/PrivacidadEditor";
@@ -25,6 +28,9 @@ export const MANAGED_KEYS = [
   "servicios",
   "casos",
   "proceso",
+  "contact",
+  "faq",
+  "cierre",
   "nosotros",
   "privacidad",
 ] as const satisfies readonly (keyof SiteContent)[];
@@ -126,6 +132,9 @@ export function ConfigEditor({ sections, initialVisible, initialContent, default
         <ServiciosEditor {...bind("servicios")} />
         <CasosEditor {...bind("casos")} />
         <ProcesoEditor {...bind("proceso")} />
+        <ContactEditor {...bind("contact")} />
+        <FaqEditor {...bind("faq")} />
+        <CierreEditor {...bind("cierre")} />
         <NosotrosEditor {...bind("nosotros")} />
         <PrivacidadEditor {...bind("privacidad")} />
 

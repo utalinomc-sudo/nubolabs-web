@@ -80,20 +80,22 @@ export function LogoMark({ width = 40, height = 33, variant = "gradient", bg }: 
 export function Logo({
   size = "md",
   variant = "gradient",
+  bg,
 }: {
   size?: "sm" | "md";
   variant?: Variant;
+  bg?: string; // fondo detrás del logo (anillo de los nodos)
 }) {
   const w = size === "sm" ? 30 : 40;
   return (
     <span className="inline-flex items-center gap-3">
-      <LogoMark width={w} height={Math.round((w * 100) / 122)} variant={variant} />
+      <LogoMark width={w} height={Math.round((w * 100) / 122)} variant={variant} bg={bg} />
       <span
         className={`font-extrabold tracking-[-0.5px] ${size === "sm" ? "text-base" : "text-[22px]"} ${
           variant === "dark" ? "text-white" : "text-navy"
         }`}
       >
-        Nubo<span className="text-brand">labs</span>
+        Nubo<span className={variant === "dark" ? "text-brand-light" : "text-brand"}>labs</span>
       </span>
     </span>
   );

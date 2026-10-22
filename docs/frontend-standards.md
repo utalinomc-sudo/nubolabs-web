@@ -38,13 +38,16 @@ app/
   admin/(panel)/layout.tsx  server: redirect a /admin/login si no hay sesión; sidebar
   admin/(panel)/{page,leads,leads/[id],config,equipo}/page.tsx
 components/
-  landing/   Nav (client), Hero, HeroPanel (client), SectionHead, Problem, Results, Approach, Services, UseCases, Process, ContactForm (client, 2 pasos), ContactSuccess (client), Footer
+  landing/   Nav (client), Hero, HeroPanel (client), SectionHead, Problem, Results, Approach, Services, UseCases, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
   diagnostico/  DiagnosticoFlow.tsx (client), AhorroEstimator.tsx (client), cuestionario.ts, ahorro.ts
   admin/     ConfigEditor (contenedor de /admin/config), TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
-  admin/config/  Field, SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Problema, Resultados, Enfoque, Servicios, Casos, Proceso, Nosotros, Privacidad)
+  admin/config/  Field, SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Problema, Resultados, Enfoque, Servicios, Casos, Proceso, Contact, Faq, Cierre, Nosotros, Privacidad)
   Logo.tsx (Logo, LogoMark) · icons.tsx · LinkedInIcon.tsx
-lib/content.ts      textos fijos fuera del CMS (nav, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, metrics, contactSection)
-lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig() (todos los textos editables por defecto), mergeConfig(), mergeFixedList(), mergeList(), normalizeTags(), renderHighlight()  (puro: tests y admin)
+lib/content.ts      textos fijos fuera del CMS (nav, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, metrics, contactSection, contact, ctaNote, footerLinks, whatsappCard, newTabNote)
+lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig() (todos los textos editables por defecto), mergeConfig(), mergeFixedList(), mergeList(), normalizeTags(), renderHighlight(), normalizeContact(), formatWhatsapp(), whatsappLink()  (puro: tests y admin)
+lib/inlineLinks.ts  parseInlineLinks(): enlaces internos [texto](/ruta) en textos del CMS, sin HTML  (puro)
+lib/qrSvg.ts        qrPath()/qrSvg(): código QR dibujado en el servidor con qrcode-generator
+lib/brandColors.ts  colores de marca que se necesitan como valor (NAVY_950); tailwind.config.ts los importa
 lib/site.ts         getSiteConfig(), getTeamMembers() + re-exports de lib/siteConfig.ts  (server-only)
 lib/leadOptions.ts  GOALS, INDUSTRIES, CONSENT_TEXTS, CONSENT_VERSION y helpers  (puro: formulario, API, correo, PDF y admin)
 lib/leads.ts        normalizeLead(), validadores (correo, WhatsApp), honeypot, LEAD_SOURCES, safeScheduleUrl()  (puro)
@@ -59,7 +62,7 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 - Componentes: archivo PascalCase `.tsx` con **export nombrado** (`export function Hero(...)`). Las páginas (`page.tsx`, `layout.tsx`) son `export default`.
 - Props tipadas inline o con `interface Props`; contenido del CMS tipado con `SiteContent["hero"]` etc.
 - Identificadores nuevos en inglés; se conservan los nombres de dominio ya existentes en español (`ahorro`, `cuestionario`, `nombre`, `cargo`…).
-- Ids de sección de la portada, en orden: `inicio`, `problema`, `resultados`, `enfoque`, `servicios`, `casos`, `modelo` (Proceso), `contacto`. El menú (`nav` en `lib/content.ts`) enlaza `resultados`, `servicios`, `casos` y `modelo`; cada ítem declara su `section` y no se muestra si esa sección está oculta. Sin ítem activo fijo. Las secciones ancladas llevan `scroll-mt-20` para quedar bajo el menú fijo.
+- Ids de sección de la portada, en orden: `inicio`, `problema`, `resultados`, `enfoque`, `servicios`, `casos`, `modelo` (Proceso), `contacto`, `preguntas` (FAQ) y la banda final. El menú (`nav` en `lib/content.ts`) enlaza `resultados`, `servicios`, `casos`, `modelo` y `preguntas` (enlaces de escritorio desde 1080 px; bajo eso, menú desplegable); cada ítem declara su `section` y no se muestra si esa sección está oculta. Sin ítem activo fijo. Las secciones ancladas llevan `scroll-mt-20` para quedar bajo el menú fijo.
 
 ### Server vs client
 - Por defecto todo es Server Component. `"use client"` **solo** en componentes con estado, eventos o Firebase cliente.
@@ -70,6 +73,8 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 ### CMS y visibilidad
 - Cada sección o página tiene toggle en `SECTIONS` (`lib/siteConfig.ts`, re-exportado por `lib/site.ts`). Se renderiza solo si `visible[key]`; las páginas ocultas devuelven `notFound()`.
 - Sección nueva editable: agregar clave a `SECTIONS`, default en `defaultSiteConfig()`, mezcla tolerante en `mergeConfig()` (`pickText` para textos, `mergeFixedList` si el diseño depende de la posición, `mergeList` si el largo es variable), tipo en `SiteContent`, editor `<Seccion>Editor.tsx` en `components/admin/config/` montado en `ConfigEditor.tsx`, **clave en `MANAGED_KEYS`** (si falta, sus ediciones no se guardan; `ConfigEditor.test.tsx` compara `MANAGED_KEYS` con las claves de `SiteContent`). El guardado envía solo las secciones modificadas (`changedKeys`) y fila en `docs/data-model.md`.
+- Enlaces en textos del CMS: solo con la forma `[texto](/ruta)` o `[texto](#ancla)` y `parseInlineLinks()` (`lib/inlineLinks.ts`); nunca HTML ni `dangerouslySetInnerHTML`. Otros destinos se muestran como texto.
+- Pie (`Footer`) igual en todas las páginas públicas: recibe `sections={visible}` (oculta enlaces a secciones o páginas ocultas) y `whatsapp={whatsappLink(content.contact)}`. La CTA fija en móvil (`StickyCta`) solo se monta si `visible.contacto` y el pie deja `pb-24` en móvil para no quedar tapado.
 - Patrón "Usar los textos recomendados": cada editor envuelve sus campos en `SectionCard` con `onReset={() => onChange(defaults)}`; solo cambia el formulario, muestra un aviso y nada se publica hasta "Guardar cambios". Las listas de largo fijo usan `ListField` con `fixed` (sin agregar, quitar ni mover).
 - Vocabulario: los textos por defecto de la portada no usan jerga técnica ni "pyme"; `lib/siteConfig.sections.test.ts` lo prueba sobre los defaults y `components/landing/Home.vocabulario.test.tsx` sobre el render completo de la portada (incluye textos fijos). El único lugar con nombres de herramientas es `servicios.notaTecnica`.
 - Textos fijos que no son del CMS viven en `lib/content.ts`, nunca hardcodeados en el JSX.

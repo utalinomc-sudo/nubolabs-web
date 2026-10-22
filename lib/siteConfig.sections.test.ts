@@ -165,10 +165,10 @@ describe("defaults de la HDU-08", () => {
   }
 
   it("ningún texto por defecto de la portada usa jerga ni 'pyme' (salvo la nota técnica)", () => {
-    const { hero, problema, resultados, enfoque, servicios, casos, proceso } = c;
+    const { hero, problema, resultados, enfoque, servicios, casos, proceso, faq, cierre } = c;
     const { notaTecnica, ...serviciosSinNota } = servicios;
     void notaTecnica;
-    const all = strings({ hero, problema, resultados, enfoque, servicios: serviciosSinNota, casos, proceso, nav, resultsVisuals, approachExample });
+    const all = strings({ hero, problema, resultados, enfoque, servicios: serviciosSinNota, casos, proceso, faq, cierre, nav, resultsVisuals, approachExample });
     const bad = all.filter(([, s]) => FORBIDDEN_CI.test(s) || FORBIDDEN_CS.test(s));
     expect(bad).toEqual([]);
   });
@@ -182,12 +182,13 @@ describe("orden y navegación", () => {
   it("SECTIONS sigue el orden de la portada con 'resultados' después de 'problema'", () => {
     expect(SECTIONS.map((s) => s.key).slice(0, 8)).toEqual(["hero", "problema", "resultados", "enfoque", "servicios", "casos", "proceso", "contacto"]);
   });
-  it("el menú ofrece Lo que ganas, Servicios, Ejemplos y Cómo trabajamos, sin 'Inicio'", () => {
+  it("el menú ofrece Lo que ganas, Servicios, Ejemplos, Cómo trabajamos y Preguntas (HDU-10), sin 'Inicio'", () => {
     expect(nav.map((n) => [n.label, n.href])).toEqual([
       ["Lo que ganas", "/#resultados"],
       ["Servicios", "/#servicios"],
       ["Ejemplos", "/#casos"],
       ["Cómo trabajamos", "/#modelo"],
+      ["Preguntas", "/#preguntas"],
     ]);
   });
 });

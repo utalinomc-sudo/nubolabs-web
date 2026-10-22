@@ -163,7 +163,7 @@ paths:
                 visible:
                   type: object
                   additionalProperties: { type: boolean }
-                  description: "Claves de SECTIONS: hero, problema, resultados, enfoque, servicios, casos, proceso, contacto, nosotros, equipo"
+                  description: "Claves de SECTIONS: hero, problema, resultados, enfoque, servicios, casos, proceso, contacto, faq, cierre, nosotros, equipo"
                   example: { hero: true, problema: true, resultados: false }
                 content:
                   $ref: "#/components/schemas/SiteContentPartial"
@@ -515,6 +515,35 @@ components:
             eyebrow: { type: string }
             title: { type: string }
             historia: { type: string }
+        faq:
+          type: object
+          description: "Preguntas frecuentes (cambio cierre-landing-faq-cta)"
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            items:
+              type: array
+              description: "1 a 10; solo se publican las que tienen pregunta y respuesta"
+              items:
+                type: object
+                properties:
+                  pregunta: { type: string }
+                  respuesta: { type: string, description: "Admite enlaces internos [texto](/ruta) o [texto](#ancla); otros destinos se muestran como texto" }
+        cierre:
+          type: object
+          description: "CTA final"
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            body: { type: string }
+            cta: { type: string }
+        contact:
+          type: object
+          description: "WhatsApp de contacto de Nubolabs; apagado por defecto"
+          properties:
+            whatsappNumber: { type: string, description: "Con código de país; al leer se dejan solo los dígitos (8 a 15)", example: "+56 9 3259 0783" }
+            showWhatsapp: { type: boolean, description: "Número en el pie de página. Solo true exacto lo activa" }
+            showWhatsappQr: { type: boolean, description: "Tarjeta con QR junto al formulario. Solo true exacto lo activa" }
         privacidad:
           type: object
           description: "Página /privacidad. Un campo vacío cae al borrador por defecto"

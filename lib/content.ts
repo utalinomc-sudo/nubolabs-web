@@ -7,7 +7,55 @@ export const nav = [
   { label: "Servicios", href: "/#servicios", section: "servicios" },
   { label: "Ejemplos", href: "/#casos", section: "casos" },
   { label: "Cómo trabajamos", href: "/#modelo", section: "proceso" },
+  { label: "Preguntas", href: "/#preguntas", section: "faq" }, // cambio cierre-landing-faq-cta
 ];
+
+// ── Cierre del sitio (cambio cierre-landing-faq-cta, design.md decisión 5) ──
+// La web no va al CMS (cambia rara vez); el WhatsApp sí (content.contact). Sin correo público hasta resolver
+// hola@nubolabs.cl (HDU-08 §14, pregunta 4).
+export const contact = { webUrl: "https://www.nubolabs.cl", webLabel: "www.nubolabs.cl" };
+
+// Nota bajo los botones para agendar (CTA final).
+export const ctaNote = "30 minutos · por videollamada · sin compromiso";
+
+// Pie de página. `section` = clave de SECTIONS: si esa sección o página está oculta, el enlace no se muestra.
+export const footerLinks = {
+  tagline: "Ordenamos tu negocio y dejamos funcionando solo lo repetitivo. Tu operación, en piloto automático.",
+  servicios: {
+    title: "Servicios",
+    section: "servicios",
+    links: [
+      { label: "Diagnóstico y plan", href: "/#servicios" },
+      { label: "Tareas que avanzan solas", href: "/#servicios" },
+      { label: "Clientes atendidos al instante", href: "/#servicios" },
+      { label: "Tus números claros", href: "/#servicios" },
+    ],
+  },
+  nubolabs: {
+    title: "Nubolabs",
+    links: [
+      { label: "Misión y visión", href: "/mision-vision", section: "nosotros" },
+      { label: "Equipo", href: "/equipo", section: "equipo" },
+      { label: "Cómo trabajamos", href: "/#modelo", section: "proceso" },
+      { label: "Preguntas frecuentes", href: "/#preguntas", section: "faq" },
+    ],
+  },
+  contacto: { title: "Contacto", agendar: "Agendar diagnóstico" },
+  privacidad: "Privacidad",
+  hechoEn: "Hecho en Chile",
+  whatsappSr: "WhatsApp: ", // prefijo solo para lectores de pantalla
+};
+
+// Avisos para lectores de pantalla en enlaces que abren otra pestaña.
+export const newTabNote = " (abre en otra pestaña)";
+
+// Tarjeta "¿Prefieres escribirnos?" junto al formulario (WhatsappCard.tsx).
+export const whatsappCard = {
+  title: "¿Prefieres escribirnos?",
+  desktop: "Escanea el código con tu celular y te respondemos por WhatsApp.",
+  mobile: "Toca aquí y te respondemos por WhatsApp.",
+  qrLabel: "Código QR para escribirnos por WhatsApp",
+};
 
 // Panel "Tu negocio hoy" del hero (cambio mensaje-principal-pyme, design.md decisión 4).
 // Ejemplos ilustrativos de producto: sin cifras de resultados, montos ni clientes reales. No van al CMS.

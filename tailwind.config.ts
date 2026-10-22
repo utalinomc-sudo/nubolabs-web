@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import { NAVY_950 } from "./lib/brandColors";
 
 const config: Config = {
   content: [
@@ -12,7 +13,7 @@ const config: Config = {
       colors: {
         navy: {
           DEFAULT: "#0B1D3A",
-          950: "#071327",
+          950: NAVY_950,
           800: "#12294F",
           700: "#1B3766",
         },

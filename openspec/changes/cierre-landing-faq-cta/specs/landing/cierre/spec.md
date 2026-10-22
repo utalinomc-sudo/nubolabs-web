@@ -24,7 +24,7 @@ La portada SHALL mostrar, si la sección `faq` está visible (por defecto sí), 
 - **THEN** la sección no se muestra, el menú no ofrece "Preguntas" y no queda espacio vacío
 
 ### Requirement: Enlaces internos en las respuestas
-Las respuestas de las preguntas frecuentes SHALL convertir el formato `[texto](destino)` en un enlace cuando el destino es interno (empieza con una sola `/` o con `#`). Cualquier otro destino (por ejemplo `https://…`, `//…` o `javascript:…`) MUST mostrarse como texto plano, sin enlace. El texto de las respuestas MUST NOT interpretarse como HTML. La respuesta por defecto de "¿Qué hacen con mis datos?" SHALL enlazar a `/privacidad`.
+Las respuestas de las preguntas frecuentes SHALL convertir el formato `[texto](destino)` en un enlace cuando el destino es interno: empieza con una sola `/` o con `#`, no contiene espacios ni `\` y resuelve al mismo origen del sitio. Cualquier otro destino (por ejemplo `https://…`, `//…` o `javascript:…`) MUST mostrarse como texto plano, sin enlace. El texto de las respuestas MUST NOT interpretarse como HTML. La respuesta por defecto de "¿Qué hacen con mis datos?" SHALL enlazar a `/privacidad`.
 
 #### Scenario: Enlace a privacidad
 - **WHEN** el visitante abre "¿Qué hacen con mis datos?"
@@ -33,6 +33,10 @@ Las respuestas de las preguntas frecuentes SHALL convertir el formato `[texto](d
 #### Scenario: Destino externo bloqueado
 - **WHEN** una respuesta guardada contiene `[clic](javascript:alert(1))` o `[sitio](https://ejemplo.com)`
 - **THEN** se muestra el texto "clic" o "sitio" sin enlace
+
+#### Scenario: Barra invertida bloqueada
+- **WHEN** una respuesta guardada contiene `[otro](/\evil.com)` (los navegadores leen `\` como `/`)
+- **THEN** se muestra el texto "otro" sin enlace
 
 #### Scenario: HTML en la respuesta
 - **WHEN** una respuesta guardada contiene `<b>hola</b>`
@@ -50,7 +54,7 @@ La portada SHALL mostrar, si la sección `cierre` está visible (por defecto sí
 - **THEN** llega a `/diagnostico`
 
 ### Requirement: CTA fija en móvil
-En pantallas de hasta 640 px de ancho, la portada SHALL mostrar un botón fijo en la parte inferior con el mismo texto del botón principal del hero (por defecto "Quiero mi diagnóstico gratis") que lleva a `#contacto`. El botón SHALL estar oculto mientras el hero esté en pantalla y mientras el formulario de contacto esté en pantalla, y visible en el resto del recorrido. MUST respetar el área segura inferior del dispositivo y MUST NOT tapar de forma permanente el contenido final de la página. En pantallas de más de 640 px MUST NOT mostrarse. Si la sección de contacto está oculta, el botón MUST NOT existir.
+En pantallas de hasta 640 px de ancho, la portada SHALL mostrar un botón fijo (sin repetir la flecha si el texto guardado ya termina en "→") en la parte inferior con el mismo texto del botón principal del hero (por defecto "Quiero mi diagnóstico gratis") que lleva a `#contacto`. El botón SHALL estar oculto mientras el hero esté en pantalla y mientras el formulario de contacto esté en pantalla, y visible en el resto del recorrido. MUST respetar el área segura inferior del dispositivo y MUST NOT tapar de forma permanente el contenido final de la página. En pantallas de más de 640 px MUST NOT mostrarse. Si la sección de contacto está oculta, el botón MUST NOT existir.
 
 #### Scenario: Aparece después del hero
 - **WHEN** a 375 px el visitante baja hasta "Lo que ganas"
@@ -65,7 +69,7 @@ En pantallas de hasta 640 px de ancho, la portada SHALL mostrar un botón fijo e
 - **THEN** el botón fijo nunca aparece
 
 ### Requirement: Footer del sitio público
-Todas las páginas públicas (portada, `/equipo`, `/mision-vision`, `/privacidad`) SHALL mostrar el mismo footer con: el logo y la frase "Ordenamos tu negocio y dejamos funcionando solo lo repetitivo. Tu operación, en piloto automático."; una columna "Servicios" con enlaces a `/#servicios`; una columna "Nubolabs" con "Misión y visión" y "Equipo" (cada uno solo si su página está visible), "Cómo trabajamos" (`/#modelo`) y "Preguntas frecuentes" (`/#preguntas`, solo si la sección está visible); una columna "Contacto" con el sitio `www.nubolabs.cl`, el WhatsApp de Nubolabs solo si está activado (ver "WhatsApp de contacto configurable") y "Agendar diagnóstico" (`/#contacto`); el enlace "Política de privacidad" (`/privacidad`); y "© <año actual> Nubolabs · Hecho en Chile". El footer MUST NOT mostrar `hola@nubolabs.ai`.
+Todas las páginas públicas (portada, `/equipo`, `/mision-vision`, `/privacidad`) SHALL mostrar el mismo footer con: el logo y la frase "Ordenamos tu negocio y dejamos funcionando solo lo repetitivo. Tu operación, en piloto automático."; una columna "Servicios" con "Diagnóstico y plan", "Tareas que avanzan solas", "Clientes atendidos al instante" y "Tus números claros", todos hacia `/#servicios` (la columna solo si la sección Servicios está visible); una columna "Nubolabs" con "Misión y visión" y "Equipo" (cada uno solo si su página está visible), "Cómo trabajamos" (`/#modelo`, solo si la sección está visible) y "Preguntas frecuentes" (`/#preguntas`, solo si la sección está visible); una columna "Contacto" con el sitio `www.nubolabs.cl`, el WhatsApp de Nubolabs solo si está activado (ver "WhatsApp de contacto configurable") y "Agendar diagnóstico" (`/#contacto`, o `/diagnostico` si la sección de contacto está oculta); el enlace "Privacidad" (`/privacidad`, el mismo texto que exige `sitio/privacidad`); y "© <año actual> Nubolabs · Hecho en Chile". El footer MUST NOT mostrar `hola@nubolabs.ai`.
 
 #### Scenario: Footer en una página interna
 - **WHEN** se abre `/equipo`
@@ -76,7 +80,7 @@ Todas las páginas públicas (portada, `/equipo`, `/mision-vision`, `/privacidad
 - **THEN** el footer no ofrece el enlace "Equipo"
 
 ### Requirement: WhatsApp de contacto configurable
-El número de WhatsApp de Nubolabs y dos interruptores independientes SHALL guardarse en `config/site` como `content.contact` (`whatsappNumber`, `showWhatsapp`, `showWhatsappQr`) y editarse en `/admin/config`. Sin datos guardados, el número por defecto SHALL ser `56932590783` y ambos interruptores SHALL estar apagados. Con `showWhatsapp` activo, el footer SHALL mostrar el número con formato "+56 9 XXXX XXXX" y enlace a `https://wa.me/<dígitos>`. Con `showWhatsappQr` activo, la sección de contacto SHALL mostrar una tarjeta "¿Prefieres escribirnos?" con un código QR que abre `https://wa.me/<dígitos>`; en pantallas de hasta 820 px de ancho SHALL mostrar un enlace directo en lugar del QR. Si el número guardado tiene menos de 8 o más de 15 dígitos, el sitio MUST NOT mostrar ni el número ni la tarjeta. Mientras ambos interruptores estén apagados, ninguna página pública MUST mostrar un número, un enlace ni un QR de WhatsApp de Nubolabs.
+El número de WhatsApp de Nubolabs y dos interruptores independientes SHALL guardarse en `config/site` como `content.contact` (`whatsappNumber`, `showWhatsapp`, `showWhatsappQr`) y editarse en `/admin/config`. Sin datos guardados, el número por defecto SHALL ser `56932590783` y ambos interruptores SHALL estar apagados. Con `showWhatsapp` activo, el footer SHALL mostrar el número con formato "+56 9 XXXX XXXX" y enlace a `https://wa.me/<dígitos>`. Con `showWhatsappQr` activo, la sección de contacto SHALL mostrar una tarjeta "¿Prefieres escribirnos?" con un código QR que abre `https://wa.me/<dígitos>`; en pantallas de hasta 820 px de ancho SHALL mostrar un enlace directo en lugar del QR. Si el número guardado tiene menos de 8 o más de 15 dígitos (incluido un número borrado o sin dígitos), el sitio MUST NOT mostrar ni el número ni la tarjeta; el número por defecto solo se usa cuando no hay un número guardado. Mientras ambos interruptores estén apagados, ninguna página pública MUST mostrar un número, un enlace ni un QR de WhatsApp de Nubolabs.
 
 #### Scenario: Valores por defecto
 - **WHEN** `config/site` no tiene `content.contact`
@@ -98,8 +102,12 @@ El número de WhatsApp de Nubolabs y dos interruptores independientes SHALL guar
 - **WHEN** el número guardado es "123" y ambos interruptores están activos
 - **THEN** no se muestra ni el número ni la tarjeta
 
+#### Scenario: Número borrado
+- **WHEN** el admin borra el número, deja ambos interruptores activos y guarda
+- **THEN** no se muestra ningún número ni tarjeta (no vuelve el número por defecto)
+
 ### Requirement: "Preguntas" en la navegación
-La navegación principal (escritorio y menú móvil) SHALL incluir "Preguntas" con destino `/#preguntas` después de "Cómo trabajamos", solo cuando la sección `faq` está visible.
+La navegación principal (escritorio y menú móvil) SHALL incluir "Preguntas" con destino `/#preguntas` después de "Cómo trabajamos", solo cuando la sección `faq` está visible. Bajo 1080 px de ancho los enlaces SHALL ofrecerse en el menú desplegable; desde 1080 px, en una sola línea sin que ningún texto se parta.
 
 #### Scenario: Menú con preguntas
 - **WHEN** el visitante abre el menú con la sección de preguntas visible
@@ -113,7 +121,7 @@ En `/admin/config`, la sección "Contacto" SHALL permitir editar el número de W
 - **THEN** el formulario vuelve a mostrar las 6 preguntas por defecto y nada se guarda hasta pulsar "Guardar cambios"
 
 ### Requirement: Cierre usable en móvil y accesible
-A 375 px de ancho la portada y las páginas internas MUST NOT tener scroll horizontal. Los botones y enlaces de estas piezas SHALL medir al menos 44 px de alto (los enlaces del footer al menos 32 px con separación suficiente) y todo texto SHALL cumplir contraste WCAG AA sobre su fondo.
+A 375 px de ancho la portada y las páginas internas MUST NOT tener scroll horizontal. Los botones y enlaces de estas piezas SHALL medir al menos 44 px de alto (los enlaces del footer al menos 32 px con separación suficiente; los enlaces dentro de un párrafo, como el de una respuesta, se rigen por la excepción de texto en línea de WCAG 2.5.8 y van siempre subrayados) y todo texto SHALL cumplir contraste WCAG AA sobre su fondo.
 
 #### Scenario: Móvil
 - **WHEN** se abre `/` a 375 × 812 px y se baja hasta el footer

@@ -6,6 +6,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { Approach } from "@/components/landing/Approach";
 import { ContactForm } from "@/components/landing/ContactForm";
+import { Faq } from "@/components/landing/Faq";
+import { FinalCta } from "@/components/landing/FinalCta";
 import { Footer } from "@/components/landing/Footer";
 import { Hero } from "@/components/landing/Hero";
 import { Nav } from "@/components/landing/Nav";
@@ -32,6 +34,8 @@ function renderHome(): HTMLElement {
         <UseCases />
         <Process />
         <ContactForm />
+        <Faq />
+        <FinalCta />
       </main>
       <Footer />
     </>,
@@ -55,7 +59,7 @@ describe("portada: vocabulario", () => {
     root.querySelectorAll("[data-nota-tecnica]").forEach((n) => n.remove());
     const text = visibleText(root);
     // El barrido no es vacío: incluye menú, panel del hero, secciones, rótulos fijos, formulario y pie.
-    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "Nubolabs"]) {
+    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por una conversación", "Hecho en Chile"]) {
       expect(text).toContain(s);
     }
     expect([...(text.match(FORBIDDEN_CI) ?? []), ...(text.match(FORBIDDEN_CS) ?? [])]).toEqual([]);

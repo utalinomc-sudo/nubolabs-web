@@ -182,3 +182,18 @@ export const IconTrend = ({ className }: P) => (
 export const problemIcons = [IconMoon, IconClock, IconWallet, IconHelp, IconNote, IconUserX];
 export const serviceIcons = [IconZap, IconChat, IconChart, IconWrench];
 export const includeIcons = [IconCalendar, IconSearch, IconFile];
+
+// ── Íconos del cierre (cambio cierre-landing-faq-cta) ──
+export const IconChevronDown = ({ className }: P) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <path {...stroke} d="m6 9 6 6 6-6" />
+  </svg>
+);
+
+export const IconGlobe = ({ className }: P) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <circle {...stroke} cx="12" cy="12" r="10" />
+    <path {...stroke} d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+    <path {...stroke} d="M2 12h20" />
+  </svg>
+);

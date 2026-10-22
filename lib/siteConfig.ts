@@ -20,6 +20,16 @@ export interface ProcessStep {
   body: string;
   recibes: string;
 }
+export interface FaqItem {
+  pregunta: string;
+  respuesta: string; // admite enlaces internos [texto](/ruta) (lib/inlineLinks.ts)
+}
+// WhatsApp de contacto de Nubolabs (cambio cierre-landing-faq-cta, design.md decisión 8). Apagado por defecto.
+export interface ContactConfig {
+  whatsappNumber: string; // solo dígitos, con código de país
+  showWhatsapp: boolean; // número en el pie de página
+  showWhatsappQr: boolean; // tarjeta con QR junto al formulario
+}
 export interface SiteContent {
   hero: {
     eyebrow: string;
@@ -57,6 +67,10 @@ export interface SiteContent {
     items: ProcessStep[]; // siempre 4
     exito: { title: string; items: string[] /* 1 a 6 */ };
   };
+  // Cierre de la portada (cambio cierre-landing-faq-cta, design.md decisión 1).
+  faq: { eyebrow: string; title: string; items: FaqItem[] /* 1 a 10 */ };
+  cierre: { eyebrow: string; title: string; body: string; cta: string };
+  contact: ContactConfig;
   nosotros: { eyebrow: string; title: string; mision: string; vision: string; objetivos: string[] };
   equipo: { eyebrow: string; title: string; historia: string };
   // Página /privacidad (cambio formulario-minimo-consentimiento, design.md decisión 6). Párrafos separados por línea en blanco.
@@ -77,6 +91,8 @@ export const SECTIONS: { key: string; label: string; hint: string }[] = [
   { key: "casos", label: "Ejemplos", hint: "Ejemplos concretos" },
   { key: "proceso", label: "Cómo trabajamos", hint: "Los 4 pasos y lo que recibes" },
   { key: "contacto", label: "Contacto", hint: "Formulario de contacto del home" },
+  { key: "faq", label: "Preguntas frecuentes", hint: "Dudas típicas antes de agendar" },
+  { key: "cierre", label: "CTA final", hint: "Banda final con el botón para agendar" },
   { key: "nosotros", label: "Nosotros — Misión y visión (página)", hint: "Página /mision-vision y su link en el menú" },
   { key: "equipo", label: "Nuestro equipo (página)", hint: "Página /equipo y su link en el menú" },
 ];
@@ -247,6 +263,50 @@ export function defaultSiteConfig(): SiteConfig {
           items: ["Más ventas", "Cobros al día", "Respuestas más rápidas", "Menos errores", "Más control"],
         },
       },
+      // Textos de la referencia HDU-08. La respuesta sobre datos la valida O&A o un abogado junto con /privacidad.
+      faq: {
+        eyebrow: "Preguntas frecuentes",
+        title: "Lo que nos preguntan antes de partir",
+        items: [
+          {
+            pregunta: "¿Necesito saber de tecnología?",
+            respuesta:
+              "No. Tú nos cuentas cómo funciona tu negocio; nosotros nos encargamos de lo técnico y le enseñamos a tu equipo lo justo para usarlo.",
+          },
+          {
+            pregunta: "¿Tengo que cambiar mis sistemas?",
+            respuesta:
+              "No. Trabajamos con lo que ya usas: WhatsApp, correo, Excel o Google Sheets y tu sistema de facturación. Solo proponemos algo nuevo si de verdad te conviene.",
+          },
+          {
+            pregunta: "¿Cuánto cuesta?",
+            respuesta:
+              "Depende de lo que quieras lograr. La primera sesión es gratis y sales con un plan por etapas y costos claros, para que decidas sin presión.",
+          },
+          {
+            pregunta: "¿Qué pasa en la sesión gratuita?",
+            respuesta:
+              "Conversamos 30 minutos por videollamada sobre tu negocio y lo que quieres mejorar. Te llevas tus prioridades y una recomendación de por dónde partir.",
+          },
+          {
+            pregunta: "¿Cuándo voy a ver resultados?",
+            respuesta:
+              "Partimos por la mejora que más impacto tiene para que la notes pronto. En la sesión te damos plazos concretos para tu caso, sin promesas en el aire.",
+          },
+          {
+            pregunta: "¿Qué hacen con mis datos?",
+            respuesta:
+              "Los usamos solo para responder tu solicitud y, si nos das permiso, para enviarte novedades. No los vendemos ni los compartimos con fines comerciales. Puedes pedir verlos, corregirlos o borrarlos cuando quieras. [Política de privacidad completa](/privacidad)",
+          },
+        ],
+      },
+      cierre: {
+        eyebrow: "Tu operación, en piloto automático",
+        title: "Tu negocio puede trabajar para ti. Empecemos por una conversación.",
+        body: "Cuéntanos qué quieres lograr y te mostramos por dónde partir.",
+        cta: "Agendar mi diagnóstico gratis",
+      },
+      contact: { whatsappNumber: "56932590783", showWhatsapp: false, showWhatsappQr: false },
       nosotros: {
         eyebrow: "NOSOTROS",
         title: "Misión, visión y objetivos",
@@ -327,7 +387,7 @@ export function mergeFixedList<T>(stored: unknown, defaults: T[], mergeItem: Mer
   return defaults.map((fallback, i) => (isRecord(stored[i]) ? mergeItem(stored[i] as Record<string, unknown>, fallback) : fallback));
 }
 
-// Lista de largo variable: un ítem es válido si es objeto con "title" no vacío. Si el valor no es arreglo o quedan
+// Lista de largo variable: un ítem es válido si es objeto con "title" no vacío (o según `isValid`). Si el valor no es arreglo o quedan
 // menos de `min` válidos, se usan los defaults. Los campos vacíos de un ítem válido toman los de `blank` (no los de
 // otra posición, que no corresponden a ese ítem). Se corta en `max`.
 export function mergeList<T>(
@@ -336,9 +396,10 @@ export function mergeList<T>(
   { min, max }: { min: number; max: number },
   mergeItem: MergeItem<T>,
   blank: T,
+  isValid: (raw: Record<string, unknown>) => boolean = (raw) => pickTrim(raw.title, "") !== "",
 ): T[] {
   if (!Array.isArray(stored)) return defaults;
-  const valid = stored.filter((raw): raw is Record<string, unknown> => isRecord(raw) && pickTrim(raw.title, "") !== "");
+  const valid = stored.filter((raw): raw is Record<string, unknown> => isRecord(raw) && isValid(raw));
   if (valid.length < min) return defaults;
   return valid.slice(0, max).map((raw) => mergeItem(raw, blank));
 }
@@ -366,6 +427,41 @@ const mergeStep: MergeItem<ProcessStep> = (raw, fb) => ({
   recibes: pickTrim(raw.recibes, fb.recibes),
 });
 
+const mergeFaq: MergeItem<FaqItem> = (raw, fb) => ({
+  pregunta: pickTrim(raw.pregunta, fb.pregunta),
+  respuesta: pickTrim(raw.respuesta, fb.respuesta),
+});
+const isCompleteFaq = (raw: Record<string, unknown>) => pickTrim(raw.pregunta, "") !== "" && pickTrim(raw.respuesta, "") !== "";
+
+const DEFAULT_WHATSAPP = "56932590783";
+
+// WhatsApp guardado en el CMS: un número guardado como texto queda solo con sus dígitos, aunque no quede ninguno
+// (entonces whatsappLink no muestra nada); el default solo se usa si no hay un texto guardado. Cada interruptor es
+// true solo si se guardó exactamente true (design.md decisión 8; revisión adversarial: borrar el número no debe
+// volver a publicar el número por defecto).
+export function normalizeContact(value: unknown): ContactConfig {
+  const raw = asRecord(value);
+  return {
+    whatsappNumber: typeof raw.whatsappNumber === "string" ? raw.whatsappNumber.replace(/\D/g, "") : DEFAULT_WHATSAPP,
+    showWhatsapp: raw.showWhatsapp === true,
+    showWhatsappQr: raw.showWhatsappQr === true,
+  };
+}
+
+// 56912345678 → "+56 9 1234 5678" (celular de Chile); otros números → "+" y los dígitos.
+export function formatWhatsapp(digits: string): string {
+  return /^569\d{8}$/.test(digits) ? `+56 9 ${digits.slice(3, 7)} ${digits.slice(7)}` : `+${digits}`;
+}
+
+// Enlace a WhatsApp para el pie ("footer") o la tarjeta con QR ("qr"). null si ese interruptor está apagado o el
+// número no tiene entre 8 y 15 dígitos: así nada se muestra con un número inválido.
+export function whatsappLink(contact: ContactConfig, where: "footer" | "qr" = "footer"): { label: string; url: string } | null {
+  const on = where === "footer" ? contact.showWhatsapp : contact.showWhatsappQr;
+  const digits = contact.whatsappNumber.replace(/\D/g, "");
+  if (!on || digits.length < 8 || digits.length > 15) return null;
+  return { label: formatWhatsapp(digits), url: `https://wa.me/${digits}` };
+}
+
 // Mezcla lo guardado en config/site sobre los defaults. Cada campo guardado válido gana sobre su default.
 export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): SiteConfig {
   const c = asRecord(data.content);
@@ -380,6 +476,8 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
   const casos = asRecord(c.casos);
   const proceso = asRecord(c.proceso);
   const exito = asRecord(proceso.exito);
+  const faq = asRecord(c.faq);
+  const cierre = asRecord(c.cierre);
   const nosotros = c.nosotros as Partial<SiteContent["nosotros"]> | undefined;
   const equipo = c.equipo as Partial<SiteContent["equipo"]> | undefined;
   return {
@@ -452,6 +550,18 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
           items: mergeTextList(exito.items, b.proceso.exito.items, { min: 1, max: 6 }),
         },
       },
+      faq: {
+        eyebrow: pickText(faq.eyebrow, b.faq.eyebrow),
+        title: pickText(faq.title, b.faq.title),
+        items: mergeList(faq.items, b.faq.items, { min: 1, max: 10 }, mergeFaq, { pregunta: "", respuesta: "" }, isCompleteFaq),
+      },
+      cierre: {
+        eyebrow: pickText(cierre.eyebrow, b.cierre.eyebrow),
+        title: pickText(cierre.title, b.cierre.title),
+        body: pickText(cierre.body, b.cierre.body),
+        cta: pickText(cierre.cta, b.cierre.cta),
+      },
+      contact: normalizeContact(c.contact),
       nosotros: {
         ...b.nosotros,
         ...(nosotros ?? {}),

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Nav } from "@/components/landing/Nav";
 import { Footer } from "@/components/landing/Footer";
+import { whatsappLink } from "@/lib/siteConfig";
 import { getSiteConfig } from "@/lib/site";
 
 // Página de privacidad (cambio formulario-minimo-consentimiento, spec sitio/privacidad). Siempre disponible:
@@ -46,7 +47,7 @@ export default async function PrivacidadPage() {
           </div>
         </article>
       </main>
-      <Footer />
+      <Footer sections={visible} whatsapp={whatsappLink(content.contact)} />
     </>
   );
 }

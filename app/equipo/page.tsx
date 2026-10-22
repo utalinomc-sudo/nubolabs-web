@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Nav } from "@/components/landing/Nav";
 import { Footer } from "@/components/landing/Footer";
 import { LinkedInIcon } from "@/components/LinkedInIcon";
+import { whatsappLink } from "@/lib/siteConfig";
 import { getSiteConfig, getTeamMembers } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -84,7 +85,7 @@ export default async function EquipoPage() {
           )}
         </section>
       </main>
-      <Footer />
+      <Footer sections={visible} whatsapp={whatsappLink(content.contact)} />
     </>
   );
 }

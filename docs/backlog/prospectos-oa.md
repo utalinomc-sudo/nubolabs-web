@@ -339,6 +339,8 @@ Derivada de "Usar la recomendación de O&A" y del contexto: el correo lleva el l
 
 **Cambio OpenSpec:** `cierre-landing-faq-cta` · Fase 2 · Tamaño S · Depende de HDU-02 y HDU-03 · Diseño en `docs/design/propuesta-web-hdu-08.html`.
 
+**Estado (2026-10-22):** implementada en la rama `feature/cierre-landing-faq-cta`, en preview; pendiente de aprobación y mezcla. WhatsApp apagado por defecto (se activa en `/admin/config` → "Contacto por WhatsApp").
+
 **Resumen.** Sección de preguntas frecuentes editable desde el CMS (6 preguntas por defecto de la referencia, incluida "¿Qué hacen con mis datos?" con enlace a `/privacidad`), banda de CTA final, botón fijo "Quiero mi diagnóstico gratis" en móvil (visible tras el hero y oculto cerca del formulario) y footer nuevo con columnas de servicios, Nubolabs, contacto y privacidad.
 
 ## 4. Preguntas abiertas para Mauro

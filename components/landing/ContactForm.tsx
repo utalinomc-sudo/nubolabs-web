@@ -3,7 +3,7 @@
 // Formulario de contacto de 2 pasos de la portada (#contacto). Cambio formulario-minimo-consentimiento,
 // design.md decisión 4 y spec leads/formulario-contacto. Referencia visual: docs/design/propuesta-web-hdu-08.html.
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { IconArrowLeft, IconArrowRight, IconCheck, IconFile, IconSearch, IconUsers } from "@/components/icons";
 import { ContactSuccess } from "@/components/landing/ContactSuccess";
 import { contactSection as copy } from "@/lib/content";
@@ -26,9 +26,11 @@ const TAKEAWAY_TONES = ["bg-brand-50 text-brand", "bg-brand-light-50 text-brand-
 interface ContactFormProps {
   source?: LeadSource;
   scheduleUrl?: string | null; // NEXT_PUBLIC_SCHEDULE_URL validada en el servidor; null = sin agenda
+  // Contenido extra bajo los beneficios (por ejemplo la tarjeta de WhatsApp, cambio cierre-landing-faq-cta).
+  aside?: ReactNode;
 }
 
-export function ContactForm({ source = "landing", scheduleUrl = null }: ContactFormProps) {
+export function ContactForm({ source = "landing", scheduleUrl = null, aside = null }: ContactFormProps) {
   const [step, setStep] = useState<1 | 2>(1);
   const [goals, setGoals] = useState<GoalKey[]>([]);
   const [industry, setIndustry] = useState<IndustryKey | null>(null);
@@ -162,6 +164,7 @@ export function ContactForm({ source = "landing", scheduleUrl = null }: ContactF
               );
             })}
           </ul>
+          {aside}
         </div>
 
         <div className="relative rounded-3xl border border-line bg-white p-[18px] shadow-form sm:p-8">

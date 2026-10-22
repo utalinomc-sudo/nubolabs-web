@@ -527,7 +527,8 @@ export function DiagnosticoFlow() {
             <Link href="/privacidad" style={{ color: C.muted, textDecoration: "underline" }}>
               Privacidad
             </Link>{" "}
-            · hola@nubolabs.ai · © {new Date().getFullYear()} Nubolabs
+            {/* Sin hola@nubolabs.ai: dominio sin verificar (cambio cierre-landing-faq-cta). El rediseño del diagnóstico es HDU-09. */}
+            · © {new Date().getFullYear()} Nubolabs
           </span>
         </div>
       </footer>

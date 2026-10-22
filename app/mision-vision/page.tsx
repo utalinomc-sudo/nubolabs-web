@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Nav } from "@/components/landing/Nav";
 import { Footer } from "@/components/landing/Footer";
+import { whatsappLink } from "@/lib/siteConfig";
 import { getSiteConfig } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -78,7 +79,7 @@ export default async function MisionVisionPage() {
           )}
         </section>
       </main>
-      <Footer />
+      <Footer sections={visible} whatsapp={whatsappLink(content.contact)} />
     </>
   );
 }

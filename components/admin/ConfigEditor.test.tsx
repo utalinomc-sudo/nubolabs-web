@@ -123,6 +123,33 @@ describe("ConfigEditor", () => {
     expect(lastBody().content).toBeUndefined();
   });
 
+  // Cambio cierre-landing-faq-cta: preguntas frecuentes, CTA final y WhatsApp.
+  it("preguntas frecuentes: 1 a 10, con ayuda de enlaces; restablecer devuelve las 6 sin guardar", () => {
+    const { fetchMock } = renderEditor();
+    const faq = screen.getByRole("region", { name: "Preguntas frecuentes" });
+    expect(within(faq).getByText(/\[texto\]\(\/ruta\)/)).toBeInTheDocument();
+    fireEvent.click(within(faq).getByRole("button", { name: "Quitar Pregunta 1" }));
+    fireEvent.click(within(faq).getByRole("button", { name: "Quitar Pregunta 1" }));
+    expect(within(faq).getAllByRole("button", { name: /^Quitar Pregunta/ })).toHaveLength(4);
+    fireEvent.click(within(faq).getByRole("button", { name: "Usar los textos recomendados" }));
+    expect(within(faq).getAllByRole("button", { name: /^Quitar Pregunta/ })).toHaveLength(6);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByRole("region", { name: "CTA final" })).toBeInTheDocument();
+  });
+
+  it("contacto: activar los interruptores envía content.contact con ellos y la vista previa del número", async () => {
+    const { fetchMock, lastBody } = renderEditor();
+    const contacto = screen.getByRole("region", { name: "Contacto por WhatsApp" });
+    expect(within(contacto).getByText(/Se verá como \+56 9 3259 0783/)).toBeInTheDocument();
+    fireEvent.click(within(contacto).getByRole("checkbox", { name: "Mostrar WhatsApp en el pie de página" }));
+    fireEvent.click(within(contacto).getByRole("checkbox", { name: "Mostrar QR junto al formulario" }));
+    await save(fetchMock, 1);
+    expect(Object.keys(lastBody().content)).toEqual(["contact"]);
+    expect(lastBody().content.contact).toEqual({ whatsappNumber: "56932590783", showWhatsapp: true, showWhatsappQr: true });
+    fireEvent.change(within(contacto).getByRole("textbox", { name: "Número de WhatsApp" }), { target: { value: "123" } });
+    expect(within(contacto).getByText(/no se mostrará/)).toBeInTheDocument();
+  });
+
   it("restablecer Servicios guardados con la forma antigua envía la sección completa con el destacado", async () => {
     const base = defaultSiteConfig().content;
     const viejo = { ...base, servicios: { ...base.servicios, title: "Vendemos resultados", items: [{ title: "Sistemas y agentes IA", body: "x", result: "y" }] } };

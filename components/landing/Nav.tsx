@@ -31,7 +31,8 @@ export function Nav({ showEquipo = true, showMision = true, showContact = true, 
           <Logo />
         </a>
 
-        <nav className="hidden items-center gap-8 text-sm font-semibold text-ink-soft lg:flex">
+        {/* Enlaces de escritorio desde 1080 px (como la referencia HDU-08): con 5 ítems no caben a 1024. */}
+        <nav className="hidden items-center gap-6 whitespace-nowrap text-sm font-semibold text-ink-soft min-[1080px]:flex xl:gap-8">
           {/* Sin ítem activo fijo (spec landing/contenido-pyme, "Orden de secciones y navegación"). */}
           {items.map((item) => (
             <a key={item.href} href={item.href} className="transition hover:text-brand">
@@ -79,7 +80,7 @@ export function Nav({ showEquipo = true, showMision = true, showContact = true, 
 
         <button
           onClick={() => setOpen((v) => !v)}
-          className="-mr-2 grid h-11 w-11 place-items-center lg:hidden"
+          className="-mr-2 grid h-11 w-11 place-items-center min-[1080px]:hidden"
           aria-label="Abrir menú"
           aria-expanded={open}
         >
@@ -90,7 +91,7 @@ export function Nav({ showEquipo = true, showMision = true, showContact = true, 
       </div>
 
       {open && (
-        <div className="border-t border-[#EEF2F8] bg-white lg:hidden">
+        <div className="border-t border-[#EEF2F8] bg-white min-[1080px]:hidden">
           <nav className="container-page flex flex-col gap-1 py-3">
             {items.map((item) => (
               <a

@@ -31,6 +31,7 @@ describe("Nav", () => {
       ["Servicios", "/#servicios"],
       ["Ejemplos", "/#casos"],
       ["Cómo trabajamos", "/#modelo"],
+      ["Preguntas", "/#preguntas"],
     ];
     for (const [label, href] of expected) {
       const links = screen.getAllByRole("link", { name: label });
@@ -45,8 +46,9 @@ describe("Nav", () => {
   });
 
   it("no muestra el ítem de una sección oculta", () => {
-    render(<Nav sections={{ resultados: false, proceso: false }} />);
+    render(<Nav sections={{ resultados: false, proceso: false, faq: false }} />);
     expect(screen.queryByRole("link", { name: "Lo que ganas" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Preguntas" })).toBeNull();
     expect(screen.queryByRole("link", { name: "Cómo trabajamos" })).toBeNull();
     expect(screen.getByRole("link", { name: "Servicios" })).toBeInTheDocument();
   });
