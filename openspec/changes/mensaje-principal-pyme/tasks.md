@@ -41,6 +41,13 @@
 - [x] 6.7 `ConfigEditor.tsx`: ocultar el aviso "Textos recomendados cargados" al guardar con éxito; verificar por lectura y en el E2E.
 - [x] 6.8 Docs: `docs/frontend-standards.md` (resalte con `.text-gradient-brand`, eyebrow del hero, `success` no se usa para texto chico, `success-strong`), `docs/backlog/prospectos-oa.md` (el CTA lleva a `#contacto`, no `#agendar`) y la deuda de "pausar animación" (WCAG 2.2.2) en `docs/ESTADO-PROYECTO.md`.
 
+## 7. Sin "Para dueños de pymes" (pedido de Mauro, 2026-10-22; design.md decisión 5b)
+
+- [x] 7.1 Actualizar `lib/siteConfig.test.ts` (debe fallar): eyebrow por defecto vacío y ningún texto por defecto del hero (eyebrow, título, bajada, botones, etiquetas) contiene "pyme". Agregar a `components/landing/Hero.test.tsx` (debe fallar): sin eyebrow no hay píldora; con eyebrow "Hola" se muestra.
+- [x] 7.2 Implementar: default `eyebrow: ""` en `lib/siteConfig.ts`, píldora condicional en `Hero.tsx`, campo "Etiqueta superior (opcional)" con ayuda en `ConfigEditor.tsx` y comentarios sin "pymes" (`app/layout.tsx`, `lib/siteConfig.ts`); verificar que los tests pasan.
+- [x] 7.3 Quitar la frase de la referencia visual (`docs/design/propuesta-web-hdu-08.html` y su copia del Escritorio), del brochure (portada) y de los docs (`docs/backlog/propuesta-valor-hdu-08.md`, `docs/backlog/prospectos-oa.md`, `docs/data-model.md`, `docs/frontend-standards.md`, `docs/ESTADO-PROYECTO.md`); verificar con una búsqueda que no queda "dueños de pymes" fuera del historial.
+- [x] 7.4 Repetir los 4 comandos (N) y un E2E corto a 1280 y 375 px: hero sin etiqueta superior, sin "pyme" en el HTML de la portada, sin scroll horizontal; agregar el resultado a los reportes.
+
 ## N. Verificación obligatoria (OBLIGATORIO — el agente lo ejecuta)
 
 - [x] N.1 Ejecutar `npm run lint`, `npx tsc --noEmit`, `npm test` y `npm run build`; guardar la salida en `openspec/changes/mensaje-principal-pyme/reports/AAAA-MM-DD-paso-N-verificacion.md` (plantilla de `docs/openspec-tasks-mandatory-steps.md` §5). Si algo falla, la tarea sigue abierta.

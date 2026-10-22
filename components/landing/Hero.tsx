@@ -31,16 +31,22 @@ export function Hero({ content, contactVisible = true, processVisible = true }: 
 
       <div className="container-page relative z-[1] grid grid-cols-[minmax(0,1fr)] items-center gap-12 pb-16 pt-11 sm:pb-24 sm:pt-[72px] lg:grid-cols-[minmax(0,1.06fr)_minmax(0,.94fr)] lg:gap-16">
         <div>
-          <span className="inline-flex items-center gap-2.5 rounded-full border border-line bg-white py-2 pl-2.5 pr-3.5 font-mono text-xs font-semibold tracking-[1.6px] text-navy shadow-card">
-            <span className="grid h-[22px] w-[22px] place-items-center rounded-full bg-gradient-to-br from-brand to-brand-light text-white">
-              <IconCheck className="h-3 w-3 [&_path]:[stroke-width:3]" />
+          {/* Etiqueta superior opcional: por defecto no hay (design.md decisión 5b); el admin puede escribir una. */}
+          {h.eyebrow.trim() && (
+            <span
+              data-hero-eyebrow
+              className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-line bg-white py-2 pl-2.5 pr-3.5 font-mono text-xs font-semibold tracking-[1.6px] text-navy shadow-card"
+            >
+              <span className="grid h-[22px] w-[22px] place-items-center rounded-full bg-gradient-to-br from-brand to-brand-light text-white">
+                <IconCheck className="h-3 w-3 [&_path]:[stroke-width:3]" />
+              </span>
+              {h.eyebrow}
             </span>
-            {h.eyebrow}
-          </span>
+          )}
 
           <h1
             id="hero-title"
-            className="mb-[22px] mt-6 text-[clamp(40px,5.6vw,66px)] font-extrabold leading-[1.02] tracking-[-1.6px] text-balance sm:tracking-[-2.4px]"
+            className="mb-[22px] text-[clamp(40px,5.6vw,66px)] font-extrabold leading-[1.02] tracking-[-1.6px] text-balance sm:tracking-[-2.4px]"
           >
             {renderHighlight(h.title).map((p, i) =>
               typeof p === "string" ? (

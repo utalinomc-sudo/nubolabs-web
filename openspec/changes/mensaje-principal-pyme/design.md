@@ -71,6 +71,9 @@ Se mueven a `lib/siteConfig.ts` (sin `server-only`): tipos (`SiteContent`, `Site
 - Si el texto guardado de un botón ya termina en "→" (como el "Solicitar diagnóstico →" que hoy está en producción), el hero no agrega el ícono de flecha.
 - *Alternativa descartada:* mantener `/diagnostico` como destino. La HDU-08 §5.2 mueve la puerta de entrada al formulario corto; el cuestionario de 18 preguntas pasa a ser complemento (HDU-09).
 
+### 5b. Sin etiqueta superior por defecto (pedido de Mauro, 2026-10-22)
+La HDU-08 había fijado el eyebrow "PARA DUEÑOS DE PYMES". Mauro lo retiró de todas las piezas (web, brochure y referencia visual) para no excluir a empresas grandes. El default de `content.hero.eyebrow` pasa a `""` y `Hero.tsx` solo dibuja la píldora (check + texto) si el eyebrow tiene contenido; el admin puede escribir uno cuando quiera (campo "Etiqueta superior (opcional)"). Como `pickText` cae al default cuando lo guardado está vacío, guardar el campo vacío también deja el hero sin etiqueta. Un test de defaults impide que vuelva a aparecer "pyme" en los textos por defecto del hero.
+
 ### 6. Migración de los textos de producción
 Como los overrides de `config/site` ganan sobre los defaults, el editor del hero en `ConfigEditor.tsx` suma el botón **"Usar los textos recomendados"**, que carga en el formulario los defaults de `defaultSiteConfig().content.hero` (eyebrow, título, bajada, botones y etiquetas) sin guardar; Mauro revisa y pulsa "Guardar". Es el mismo patrón que usarán las HDU siguientes para sus secciones.
 

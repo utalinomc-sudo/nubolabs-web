@@ -63,7 +63,7 @@ Escribe `POST /api/admin/config` con `set(patch, { merge: true })`; lee `getSite
 | Campo | Tipo | Descripción |
 |---|---|---|
 | `visible` | `Record<string, boolean>` | Visibilidad por sección. Claves válidas = `SECTIONS[].key`: `hero`, `problema`, `enfoque`, `servicios`, `proceso`, `casos`, `nosotros`, `equipo`, `contacto` |
-| `content.hero` | `{ eyebrow, title, subtitle, ctaPrimary, ctaSecondary, tags? }` | `title` admite `**resalte**` → texto con el degradado de marca (`renderHighlight` + `.text-gradient-brand`). Cada campo guardado gana sobre su default |
+| `content.hero` | `{ eyebrow, title, subtitle, ctaPrimary, ctaSecondary, tags? }` | `eyebrow` es opcional: por defecto vacío (sin etiqueta sobre el título). `title` admite `**resalte**` → texto con el degradado de marca (`renderHighlight` + `.text-gradient-brand`). Cada campo guardado gana sobre su default |
 | `content.hero.tags` | `string[]` (opcional) | Etiquetas bajo los botones del hero (cambio mensaje-principal-pyme). Al leer se normalizan con `normalizeTags()`: se recortan, se descartan vacías y no-strings y se toman las 3 primeras; si no es arreglo o queda vacía se usan los defaults ("30 minutos, gratis y sin compromiso", "Sin cambiar tus sistemas", "Respuesta en menos de 24 horas"). Documentos sin `tags` siguen siendo válidos |
 | `content.servicios` | `{ eyebrow, title, items[] { title, body, result } }` | |
 | `content.casos` | `{ eyebrow, title, subtitle, items[] { title, body } }` | |

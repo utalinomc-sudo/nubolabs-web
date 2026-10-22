@@ -164,7 +164,12 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
           </p>
         )}
         <div className="mt-4 space-y-4">
-          <Field label="Etiqueta superior" value={content.hero.eyebrow} onChange={(v) => setHero("eyebrow", v)} />
+          <Field
+            label="Etiqueta superior (opcional)"
+            value={content.hero.eyebrow}
+            onChange={(v) => setHero("eyebrow", v)}
+            hint="Texto corto sobre el título. Déjala vacía para no mostrar etiqueta (recomendado)."
+          />
           <Field
             label="Título"
             value={content.hero.title}

@@ -100,11 +100,16 @@ describe("defaults del hero", () => {
   const hero = defaultSiteConfig().content.hero;
 
   it("tienen el mensaje de la HDU-08", () => {
-    expect(hero.eyebrow).toBe("PARA DUEÑOS DE PYMES");
+    expect(hero.eyebrow).toBe(""); // sin etiqueta superior por defecto (design.md decisión 5b)
     expect(hero.title).toBe("Que tu negocio **trabaje para ti**, no al revés.");
     expect(hero.ctaPrimary).toBe("Quiero mi diagnóstico gratis");
     expect(hero.ctaSecondary).toBe("Ver cómo trabajamos");
     expect(hero.tags).toEqual(DEFAULT_TAGS);
+  });
+
+  it("ningún texto por defecto limita el público a pymes", () => {
+    const texts = [hero.eyebrow, hero.title, hero.subtitle, hero.ctaPrimary, hero.ctaSecondary, ...hero.tags];
+    for (const text of texts) expect(text.toLowerCase()).not.toContain("pyme");
   });
 
   it("título y bajada no usan horas, IA, nube ni automatización", () => {

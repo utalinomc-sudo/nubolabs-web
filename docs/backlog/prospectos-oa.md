@@ -65,7 +65,7 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 **Alcance.**
 - Nuevos textos por defecto del hero (propuesta; Mauro elige o ajusta en el preview):
-  - Eyebrow: `PARA DUEÑOS DE PYMES` (reemplaza el inglés "AI & AUTOMATION AGENCY").
+  - Eyebrow: ~~`PARA DUEÑOS DE PYMES`~~ → **sin eyebrow** (decisión del 2026-10-22: no excluir a empresas grandes; HDU-08 §14 fila 9). Reemplaza el inglés "AI & AUTOMATION AGENCY".
   - Título: `Te devolvemos las **horas** que tu equipo pierde en tareas repetitivas.` Alternativa: `Menos pega manual, **menos errores** y más tiempo para tu negocio.`
   - Subtítulo: `Primero entendemos cómo trabaja tu empresa y simplificamos lo que sobra. Después hacemos que las tareas repetitivas se hagan solas: correos, cotizaciones, cobranzas, reportes.`
   - CTA primario: `Quiero mi diagnóstico gratis` (sigue llevando a `/diagnostico`). CTA secundario: `Ver cómo trabajamos` (ancla `#modelo`).
@@ -337,7 +337,7 @@ Derivada de "Usar la recomendación de O&A" y del contexto: el correo lleva el l
 
 ## 4. Preguntas abiertas para Mauro
 
-> **Resueltas el 2026-10-21 con la aprobación de la HDU-08:** 5 (rubros, se agrega "Comercio"), 6 (cifras ocultas de inmediato) y 7 (eyebrow "PARA DUEÑOS DE PYMES"). Siguen abiertas 1, 2, 3 y 4 (ver HDU-08 §14).
+> **Resueltas el 2026-10-21 con la aprobación de la HDU-08:** 5 (rubros, se agrega "Comercio"), 6 (cifras ocultas de inmediato) y 7 (eyebrow "PARA DUEÑOS DE PYMES"; **cambiado el 2026-10-22: sin eyebrow**, para no excluir a empresas grandes). Siguen abiertas 1, 2, 3 y 4 (ver HDU-08 §14).
 
 1. **¿Cuándo sale el correo de O&A y qué link llevará?** Define la fase (1 o completa) y si conviene adelantar HDU-07 para usar `nubolabs.cl/oa`.
 2. **¿Tenemos ya un testimonio o una frase autorizada de O&A?** Si sí, HDU-04 sube de prioridad; si no, se usa el texto puente.

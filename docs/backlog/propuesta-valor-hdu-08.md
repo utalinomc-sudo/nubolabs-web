@@ -228,7 +228,7 @@ referral?: 'oa';             // HDU-07: referido de O&A (ver landing-referidos-o
 
 | HDU | Cambio que introduce esta HDU-08 |
 |---|---|
-| HDU-01 `mensaje-principal-pyme` | Título por defecto: **"Que tu negocio trabaje para ti, no al revés."** (se descarta "Te devolvemos las horas…"). Eyebrow: "PARA DUEÑOS DE PYMES". Tags (como en la referencia visual): "30 minutos, gratis y sin compromiso" · "Sin cambiar tus sistemas" · "Respuesta en menos de 24 horas". El criterio "una promesa en términos de horas" pasa a ser **"una promesa de resultado de negocio (ventas, control, orden o crecimiento)"**. |
+| HDU-01 `mensaje-principal-pyme` | Título por defecto: **"Que tu negocio trabaje para ti, no al revés."** (se descarta "Te devolvemos las horas…"). Sin eyebrow (el "PARA DUEÑOS DE PYMES" aprobado el 2026-10-21 se retiró el 2026-10-22, ver §14 fila 9). Tags (como en la referencia visual): "30 minutos, gratis y sin compromiso" · "Sin cambiar tus sistemas" · "Respuesta en menos de 24 horas". El criterio "una promesa en términos de horas" pasa a ser **"una promesa de resultado de negocio (ventas, control, orden o crecimiento)"**. |
 | HDU-02 `lenguaje-sin-jerga` | Se agrega a la tabla de reemplazos: "horas ahorradas" → resultado concreto según la sección; "ROI estimado" → "tus prioridades". Nueva sección "Lo que ganas" (4 resultados) entre Problemas y Enfoque. |
 | HDU-03 `formulario-minimo-consentimiento` | Se reemplaza el alcance por §6: formulario de 2 pasos con objetivos y rubro, 2 consentimientos, WhatsApp obligatorio, sin "¿qué tarea te gustaría dejar de hacer a mano?". |
 | HDU-04 `confianza-recomendacion` | Usar el testimonio revisado (§8) cuando Mauricio O. lo apruebe; mientras, el texto puente. |
@@ -287,6 +287,7 @@ referral?: 'oa';             // HDU-07: referido de O&A (ver landing-referidos-o
 | 6 | Testimonio y texto del correo en voz de Mauricio O. | ⏳ Pendiente de su visto bueno: el CMS arranca con el texto puente y el testimonio se carga desde `/admin/config` cuando él apruebe |
 | 7 | Texto de `/privacidad` | ⏳ Lo valida O&A o un abogado antes del 1-dic-2026 |
 | 8 | WhatsApp de contacto de Nubolabs (no confundir con el campo WhatsApp del formulario, fila 2) | ✅ Decidido el 2026-10-22: fuera del brochure (ni número ni QR). En la web, oculto por defecto y configurable desde el admin: número en el pie y QR junto al formulario, por separado (§10, §11). Número cargado: el de Germán, +56 9 3259 0783 |
+| 9 | Público objetivo en los textos | ✅ Decidido el 2026-10-22: se retira "PARA DUEÑOS DE PYMES" de todas las piezas (web, referencia visual y brochure) para no excluir a empresas grandes. El hero queda sin etiqueta superior por defecto (el admin puede escribir una) y ningún texto público se dirige solo a pymes. El análisis del prospecto de O&A (dueño de pyme) sigue siendo válido como contexto interno |
 
 ### 15. Reparto en cambios OpenSpec (orden de implementación)
 

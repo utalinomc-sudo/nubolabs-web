@@ -18,7 +18,7 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: "Nubolabs — AI & Automation Agency",
-  // Promesa para dueños de pymes (cambio mensaje-principal-pyme, decisión 7). El título mantiene la marca.
+  // Promesa orientada a resultados de negocio (cambio mensaje-principal-pyme, decisión 7). El título mantiene la marca.
   description:
     "Ordenamos cómo funciona tu empresa y dejamos funcionando solas las tareas que hoy te frenan. Vende más, ten el control y crece sin desordenarte.",
   metadataBase: new URL("https://www.nubolabs.cl"),

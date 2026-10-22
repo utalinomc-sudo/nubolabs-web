@@ -1,10 +1,10 @@
 ## Purpose
 
-Define las secciones de contenido de la portada de nubolabs.cl (¿Te suena?, Lo que ganas, Enfoque, Servicios y Proceso) para un dueño de pyme: qué dicen por defecto, en qué orden aparecen, qué vocabulario no pueden usar y cómo se editan desde el CMS sin despliegue.
+Define las secciones de contenido de la portada de nubolabs.cl (¿Te suena?, Lo que ganas, Enfoque, Servicios y Proceso) para un dueño de negocio (de cualquier tamaño): qué dicen por defecto, en qué orden aparecen, qué vocabulario no pueden usar y cómo se editan desde el CMS sin despliegue.
 
 ## ADDED Requirements
 
-### Requirement: Vocabulario para dueños de pyme
+### Requirement: Vocabulario para dueños de negocio
 Con los textos por defecto, el texto visible de la portada MUST NOT contener las palabras "n8n", "Make", "API", "APIs", "CRM", "ERP", "agente", "agentes", "IA", "ROI" ni la expresión "horas ahorradas", salvo dentro de la nota técnica de Servicios. La nota técnica SHALL ser un único párrafo de texto pequeño ubicado al final de Servicios.
 
 #### Scenario: Barrido de la portada

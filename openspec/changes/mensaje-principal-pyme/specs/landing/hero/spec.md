@@ -1,15 +1,19 @@
 ## Purpose
 
-Define el mensaje principal de la portada de nubolabs.cl para dueños de pymes: qué promete, a dónde llevan sus llamados a la acción, qué se puede editar desde el CMS y cómo se comporta el panel ilustrativo "Tu negocio hoy".
+Define el mensaje principal de la portada de nubolabs.cl para dueños de negocios de cualquier tamaño: qué promete, a dónde llevan sus llamados a la acción, qué se puede editar desde el CMS y cómo se comporta el panel ilustrativo "Tu negocio hoy".
 
 ## ADDED Requirements
 
 ### Requirement: Mensaje orientado a resultados de negocio
-Sin overrides en el CMS, el hero SHALL mostrar el eyebrow "PARA DUEÑOS DE PYMES", el título "Que tu negocio trabaje para ti, no al revés." con "trabaje para ti" resaltado, y la bajada "Ordenamos cómo funciona tu empresa y dejamos andando solas las tareas que hoy te frenan: cotizaciones, cobranzas, pedidos, reportes y respuestas a clientes. Tú nos dices qué quieres lograr; nosotros lo dejamos funcionando." El título y la bajada por defecto MUST NOT contener las palabras "horas", "IA", "nube", "automatización" ni "automatizaciones".
+Sin overrides en el CMS, el hero SHALL mostrar el título "Que tu negocio trabaje para ti, no al revés." con "trabaje para ti" resaltado, y la bajada "Ordenamos cómo funciona tu empresa y dejamos andando solas las tareas que hoy te frenan: cotizaciones, cobranzas, pedidos, reportes y respuestas a clientes. Tú nos dices qué quieres lograr; nosotros lo dejamos funcionando." El título y la bajada por defecto MUST NOT contener las palabras "horas", "IA", "nube", "automatización" ni "automatizaciones". Por defecto el hero MUST NOT mostrar etiqueta superior (eyebrow), y ningún texto por defecto MUST limitar el público a pymes (decisión de Mauro del 2026-10-22: no excluir a empresas grandes). Si el admin escribe una etiqueta superior en el CMS, el hero SHALL mostrarla sobre el título; si la deja vacía, no se muestra.
 
 #### Scenario: Portada sin overrides
 - **WHEN** un visitante abre `/` y el documento `config/site` no tiene `content.hero`
-- **THEN** ve el eyebrow, el título y la bajada por defecto, con "trabaje para ti" destacado visualmente
+- **THEN** ve el título y la bajada por defecto, con "trabaje para ti" destacado visualmente
+
+#### Scenario: Sin etiqueta superior por defecto
+- **WHEN** un visitante abre `/` sin overrides del hero, o el admin guarda la etiqueta superior vacía
+- **THEN** no hay etiqueta sobre el título y la portada no menciona "pymes" en el hero
 
 #### Scenario: Vocabulario prohibido
 - **WHEN** se revisan el título y la bajada por defecto

@@ -49,9 +49,10 @@ export function defaultSiteConfig(): SiteConfig {
   return {
     visible: Object.fromEntries(SECTIONS.map((s) => [s.key, true])),
     content: {
-      // Mensaje para dueños de pymes (HDU-08 §2, spec landing/hero). Sin "horas", "IA", "nube" ni "automatización".
+      // Mensaje orientado a resultados de negocio (HDU-08 §2, spec landing/hero). Sin "horas", "IA", "nube" ni
+      // "automatización". Sin etiqueta superior por defecto: no se limita el público a pymes (design.md decisión 5b).
       hero: {
-        eyebrow: "PARA DUEÑOS DE PYMES",
+        eyebrow: "",
         title: "Que tu negocio **trabaje para ti**, no al revés.",
         subtitle:
           "Ordenamos cómo funciona tu empresa y dejamos andando solas las tareas que hoy te frenan: cotizaciones, cobranzas, pedidos, reportes y respuestas a clientes. Tú nos dices qué quieres lograr; nosotros lo dejamos funcionando.",

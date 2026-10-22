@@ -79,7 +79,8 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 - No usar `brand-light` (`#00C2FF`, 2,1:1) para texto sobre blanco; para eso está `brand-deep` (3,5:1, solo texto grande).
 - Primitivas antes que clases repetidas: `.container-page`, `.btn-primary`, `.btn-ghost`, `.pill`, `.card`, `.field`, `.text-gradient-brand` (resalte con degradado `brand` → `brand-deep`; sin soporte de `background-clip` queda en `brand`) y `.bg-dots` (trama de puntos; la máscara la pone cada sección).
 - En grids que mezclan texto con paneles de ancho mínimo grande, usar columnas `minmax(0, …)` para que en móvil no crezcan más que el contenedor.
-- Tipografía: títulos `font-extrabold` con `tracking` negativo y `text-balance`; cuerpo `text-ink-muted leading-relaxed`; eyebrows de sección `text-xs font-bold tracking-[2.5px] text-brand`. El eyebrow del hero (desde HDU-01) es una píldora blanca con check: `font-mono text-xs font-semibold tracking-[1.6px] text-navy`.
+- Tipografía: títulos `font-extrabold` con `tracking` negativo y `text-balance`; cuerpo `text-ink-muted leading-relaxed`; eyebrows de sección `text-xs font-bold tracking-[2.5px] text-brand`. El eyebrow del hero es opcional y por defecto no se muestra; si el admin escribe uno, va en una píldora blanca con check (`font-mono text-xs font-semibold tracking-[1.6px] text-navy`).
+- Público: los textos públicos no se dirigen solo a pymes (nada de "para dueños de pymes"); hablar de "tu negocio" o "tu empresa" (decisión de Mauro del 2026-10-22, HDU-08 §14 fila 9).
 - `success` (`#138A4D`) es para íconos y marcas de completado; para texto chico sobre `success-50` usar `success-strong` (5,02:1; `success` da 4,09:1 y no cumple).
 - Responsive mobile-first con breakpoints `md`/`lg`; el sidebar del admin se oculta bajo `md`.
 - Dirección de diseño "1b claro & azul": fondo blanco/`surface-soft`, acento azul `brand`, detalles cian y naranjo puntuales.

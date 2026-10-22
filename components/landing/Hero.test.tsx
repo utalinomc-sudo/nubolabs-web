@@ -35,6 +35,14 @@ describe("Hero", () => {
     for (const tag of hero.tags) expect(screen.getByText(tag)).toBeInTheDocument();
   });
 
+  it("sin etiqueta superior no muestra la píldora; con texto, sí", () => {
+    const { container } = render(<Hero content={hero} />);
+    expect(container.querySelector("[data-hero-eyebrow]")).toBeNull();
+    cleanup();
+    render(<Hero content={{ ...hero, eyebrow: "Hola" }} />);
+    expect(screen.getByText("Hola").closest("[data-hero-eyebrow]")).not.toBeNull();
+  });
+
   it("no agrega otra flecha si el texto del botón ya termina en →", () => {
     render(<Hero content={{ ...hero, ctaPrimary: "Solicitar diagnóstico →" }} />);
     expect(screen.getByRole("link", { name: "Solicitar diagnóstico →" }).querySelector("svg")).toBeNull();

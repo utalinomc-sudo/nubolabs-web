@@ -4,7 +4,7 @@ El hero de nubolabs.cl habla de tecnología ("automatizaciones con IA que trabaj
 
 ## What Changes
 
-- **Nuevo mensaje del hero (defaults del CMS):** eyebrow "PARA DUEÑOS DE PYMES", título "Que tu negocio **trabaje para ti**, no al revés.", bajada de la HDU-08 §2, CTA principal "Quiero mi diagnóstico gratis" hacia el formulario de la landing (`#contacto`) y secundario "Ver cómo trabajamos" (`#modelo`).
+- **Nuevo mensaje del hero (defaults del CMS):** sin etiqueta superior (eyebrow vacío; el admin puede escribir una), título "Que tu negocio **trabaje para ti**, no al revés.", bajada de la HDU-08 §2, CTA principal "Quiero mi diagnóstico gratis" hacia el formulario de la landing (`#contacto`) y secundario "Ver cómo trabajamos" (`#modelo`).
 - **Etiquetas del hero editables desde el CMS** (`content.hero.tags`, 3 textos) con los defaults "30 minutos, gratis y sin compromiso", "Sin cambiar tus sistemas" y "Respuesta en menos de 24 horas". Hoy viven fijas en `lib/content.ts` (`heroTags`).
 - **Panel "Tu negocio hoy"** en lugar del diagrama `HeroGraphic`: tareas de ejemplo que se completan solas (cotización, cobranza, WhatsApp, pedido, resumen para el contador), con animación sutil que respeta "reducir movimiento". Es ilustrativo: sin cifras ni nombres de clientes.
 - **Navegación:** el botón del menú pasa a "Diagnóstico gratis" y lleva a `/#contacto` (hoy "Agendar diagnóstico →" a `/diagnostico`), en escritorio y en el menú móvil.
