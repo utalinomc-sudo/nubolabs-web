@@ -11,16 +11,21 @@ import { Faq } from "@/components/landing/Faq";
 import { FinalCta } from "@/components/landing/FinalCta";
 import { StickyCta } from "@/components/landing/StickyCta";
 import { WhatsappCard } from "@/components/landing/WhatsappCard";
+import { MiniQuote } from "@/components/landing/MiniQuote";
+import { Trust } from "@/components/landing/Trust";
 import { Footer } from "@/components/landing/Footer";
 import { safeScheduleUrl } from "@/lib/leads";
 import { getSiteConfig } from "@/lib/site";
-import { whatsappLink } from "@/lib/siteConfig";
+import { contactQuote, whatsappLink } from "@/lib/siteConfig";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const { visible, content } = await getSiteConfig();
   const whatsappQr = whatsappLink(content.contact, "qr");
+  // Cita breve en #contacto: solo con un testimonio autorizado y el bloque de confianza visible (confianza-recomendacion).
+  const principal = contactQuote(visible, content.confianza);
+  const cita = principal ? <MiniQuote testimonio={principal} /> : null;
 
   return (
     <>
@@ -29,6 +34,7 @@ export default async function HomePage() {
         {visible.hero && (
           <Hero content={content.hero} contactVisible={visible.contacto} processVisible={visible.proceso} />
         )}
+        {visible.confianza && <Trust content={content.confianza} spaced={!visible.hero} />}
         {/* Orden de la portada (cambio lenguaje-sin-jerga, design.md decisión 4). */}
         {visible.problema && <Problem content={content.problema} resultsVisible={visible.resultados} />}
         {visible.resultados && <Results content={content.resultados} />}
@@ -39,7 +45,14 @@ export default async function HomePage() {
         {visible.contacto && (
           <ContactForm
             scheduleUrl={safeScheduleUrl(process.env.NEXT_PUBLIC_SCHEDULE_URL)}
-            aside={whatsappQr ? <WhatsappCard link={whatsappQr} /> : null}
+            aside={
+              cita || whatsappQr ? (
+                <>
+                  {cita}
+                  {whatsappQr && <WhatsappCard link={whatsappQr} />}
+                </>
+              ) : null
+            }
           />
         )}
         {/* Cierre (cambio cierre-landing-faq-cta). */}

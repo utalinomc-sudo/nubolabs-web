@@ -123,6 +123,41 @@ describe("ConfigEditor", () => {
     expect(lastBody().content).toBeUndefined();
   });
 
+  // Cambio confianza-recomendacion: testimonios con destacado único y textos recomendados que no tocan testimonios.
+  it("confianza: aviso de autorización, destacado único y restablecer sin tocar los testimonios", async () => {
+    const { fetchMock, lastBody } = renderEditor();
+    const conf = screen.getByRole("region", { name: "Confianza" });
+    expect(within(conf).getByText("Publica solo testimonios con autorización escrita del cliente.")).toBeInTheDocument();
+    expect(within(conf).queryByRole("button", { name: /Quitar Compromiso/ })).toBeNull();
+
+    fireEvent.click(within(conf).getByRole("button", { name: /Agregar testimonio/ }));
+    fireEvent.click(within(conf).getByRole("button", { name: /Agregar testimonio/ }));
+    const nombres = within(conf).getAllByRole("textbox", { name: "Nombre" });
+    const textos = within(conf).getAllByRole("textbox", { name: "Testimonio" });
+    fireEvent.change(nombres[0], { target: { value: "Ana Pérez" } });
+    fireEvent.change(textos[0], { target: { value: "Muy recomendables." } });
+    fireEvent.change(nombres[1], { target: { value: "Mauricio Osorio" } });
+    fireEvent.change(textos[1], { target: { value: "Los recomiendo sin dudar." } });
+
+    const destacados = () => within(conf).getAllByRole("checkbox", { name: "Destacado" }) as HTMLInputElement[];
+    fireEvent.click(destacados()[0]);
+    fireEvent.click(destacados()[1]);
+    expect(destacados().map((c) => c.checked)).toEqual([false, true]);
+
+    fireEvent.change(within(conf).getByRole("textbox", { name: "Texto puente" }), { target: { value: "Otro texto" } });
+    fireEvent.click(within(conf).getByRole("button", { name: "Usar los textos recomendados" }));
+    expect(within(conf).getByRole("textbox", { name: "Texto puente" })).toHaveValue(defaultSiteConfig().content.confianza.textoPuente);
+    expect(within(conf).getAllByRole("textbox", { name: "Nombre" }).map((i) => (i as HTMLInputElement).value)).toEqual(["Ana Pérez", "Mauricio Osorio"]);
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    await save(fetchMock, 1);
+    expect(Object.keys(lastBody().content)).toEqual(["confianza"]);
+    expect(lastBody().content.confianza.testimonios.map((t: { nombre: string; destacado: boolean }) => [t.nombre, t.destacado])).toEqual([
+      ["Ana Pérez", false],
+      ["Mauricio Osorio", true],
+    ]);
+  });
+
   // Cambio cierre-landing-faq-cta: preguntas frecuentes, CTA final y WhatsApp.
   it("preguntas frecuentes: 1 a 10, con ayuda de enlaces; restablecer devuelve las 6 sin guardar", () => {
     const { fetchMock } = renderEditor();

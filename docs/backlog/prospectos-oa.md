@@ -185,6 +185,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 **Cambio OpenSpec:** `confianza-recomendacion` · Fase 2 · Tamaño M · Depende de HDU-01
 
+**Estado (2026-10-22):** implementada en la rama `feature/confianza-recomendacion`, en preview; pendiente de aprobación y mezcla. Sin testimonios por defecto: el de Mauricio O. se carga desde el admin cuando lo apruebe por escrito.
+
 ### Original
 "Usar la recomendación de O&A — nuestro activo más fuerte. Hoy no está, y es clave. La página debería confirmar esa confianza en los primeros 5 segundos: una zona de testimonios o 'empresas que confían en nosotros'. Mientras no tengamos el testimonio de O&A: al menos 'trabajamos con estudios contables y empresas que nos recomiendan a sus clientes'."
 

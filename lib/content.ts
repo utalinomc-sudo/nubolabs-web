@@ -10,6 +10,12 @@ export const nav = [
   { label: "Preguntas", href: "/#preguntas", section: "faq" }, // cambio cierre-landing-faq-cta
 ];
 
+// Bloque de confianza (cambio confianza-recomendacion): textos fijos (no van al CMS).
+export const trustLabels = {
+  section: "Nos recomiendan", // nombre de la región para lectores de pantalla
+  promisesTitle: "Nuestro compromiso contigo",
+};
+
 // ── Cierre del sitio (cambio cierre-landing-faq-cta, design.md decisión 5) ──
 // La web no va al CMS (cambia rara vez); el WhatsApp sí (content.contact). Sin correo público hasta resolver
 // hola@nubolabs.cl (HDU-08 §14, pregunta 4).

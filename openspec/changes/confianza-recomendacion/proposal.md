@@ -48,7 +48,7 @@ El prospecto que llega por el correo de O&A viene por la confianza de su contado
 
 ## Impact
 
-- **Código:** `lib/siteConfig.ts` (+ `lib/siteConfig.test.ts`), `lib/content.ts` (título fijo "Nuestro compromiso contigo"), `components/landing/Trust.tsx` (nuevo, + `Trust.test.tsx`), `app/page.tsx` (orden y props), la sección de agendar de HDU-03 (cita breve), el editor de la sección Confianza en `components/admin/`, `app/admin/(panel)/config/page.tsx` si cambia `initialContent`.
+- **Código:** `lib/siteConfig.ts` (+ `lib/siteConfig.confianza.test.ts`), `lib/content.ts` (título fijo "Nuestro compromiso contigo"), `components/landing/Trust.tsx` (nuevo, + `Trust.test.tsx`), `app/page.tsx` (orden y props), la sección de agendar de HDU-03 (cita breve), el editor de la sección Confianza en `components/admin/`, `app/admin/(panel)/config/page.tsx` si cambia `initialContent`.
 - **API y datos:** sin endpoints nuevos ni cambios en `app/api/**`. `config/site` gana `visible.confianza` y `content.confianza`; `POST /api/admin/config` ya los acepta (merge).
 - **Variables de entorno:** ninguna.
 - **Documentos a actualizar** (`docs/documentation-standards.md` §3): `docs/data-model.md` (clave `confianza` en `visible` y `content.confianza`), `docs/api-spec.yml` (`SiteContentPartial.confianza`), `docs/ESTADO-PROYECTO.md`, estado de HDU-04 en `docs/backlog/prospectos-oa.md`.

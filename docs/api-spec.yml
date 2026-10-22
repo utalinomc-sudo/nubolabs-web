@@ -163,7 +163,7 @@ paths:
                 visible:
                   type: object
                   additionalProperties: { type: boolean }
-                  description: "Claves de SECTIONS: hero, problema, resultados, enfoque, servicios, casos, proceso, contacto, faq, cierre, nosotros, equipo"
+                  description: "Claves de SECTIONS: hero, confianza, problema, resultados, enfoque, servicios, casos, proceso, contacto, faq, cierre, nosotros, equipo"
                   example: { hero: true, problema: true, resultados: false }
                 content:
                   $ref: "#/components/schemas/SiteContentPartial"
@@ -417,6 +417,31 @@ components:
               description: "Etiquetas bajo los botones. Al leer se recortan, se descartan vacías y se usan como máximo 3; si queda vacía o no es arreglo se usan los defaults."
               items: { type: string }
               example: ["30 minutos, gratis y sin compromiso", "Sin cambiar tus sistemas", "Respuesta en menos de 24 horas"]
+        confianza:
+          type: object
+          description: "Bloque Nos recomiendan (cambio confianza-recomendacion). Sin testimonios por defecto"
+          properties:
+            eyebrow: { type: string }
+            textoPuente: { type: string, description: "Se muestra mientras no haya testimonios válidos" }
+            testimonios:
+              type: array
+              description: "Solo con autorización escrita. Sin nombre o texto no se publica; se muestran hasta 3"
+              items:
+                type: object
+                properties:
+                  nombre: { type: string }
+                  cargo: { type: string }
+                  empresa: { type: string }
+                  texto: { type: string }
+                  destacado: { type: boolean, description: "Solo true exacto; el primero destacado va en el panel" }
+            compromisos:
+              type: array
+              description: "Siempre 3 por posición; un título o texto vacío toma el recomendado de esa posición"
+              items:
+                type: object
+                properties:
+                  titulo: { type: string }
+                  texto: { type: string }
         problema:
           type: object
           description: "¿Te suena? (cambio lenguaje-sin-jerga)"

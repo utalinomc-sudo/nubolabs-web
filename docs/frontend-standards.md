@@ -38,12 +38,12 @@ app/
   admin/(panel)/layout.tsx  server: redirect a /admin/login si no hay sesión; sidebar
   admin/(panel)/{page,leads,leads/[id],config,equipo}/page.tsx
 components/
-  landing/   Nav (client), Hero, HeroPanel (client), SectionHead, Problem, Results, Approach, Services, UseCases, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
+  landing/   Nav (client), Hero, HeroPanel (client), Trust, MiniQuote, SectionHead, Problem, Results, Approach, Services, UseCases, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
   diagnostico/  DiagnosticoFlow.tsx (client), AhorroEstimator.tsx (client), cuestionario.ts, ahorro.ts
   admin/     ConfigEditor (contenedor de /admin/config), TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
-  admin/config/  Field, SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Problema, Resultados, Enfoque, Servicios, Casos, Proceso, Contact, Faq, Cierre, Nosotros, Privacidad)
+  admin/config/  Field, SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Confianza, Problema, Resultados, Enfoque, Servicios, Casos, Proceso, Contact, Faq, Cierre, Nosotros, Privacidad)
   Logo.tsx (Logo, LogoMark) · icons.tsx · LinkedInIcon.tsx
-lib/content.ts      textos fijos fuera del CMS (nav, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, metrics, contactSection, contact, ctaNote, footerLinks, whatsappCard, newTabNote)
+lib/content.ts      textos fijos fuera del CMS (nav, trustLabels, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, metrics, contactSection, contact, ctaNote, footerLinks, whatsappCard, newTabNote)
 lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig() (todos los textos editables por defecto), mergeConfig(), mergeFixedList(), mergeList(), normalizeTags(), renderHighlight(), normalizeContact(), formatWhatsapp(), whatsappLink()  (puro: tests y admin)
 lib/inlineLinks.ts  parseInlineLinks(): enlaces internos [texto](/ruta) en textos del CMS, sin HTML  (puro)
 lib/qrSvg.ts        qrPath()/qrSvg(): código QR dibujado en el servidor con qrcode-generator
@@ -62,7 +62,7 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 - Componentes: archivo PascalCase `.tsx` con **export nombrado** (`export function Hero(...)`). Las páginas (`page.tsx`, `layout.tsx`) son `export default`.
 - Props tipadas inline o con `interface Props`; contenido del CMS tipado con `SiteContent["hero"]` etc.
 - Identificadores nuevos en inglés; se conservan los nombres de dominio ya existentes en español (`ahorro`, `cuestionario`, `nombre`, `cargo`…).
-- Ids de sección de la portada, en orden: `inicio`, `problema`, `resultados`, `enfoque`, `servicios`, `casos`, `modelo` (Proceso), `contacto`, `preguntas` (FAQ) y la banda final. El menú (`nav` en `lib/content.ts`) enlaza `resultados`, `servicios`, `casos`, `modelo` y `preguntas` (enlaces de escritorio desde 1080 px; bajo eso, menú desplegable); cada ítem declara su `section` y no se muestra si esa sección está oculta. Sin ítem activo fijo. Las secciones ancladas llevan `scroll-mt-20` para quedar bajo el menú fijo.
+- Ids de sección de la portada, en orden: `inicio`, el bloque de confianza (`aria-label` "Nos recomiendan", sin ancla de menú), `problema`, `resultados`, `enfoque`, `servicios`, `casos`, `modelo` (Proceso), `contacto`, `preguntas` (FAQ) y la banda final. El menú (`nav` en `lib/content.ts`) enlaza `resultados`, `servicios`, `casos`, `modelo` y `preguntas` (enlaces de escritorio desde 1080 px; bajo eso, menú desplegable); cada ítem declara su `section` y no se muestra si esa sección está oculta. Sin ítem activo fijo. Las secciones ancladas llevan `scroll-mt-20` para quedar bajo el menú fijo.
 
 ### Server vs client
 - Por defecto todo es Server Component. `"use client"` **solo** en componentes con estado, eventos o Firebase cliente.

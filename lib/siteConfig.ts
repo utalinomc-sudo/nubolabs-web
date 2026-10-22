@@ -20,6 +20,18 @@ export interface ProcessStep {
   body: string;
   recibes: string;
 }
+// Bloque de confianza (cambio confianza-recomendacion, design.md decisión 1). Solo testimonios con autorización escrita.
+export interface Testimonio {
+  nombre: string;
+  cargo: string;
+  empresa: string;
+  texto: string;
+  destacado: boolean;
+}
+export interface Compromiso {
+  titulo: string;
+  texto: string;
+}
 export interface FaqItem {
   pregunta: string;
   respuesta: string; // admite enlaces internos [texto](/ruta) (lib/inlineLinks.ts)
@@ -39,6 +51,8 @@ export interface SiteContent {
     ctaSecondary: string;
     tags: string[]; // 1 a 3 etiquetas bajo los botones (ver normalizeTags)
   };
+  // Bajo el hero: texto puente o testimonios autorizados y compromisos (cambio confianza-recomendacion).
+  confianza: { eyebrow: string; textoPuente: string; testimonios: Testimonio[]; compromisos: Compromiso[] /* siempre 3 */ };
   // Secciones de la portada del cambio lenguaje-sin-jerga (design.md decisión 1).
   problema: {
     eyebrow: string;
@@ -84,6 +98,7 @@ export interface SiteConfig {
 // Secciones/páginas gobernadas por el toggle de visibilidad (orden = orden en la landing; design.md decisión 4).
 export const SECTIONS: { key: string; label: string; hint: string }[] = [
   { key: "hero", label: "Inicio (Hero)", hint: "Encabezado principal del home" },
+  { key: "confianza", label: "Confianza (Nos recomiendan)", hint: "Texto puente, testimonios y compromisos bajo el hero" },
   { key: "problema", label: "¿Te suena?", hint: "Los dolores del día a día" },
   { key: "resultados", label: "Lo que ganas", hint: "Los 4 resultados para tu negocio" },
   { key: "enfoque", label: "Enfoque", hint: "Primero ordenamos, después automatizamos" },
@@ -127,6 +142,17 @@ export function defaultSiteConfig(): SiteConfig {
         ctaPrimary: "Quiero mi diagnóstico gratis",
         ctaSecondary: "Ver cómo trabajamos",
         tags: ["30 minutos, gratis y sin compromiso", "Sin cambiar tus sistemas", "Respuesta en menos de 24 horas"],
+      },
+      // Sin testimonios por defecto: solo se publican con autorización escrita, cargados desde el admin.
+      confianza: {
+        eyebrow: "Nos recomiendan",
+        textoPuente: "Trabajamos con estudios contables y empresas que nos recomiendan a sus clientes.",
+        testimonios: [],
+        compromisos: [
+          { titulo: "Primera sesión gratis", texto: "30 minutos por videollamada, sin compromiso." },
+          { titulo: "Con lo que ya usas", texto: "WhatsApp, correo, planillas y tu sistema de facturación." },
+          { titulo: "Sin letra chica", texto: "Plan por etapas y costos claros antes de partir." },
+        ],
       },
       problema: {
         eyebrow: "El día a día",
@@ -433,6 +459,65 @@ const mergeFaq: MergeItem<FaqItem> = (raw, fb) => ({
 });
 const isCompleteFaq = (raw: Record<string, unknown>) => pickTrim(raw.pregunta, "") !== "" && pickTrim(raw.respuesta, "") !== "";
 
+// ── Confianza (cambio confianza-recomendacion, design.md decisión 2) ──
+// Testimonios guardados: textos recortados, `destacado` solo con true exacto; sin nombre o sin texto no se publica.
+// Una lista vacía es válida (el bloque muestra el texto puente): no cae a ningún default.
+// Si hay más de un destacado (documento editado a mano), solo vale el primero: así la portada y el admin coinciden.
+export function normalizeTestimonios(value: unknown): Testimonio[] {
+  if (!Array.isArray(value)) return [];
+  let hasDestacado = false;
+  return value
+    .filter(isRecord)
+    .map((raw) => ({
+      nombre: pickTrim(raw.nombre, ""),
+      cargo: pickTrim(raw.cargo, ""),
+      empresa: pickTrim(raw.empresa, ""),
+      texto: pickTrim(raw.texto, ""),
+      destacado: raw.destacado === true,
+    }))
+    .filter((t) => t.nombre !== "" && t.texto !== "")
+    .map((t) => {
+      const destacado = t.destacado && !hasDestacado;
+      if (destacado) hasDestacado = true;
+      return { ...t, destacado };
+    });
+}
+
+// Compromisos: siempre 3 por posición (el ícono depende de ella), con mergeFixedList como resultados y proceso:
+// un título o texto vacío toma el de esa posición (revisión adversarial de confianza-recomendacion).
+const mergeCompromiso: MergeItem<Compromiso> = (raw, fb) => ({
+  titulo: pickTrim(raw.titulo, fb.titulo),
+  texto: pickTrim(raw.texto, fb.texto),
+});
+
+// Qué se muestra: el primer destacado (o el primero) en el panel y los siguientes, en orden, hasta 3 en total.
+export function pickTestimonios(list: Testimonio[]): { principal: Testimonio | null; resto: Testimonio[] } {
+  if (list.length === 0) return { principal: null, resto: [] };
+  const i = Math.max(0, list.findIndex((t) => t.destacado));
+  const principal = list[i];
+  const resto = list.filter((_, j) => j !== i).slice(0, 2);
+  return { principal, resto };
+}
+
+// Iniciales para el avatar: la primera letra de las dos primeras palabras que tengan letras, en mayúscula. Se
+// compone el texto (NFC) y se buscan letras Unicode, para no cortar emojis ni tildes escritas por separado.
+export function initials(nombre: string): string {
+  return nombre
+    .normalize("NFC")
+    .split(/\s+/)
+    .map((w) => w.match(/\p{L}/u)?.[0] ?? "")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((l) => l.toLocaleUpperCase("es-CL"))
+    .join("");
+}
+
+// Cita breve de la sección de agendar: el testimonio principal, solo si el bloque de confianza está visible.
+export function contactQuote(visible: Record<string, boolean>, confianza: SiteContent["confianza"]): Testimonio | null {
+  if (visible.confianza === false) return null;
+  return pickTestimonios(confianza.testimonios).principal;
+}
+
 const DEFAULT_WHATSAPP = "56932590783";
 
 // WhatsApp guardado en el CMS: un número guardado como texto queda solo con sus dígitos, aunque no quede ninguno
@@ -477,6 +562,7 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
   const proceso = asRecord(c.proceso);
   const exito = asRecord(proceso.exito);
   const faq = asRecord(c.faq);
+  const confianza = asRecord(c.confianza);
   const cierre = asRecord(c.cierre);
   const nosotros = c.nosotros as Partial<SiteContent["nosotros"]> | undefined;
   const equipo = c.equipo as Partial<SiteContent["equipo"]> | undefined;
@@ -490,6 +576,12 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
         ctaPrimary: pickText(hero.ctaPrimary, b.hero.ctaPrimary),
         ctaSecondary: pickText(hero.ctaSecondary, b.hero.ctaSecondary),
         tags: normalizeTags(hero.tags) ?? b.hero.tags,
+      },
+      confianza: {
+        eyebrow: pickText(confianza.eyebrow, b.confianza.eyebrow),
+        textoPuente: pickText(confianza.textoPuente, b.confianza.textoPuente),
+        testimonios: normalizeTestimonios(confianza.testimonios),
+        compromisos: mergeFixedList(confianza.compromisos, b.confianza.compromisos, mergeCompromiso),
       },
       problema: {
         eyebrow: pickText(problema.eyebrow, b.problema.eyebrow),

@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { CasosEditor } from "@/components/admin/config/CasosEditor";
 import { CierreEditor } from "@/components/admin/config/CierreEditor";
+import { ConfianzaEditor } from "@/components/admin/config/ConfianzaEditor";
 import { ContactEditor } from "@/components/admin/config/ContactEditor";
 import { EnfoqueEditor } from "@/components/admin/config/EnfoqueEditor";
 import { FaqEditor } from "@/components/admin/config/FaqEditor";
@@ -22,6 +23,7 @@ import type { SiteContent } from "@/lib/siteConfig";
 // Regla: cada sección nueva del CMS suma su editor aquí y su clave a esta lista; si no, sus cambios no se guardan.
 export const MANAGED_KEYS = [
   "hero",
+  "confianza",
   "problema",
   "resultados",
   "enfoque",
@@ -126,6 +128,7 @@ export function ConfigEditor({ sections, initialVisible, initialContent, default
 
         {/* En el orden de la portada (SECTIONS). */}
         <HeroEditor {...bind("hero")} />
+        <ConfianzaEditor {...bind("confianza")} />
         <ProblemaEditor {...bind("problema")} />
         <ResultadosEditor {...bind("resultados")} />
         <EnfoqueEditor {...bind("enfoque")} />
