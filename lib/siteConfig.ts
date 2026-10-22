@@ -32,6 +32,12 @@ export interface Compromiso {
   titulo: string;
   texto: string;
 }
+// Cifra de resultados (cambio cifras-con-respaldo): solo se publica con valor, texto y fuente.
+export interface Cifra {
+  valor: string;
+  texto: string;
+  fuente: string;
+}
 export interface FaqItem {
   pregunta: string;
   respuesta: string; // admite enlaces internos [texto](/ruta) (lib/inlineLinks.ts)
@@ -74,6 +80,8 @@ export interface SiteContent {
     notaTecnica: string; // único lugar de la portada donde se nombran herramientas; admite **resalte**
   };
   casos: { eyebrow: string; title: string; subtitle: string; items: CaseItem[] };
+  // Oculta por defecto; sin cifras válidas muestra la frase (cambio cifras-con-respaldo).
+  cifras: { items: Cifra[]; frase: string };
   proceso: {
     eyebrow: string;
     title: string;
@@ -96,7 +104,8 @@ export interface SiteConfig {
 }
 
 // Secciones/páginas gobernadas por el toggle de visibilidad (orden = orden en la landing; design.md decisión 4).
-export const SECTIONS: { key: string; label: string; hint: string }[] = [
+// `defaultHidden`: la sección parte oculta (solo "cifras", hasta tener datos reales con fuente).
+export const SECTIONS: { key: string; label: string; hint: string; defaultHidden?: boolean }[] = [
   { key: "hero", label: "Inicio (Hero)", hint: "Encabezado principal del home" },
   { key: "confianza", label: "Confianza (Nos recomiendan)", hint: "Texto puente, testimonios y compromisos bajo el hero" },
   { key: "problema", label: "¿Te suena?", hint: "Los dolores del día a día" },
@@ -104,6 +113,7 @@ export const SECTIONS: { key: string; label: string; hint: string }[] = [
   { key: "enfoque", label: "Enfoque", hint: "Primero ordenamos, después automatizamos" },
   { key: "servicios", label: "Servicios", hint: "Qué hacemos por tu negocio" },
   { key: "casos", label: "Ejemplos", hint: "Ejemplos concretos" },
+  { key: "cifras", label: "Cifras de resultados", hint: "Oculta hasta tener datos reales con fuente", defaultHidden: true },
   { key: "proceso", label: "Cómo trabajamos", hint: "Los 4 pasos y lo que recibes" },
   { key: "contacto", label: "Contacto", hint: "Formulario de contacto del home" },
   { key: "faq", label: "Preguntas frecuentes", hint: "Dudas típicas antes de agendar" },
@@ -130,7 +140,7 @@ const PRIVACY_DRAFT = [
 // lo prueba lib/siteConfig.sections.test.ts (design.md decisión 7).
 export function defaultSiteConfig(): SiteConfig {
   return {
-    visible: Object.fromEntries(SECTIONS.map((s) => [s.key, true])),
+    visible: Object.fromEntries(SECTIONS.map((s) => [s.key, !s.defaultHidden])),
     content: {
       // Mensaje orientado a resultados de negocio (HDU-08 §2, spec landing/hero). Sin "horas", "IA", "nube" ni
       // "automatización". Sin etiqueta superior por defecto: no se limita el público a pymes (design.md decisión 5b).
@@ -257,6 +267,11 @@ export function defaultSiteConfig(): SiteConfig {
           { title: "Respuestas automáticas por WhatsApp y correo", body: "Consultas, reservas y pedidos respondidos al instante, incluso de noche." },
           { title: "Solicitudes y aprobaciones sin cadenas de correos", body: "Cada solicitud llega a quien la aprueba y sabes en qué va." },
         ],
+      },
+      // Sin cifras de ejemplo: solo datos reales con su fuente, cargados desde el admin.
+      cifras: {
+        items: [],
+        frase: "Medimos cada proyecto con los indicadores que tú elijas, y en el diagnóstico te mostramos los números de tu caso.",
       },
       proceso: {
         eyebrow: "Cómo trabajamos contigo",
@@ -518,6 +533,26 @@ export function contactQuote(visible: Record<string, boolean>, confianza: SiteCo
   return pickTestimonios(confianza.testimonios).principal;
 }
 
+// ── Cifras (cambio cifras-con-respaldo, design.md decisión 2) ──
+// Al leer se conservan también las incompletas, para que el admin pueda terminarlas.
+export function normalizeCifras(value: unknown): Cifra[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .filter(isRecord)
+    .map((raw) => ({ valor: pickTrim(raw.valor, ""), texto: pickTrim(raw.texto, ""), fuente: pickTrim(raw.fuente, "") }));
+}
+
+// Un texto "tiene contenido" si trae al menos una letra o un dígito: así un espacio invisible pegado desde Word o
+// WhatsApp (U+200B y similares) o un signo suelto ("." o "-") no cuentan como fuente (revisión adversarial).
+export function hasContent(text: string): boolean {
+  return /[\p{L}\p{N}]/u.test(text);
+}
+
+// Lo que se publica: solo con valor, texto y fuente con contenido; las 4 primeras, en el orden del CMS.
+export function visibleCifras(items: Cifra[]): Cifra[] {
+  return items.filter((c) => hasContent(c.valor) && hasContent(c.texto) && hasContent(c.fuente)).slice(0, 4);
+}
+
 const DEFAULT_WHATSAPP = "56932590783";
 
 // WhatsApp guardado en el CMS: un número guardado como texto queda solo con sus dígitos, aunque no quede ninguno
@@ -563,6 +598,7 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
   const exito = asRecord(proceso.exito);
   const faq = asRecord(c.faq);
   const confianza = asRecord(c.confianza);
+  const cifras = asRecord(c.cifras);
   const cierre = asRecord(c.cierre);
   const nosotros = c.nosotros as Partial<SiteContent["nosotros"]> | undefined;
   const equipo = c.equipo as Partial<SiteContent["equipo"]> | undefined;
@@ -631,6 +667,11 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
         title: pickText(casos.title, b.casos.title),
         subtitle: pickText(casos.subtitle, b.casos.subtitle),
         items: mergeList(casos.items, b.casos.items, { min: 1, max: 12 }, mergeTextItem, { title: "", body: "" }),
+      },
+      cifras: {
+        items: normalizeCifras(cifras.items),
+        // Una frase guardada vacía se respeta (apaga la frase); si no hay texto guardado, va la de por defecto.
+        frase: typeof cifras.frase === "string" ? cifras.frase.trim() : b.cifras.frase,
       },
       proceso: {
         eyebrow: pickText(proceso.eyebrow, b.proceso.eyebrow),

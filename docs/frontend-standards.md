@@ -38,13 +38,13 @@ app/
   admin/(panel)/layout.tsx  server: redirect a /admin/login si no hay sesión; sidebar
   admin/(panel)/{page,leads,leads/[id],config,equipo}/page.tsx
 components/
-  landing/   Nav (client), Hero, HeroPanel (client), Trust, MiniQuote, SectionHead, Problem, Results, Approach, Services, UseCases, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
+  landing/   Nav (client), Hero, HeroPanel (client), Trust, MiniQuote, SectionHead, Problem, Results, Approach, Services, UseCases, Metrics, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
   diagnostico/  DiagnosticoFlow.tsx (client), AhorroEstimator.tsx (client), cuestionario.ts, ahorro.ts
   admin/     ConfigEditor (contenedor de /admin/config), TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
-  admin/config/  Field, SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Confianza, Problema, Resultados, Enfoque, Servicios, Casos, Proceso, Contact, Faq, Cierre, Nosotros, Privacidad)
+  admin/config/  Field, SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Confianza, Problema, Resultados, Enfoque, Servicios, Casos, Cifras, Proceso, Contact, Faq, Cierre, Nosotros, Privacidad)
   Logo.tsx (Logo, LogoMark) · icons.tsx · LinkedInIcon.tsx
-lib/content.ts      textos fijos fuera del CMS (nav, trustLabels, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, metrics, contactSection, contact, ctaNote, footerLinks, whatsappCard, newTabNote)
-lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig() (todos los textos editables por defecto), mergeConfig(), mergeFixedList(), mergeList(), normalizeTags(), renderHighlight(), normalizeContact(), formatWhatsapp(), whatsappLink()  (puro: tests y admin)
+lib/content.ts      textos fijos fuera del CMS (nav, trustLabels, metricsLabels, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, contactSection, contact, ctaNote, footerLinks, whatsappCard, newTabNote)
+lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig() (todos los textos editables por defecto), mergeConfig(), mergeFixedList(), mergeList(), normalizeTags(), renderHighlight(), normalizeContact(), formatWhatsapp(), whatsappLink(), normalizeTestimonios(), pickTestimonios(), contactQuote(), initials(), normalizeCifras(), visibleCifras(), hasContent()  (puro: tests y admin)
 lib/inlineLinks.ts  parseInlineLinks(): enlaces internos [texto](/ruta) en textos del CMS, sin HTML  (puro)
 lib/qrSvg.ts        qrPath()/qrSvg(): código QR dibujado en el servidor con qrcode-generator
 lib/brandColors.ts  colores de marca que se necesitan como valor (NAVY_950); tailwind.config.ts los importa

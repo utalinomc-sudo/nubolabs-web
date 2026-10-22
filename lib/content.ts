@@ -144,12 +144,11 @@ export const sectionLabels = {
   pasoSobra: " (paso que sobra)", // solo para lectores de pantalla en el ejemplo antes/después
 };
 
-// Cifras de Casos: siguen hasta HDU-06 (fuera de la prueba de vocabulario a propósito).
-export const metrics = [
-  { value: "+120 h", label: "ahorradas al mes por cliente" },
-  { value: "minutos", label: "donde antes había días de reportería" },
-  { value: "−90%", label: "de error en tareas repetitivas" },
-];
+// Cifras con respaldo (cambio cifras-con-respaldo): textos fijos de la sección.
+export const metricsLabels = {
+  section: "Resultados medibles", // nombre de la región para lectores de pantalla
+  source: "Fuente: ",
+};
 
 // ── Sección de contacto: formulario de 2 pasos (cambio formulario-minimo-consentimiento, design.md decisión 4) ──
 // Textos fijos (no CMS en este cambio). Las opciones y los textos de consentimiento viven en lib/leadOptions.ts.

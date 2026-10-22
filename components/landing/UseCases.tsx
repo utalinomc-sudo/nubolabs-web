@@ -1,4 +1,4 @@
-import { metrics } from "@/lib/content";
+// Sin cifras de ejemplo: las cifras reales con fuente van en Metrics.tsx (cambio cifras-con-respaldo).
 import { defaultSiteConfig, type SiteContent } from "@/lib/siteConfig";
 
 export function UseCases({ content }: { content?: SiteContent["casos"] }) {
@@ -21,18 +21,6 @@ export function UseCases({ content }: { content?: SiteContent["casos"] }) {
               <div className="text-[13px] leading-relaxed text-[#B9C6DD]">{c.body}</div>
             </div>
           ))}
-        </div>
-
-        <div className="mt-12 flex flex-wrap items-end gap-x-14 gap-y-6 border-t border-white/10 pt-9">
-          {metrics.map((m) => (
-            <div key={m.label}>
-              <div className="text-[38px] font-extrabold text-brand-light">{m.value}</div>
-              <div className="text-[13px] text-[#93A5C4]">{m.label}</div>
-            </div>
-          ))}
-          <div className="ml-auto font-mono text-[11px] text-inverse-muted">
-            * cifras referenciales de ejemplo
-          </div>
         </div>
       </div>
     </section>

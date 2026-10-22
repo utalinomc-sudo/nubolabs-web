@@ -123,6 +123,56 @@ describe("ConfigEditor", () => {
     expect(lastBody().content).toBeUndefined();
   });
 
+  // Cambio cifras-con-respaldo: la casilla de la sección parte desmarcada (oculta por defecto) y activarla se guarda.
+  it("cifras: la casilla de visibilidad parte desmarcada y al marcarla se envía visible.cifras = true", async () => {
+    const { fetchMock, lastBody } = renderEditor();
+    const casilla = screen.getByRole("checkbox", { name: /Cifras de resultados/ });
+    expect(casilla).not.toBeChecked();
+    fireEvent.click(casilla);
+    await save(fetchMock, 1);
+    expect(lastBody().visible.cifras).toBe(true);
+  });
+
+  it("cifras: sin la clave en la visibilidad cargada, la casilla también parte desmarcada", () => {
+    const { visible } = defaultSiteConfig();
+    const { cifras: _omitida, ...sinCifras } = visible;
+    void _omitida;
+    vi.stubGlobal("fetch", vi.fn());
+    render(<ConfigEditor sections={SECTIONS} initialVisible={sinCifras} initialContent={defaultSiteConfig().content} defaults={defaultSiteConfig().content} />);
+    expect(screen.getByRole("checkbox", { name: /Cifras de resultados/ })).not.toBeChecked();
+  });
+
+  // Cambio cifras-con-respaldo: ayuda fija, aviso por cifra incompleta, máximo 4 y restablecer solo la frase.
+  it("cifras: ayuda, aviso de cifra sin fuente, máximo 4 y textos recomendados solo para la frase", async () => {
+    const { fetchMock, lastBody } = renderEditor();
+    const cifras = screen.getByRole("region", { name: "Cifras de resultados" });
+    expect(within(cifras).getByText(/Usa solo datos reales con su fuente/)).toBeInTheDocument();
+
+    const agregar = () => within(cifras).getByRole("button", { name: /Agregar cifra/ });
+    fireEvent.click(agregar());
+    fireEvent.change(within(cifras).getByRole("textbox", { name: "Valor" }), { target: { value: "Mismo día" } });
+    fireEvent.change(within(cifras).getByRole("textbox", { name: "Texto" }), { target: { value: "en responder cotizaciones" } });
+    expect(within(cifras).getByText("No se mostrará: falta la fuente.")).toBeInTheDocument();
+    fireEvent.change(within(cifras).getByRole("textbox", { name: "Fuente" }), { target: { value: "\u200B." } });
+    expect(within(cifras).getByText("No se mostrará: falta la fuente.")).toBeInTheDocument();
+    fireEvent.change(within(cifras).getByRole("textbox", { name: "Fuente" }), { target: { value: "Piloto con cliente de O&A, 2026" } });
+    expect(within(cifras).queryByText(/No se mostrará/)).toBeNull();
+
+    for (let i = 0; i < 3; i++) fireEvent.click(agregar());
+    expect(within(cifras).getAllByRole("textbox", { name: "Valor" })).toHaveLength(4);
+    expect(agregar()).toBeDisabled();
+
+    fireEvent.change(within(cifras).getByRole("textbox", { name: "Frase (si no hay cifras)" }), { target: { value: "Otra" } });
+    fireEvent.click(within(cifras).getByRole("button", { name: "Usar los textos recomendados" }));
+    expect(within(cifras).getByRole("textbox", { name: "Frase (si no hay cifras)" })).toHaveValue(defaultSiteConfig().content.cifras.frase);
+    expect(within(cifras).getAllByRole("textbox", { name: "Valor" })).toHaveLength(4);
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    await save(fetchMock, 1);
+    expect(Object.keys(lastBody().content)).toEqual(["cifras"]);
+    expect(lastBody().content.cifras.items[0]).toEqual({ valor: "Mismo día", texto: "en responder cotizaciones", fuente: "Piloto con cliente de O&A, 2026" });
+  });
+
   // Cambio confianza-recomendacion: testimonios con destacado único y textos recomendados que no tocan testimonios.
   it("confianza: aviso de autorización, destacado único y restablecer sin tocar los testimonios", async () => {
     const { fetchMock, lastBody } = renderEditor();

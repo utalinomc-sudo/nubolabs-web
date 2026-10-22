@@ -17,7 +17,7 @@ La portada muestra "+120 h ahorradas al mes por cliente", "minutos donde antes h
 - `landing/cifras`: cifras de resultados de la portada, ocultas por defecto, publicables solo con fuente desde el CMS.
 
 ### Modified Capabilities
-<!-- Ninguna: no hay specs vigentes de la landing que mencionen las cifras. -->
+- `landing/contenido-pyme`: la regla de vocabulario deja de exceptuar las cifras de Casos ("+120 h", "minutos", "−90%") "hasta HDU-06": esas cifras se eliminan en este cambio (ajuste de la revisión adversarial).
 
 ## Non-goals
 

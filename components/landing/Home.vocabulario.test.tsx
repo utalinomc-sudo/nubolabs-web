@@ -17,6 +17,7 @@ import { Results } from "@/components/landing/Results";
 import { Trust } from "@/components/landing/Trust";
 import { Services } from "@/components/landing/Services";
 import { UseCases } from "@/components/landing/UseCases";
+import { Metrics } from "@/components/landing/Metrics";
 
 // Regex de la decisión 7 de design.md más "nube" (propuesta). "Make" e "IA" con mayúsculas exactas.
 const FORBIDDEN_CI = /\bn8n\b|\bAPIs?\b|\bCRM\b|\bERP\b|\bagentes?\b|\bROI\b|horas ahorradas|pymes?|\bnube\b/gi;
@@ -34,6 +35,7 @@ function renderHome(): HTMLElement {
         <Approach />
         <Services />
         <UseCases />
+        <Metrics />
         <Process />
         <ContactForm />
         <Faq />
@@ -61,10 +63,12 @@ describe("portada: vocabulario", () => {
     root.querySelectorAll("[data-nota-tecnica]").forEach((n) => n.remove());
     const text = visibleText(root);
     // El barrido no es vacío: incluye menú, panel del hero, secciones, rótulos fijos, formulario y pie.
-    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "Nuestro compromiso contigo", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por una conversación", "Hecho en Chile"]) {
+    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "Nuestro compromiso contigo", "Medimos cada proyecto", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por una conversación", "Hecho en Chile"]) {
       expect(text).toContain(s);
     }
     expect([...(text.match(FORBIDDEN_CI) ?? []), ...(text.match(FORBIDDEN_CS) ?? [])]).toEqual([]);
+    // Cambio cifras-con-respaldo: sin las cifras de ejemplo ni su nota.
+    expect(text).not.toMatch(/\+120 h|−90%|minutos donde antes había días|referenciales/);
   });
 
   it("hay una sola nota técnica y es el único lugar con n8n", () => {

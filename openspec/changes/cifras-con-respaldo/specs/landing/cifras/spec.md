@@ -23,7 +23,7 @@ La sección de cifras SHALL estar oculta por defecto. Cuando está oculta MUST N
 - **THEN** la sección aparece inmediatamente después de los casos de uso
 
 ### Requirement: Solo cifras con respaldo
-Una cifra es válida solo si `valor`, `texto` y `fuente` tienen contenido (tras recortar espacios); las inválidas MUST NOT mostrarse. Cada cifra visible SHALL mostrar su valor destacado, su texto y su fuente en letra más pequeña. Se muestran como máximo las 4 primeras cifras válidas, en el orden del CMS.
+Una cifra es válida solo si `valor`, `texto` y `fuente` tienen contenido: al menos una letra o un dígito (un espacio, un carácter invisible o un signo suelto como "." o "-" no cuentan); las inválidas MUST NOT mostrarse. Cada cifra visible SHALL mostrar su valor destacado, su texto y su fuente en letra más pequeña. Se muestran como máximo las 4 primeras cifras válidas, en el orden del CMS.
 
 #### Scenario: Cifra completa
 - **WHEN** la sección está visible y el CMS trae `{ valor: "Mismo día", texto: "en responder cotizaciones", fuente: "Piloto con cliente de O&A, 2026" }`
@@ -33,16 +33,24 @@ Una cifra es válida solo si `valor`, `texto` y `fuente` tienen contenido (tras 
 - **WHEN** una cifra tiene `fuente` vacía o solo espacios
 - **THEN** esa cifra no se muestra
 
+#### Scenario: Fuente con un carácter invisible o un signo
+- **WHEN** una cifra tiene como `fuente` solo un espacio invisible (por ejemplo U+200B, pegado desde otro programa) o "-"
+- **THEN** esa cifra no se muestra y el editor avisa "No se mostrará: falta la fuente."
+
 #### Scenario: Más de cuatro
 - **WHEN** el CMS trae 6 cifras válidas
 - **THEN** se muestran las 4 primeras
 
 ### Requirement: Frase cualitativa
-Si la sección está visible pero no hay cifras válidas, SHALL mostrarse solo la frase del CMS (por defecto "Medimos cada proyecto con los indicadores que tú elijas, y en el diagnóstico te mostramos los números de tu caso."). Si además la frase está vacía, la sección MUST NOT renderizarse. La frase por defecto MUST NOT mencionar horas.
+Si la sección está visible pero no hay cifras válidas, SHALL mostrarse solo la frase del CMS (una frase guardada vacía se respeta y no vuelve a la de por defecto, para poder apagarla; si no hay frase guardada, va la de por defecto) (por defecto "Medimos cada proyecto con los indicadores que tú elijas, y en el diagnóstico te mostramos los números de tu caso."). Si además la frase está vacía, la sección MUST NOT renderizarse. La frase por defecto MUST NOT mencionar horas.
 
 #### Scenario: Visible sin cifras
 - **WHEN** `visible.cifras` es `true` y no hay cifras válidas
 - **THEN** se muestra solo la frase
+
+#### Scenario: Frase guardada vacía
+- **WHEN** el admin vacía la frase y guarda
+- **THEN** la frase no vuelve a la de por defecto y, sin cifras válidas, la sección no aparece
 
 #### Scenario: Visible sin cifras ni frase
 - **WHEN** `visible.cifras` es `true`, no hay cifras válidas y la frase está vacía

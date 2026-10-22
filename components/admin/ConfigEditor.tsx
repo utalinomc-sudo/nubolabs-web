@@ -4,6 +4,7 @@
 // design.md decisión 5). Cada editor vive en components/admin/config/.
 import { useState } from "react";
 import { CasosEditor } from "@/components/admin/config/CasosEditor";
+import { CifrasEditor } from "@/components/admin/config/CifrasEditor";
 import { CierreEditor } from "@/components/admin/config/CierreEditor";
 import { ConfianzaEditor } from "@/components/admin/config/ConfianzaEditor";
 import { ContactEditor } from "@/components/admin/config/ContactEditor";
@@ -29,6 +30,7 @@ export const MANAGED_KEYS = [
   "enfoque",
   "servicios",
   "casos",
+  "cifras",
   "proceso",
   "contact",
   "faq",
@@ -53,7 +55,7 @@ export function changedKeys(content: ManagedContent, saved: ManagedContent): Man
 }
 
 interface Props {
-  sections: { key: string; label: string; hint: string }[];
+  sections: { key: string; label: string; hint: string; defaultHidden?: boolean }[];
   initialVisible: Record<string, boolean>;
   initialContent: ManagedContent;
   defaults: ManagedContent; // textos recomendados vigentes (defaultSiteConfig().content)
@@ -117,7 +119,7 @@ export function ConfigEditor({ sections, initialVisible, initialContent, default
                 </span>
                 <input
                   type="checkbox"
-                  checked={visible[s.key] ?? true}
+                  checked={visible[s.key] ?? !s.defaultHidden}
                   onChange={(e) => setVisible((v) => ({ ...v, [s.key]: e.target.checked }))}
                   className="h-5 w-5 accent-brand"
                 />
@@ -134,6 +136,7 @@ export function ConfigEditor({ sections, initialVisible, initialContent, default
         <EnfoqueEditor {...bind("enfoque")} />
         <ServiciosEditor {...bind("servicios")} />
         <CasosEditor {...bind("casos")} />
+        <CifrasEditor {...bind("cifras")} />
         <ProcesoEditor {...bind("proceso")} />
         <ContactEditor {...bind("contact")} />
         <FaqEditor {...bind("faq")} />

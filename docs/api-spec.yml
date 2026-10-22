@@ -163,7 +163,7 @@ paths:
                 visible:
                   type: object
                   additionalProperties: { type: boolean }
-                  description: "Claves de SECTIONS: hero, confianza, problema, resultados, enfoque, servicios, casos, proceso, contacto, faq, cierre, nosotros, equipo"
+                  description: "Claves de SECTIONS: hero, confianza, problema, resultados, enfoque, servicios, casos, cifras, proceso, contacto, faq, cierre, nosotros, equipo"
                   example: { hero: true, problema: true, resultados: false }
                 content:
                   $ref: "#/components/schemas/SiteContentPartial"
@@ -510,6 +510,20 @@ components:
               items:
                 type: object
                 properties: { title: { type: string }, body: { type: string } }
+        cifras:
+          type: object
+          description: "Cifras de resultados (cambio cifras-con-respaldo). Oculta por defecto (visible.cifras = false)"
+          properties:
+            items:
+              type: array
+              description: "Solo se publican las que tienen valor, texto y fuente; máximo 4"
+              items:
+                type: object
+                properties:
+                  valor: { type: string, example: "Mismo día" }
+                  texto: { type: string, example: "en responder cotizaciones" }
+                  fuente: { type: string, example: "Piloto con cliente de O&A, 2026" }
+            frase: { type: string, description: "Se muestra sin cifras válidas; guardada vacía, la sección no se renderiza" }
         proceso:
           type: object
           description: "Cómo trabajamos (ancla #modelo)"

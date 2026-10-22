@@ -6,6 +6,7 @@ import { Approach } from "@/components/landing/Approach";
 import { Services } from "@/components/landing/Services";
 import { Process } from "@/components/landing/Process";
 import { UseCases } from "@/components/landing/UseCases";
+import { Metrics } from "@/components/landing/Metrics";
 import { ContactForm } from "@/components/landing/ContactForm";
 import { Faq } from "@/components/landing/Faq";
 import { FinalCta } from "@/components/landing/FinalCta";
@@ -41,6 +42,7 @@ export default async function HomePage() {
         {visible.enfoque && <Approach content={content.enfoque} />}
         {visible.servicios && <Services content={content.servicios} />}
         {visible.casos && <UseCases content={content.casos} />}
+        {visible.cifras && <Metrics content={content.cifras} spaced={!visible.casos} />}
         {visible.proceso && <Process content={content.proceso} />}
         {visible.contacto && (
           <ContactForm
