@@ -151,7 +151,9 @@ describe("defaults de la HDU-08", () => {
     ]);
     expect(c.proceso.items.map((i) => i.title)).toEqual(["Conversamos", "Ordenamos y proponemos", "Lo dejamos funcionando", "Medimos y mejoramos"]);
     expect(c.proceso.items[3].body + c.proceso.items[3].recibes).not.toMatch(/horas/i);
-    expect(c.casos.subtitle).toBe("Ejemplos reales de lo que dejamos funcionando en empresas como la tuya.");
+    // Cambio casos-por-rubro (delta MODIFIED de contenido-pyme): encabezado por rubro, sin bajada.
+    expect(c.casos.title).toBe("Esto es lo que dejamos funcionando en negocios como el tuyo");
+    expect(c.casos.subtitle).toBe("");
   });
 
   // Decisión 7 (+ "pyme(s)", 2026-10-22). "Make" e "IA" se buscan con mayúsculas exactas.

@@ -150,6 +150,18 @@ export const metricsLabels = {
   source: "Fuente: ",
 };
 
+// Ejemplos por rubro (cambio casos-por-rubro): textos fijos del filtro. Las etiquetas de cada rubro vienen de
+// INDUSTRIES (lib/leadOptions.ts), las mismas del formulario.
+export const casesLabels = {
+  all: "Todos", // chip que muestra todos los casos
+  forAll: "Para todos", // etiqueta de los casos sin rubro
+  filterGroup: "Filtrar ejemplos por rubro", // nombre del grupo de chips para lectores de pantalla
+  showing: "Mostrando",
+  one: "ejemplo",
+  many: "ejemplos",
+  of: "de",
+};
+
 // ── Sección de contacto: formulario de 2 pasos (cambio formulario-minimo-consentimiento, design.md decisión 4) ──
 // Textos fijos (no CMS en este cambio). Las opciones y los textos de consentimiento viven en lib/leadOptions.ts.
 export const contactSection = {

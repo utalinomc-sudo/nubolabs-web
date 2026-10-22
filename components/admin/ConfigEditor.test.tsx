@@ -235,6 +235,48 @@ describe("ConfigEditor", () => {
     expect(within(contacto).getByText(/no se mostrará/)).toBeInTheDocument();
   });
 
+  // Cambio casos-por-rubro: rubro por caso, casos nuevos "Para todos" y textos recomendados con los 14 casos.
+  it("casos: cada caso tiene texto principal, detalle y rubro; al cambiar el rubro se envía solo content.casos", async () => {
+    const { fetchMock, lastBody } = renderEditor();
+    const casos = screen.getByRole("region", { name: "Ejemplos" });
+    const rubros = within(casos).getAllByRole("combobox", { name: "Rubro" });
+    expect(rubros).toHaveLength(14);
+    expect(within(rubros[0]).getAllByRole("option").map((o) => o.textContent)).toEqual([
+      "Para todos",
+      "Gastronomía",
+      "Automotriz",
+      "Construcción",
+      "Servicios profesionales",
+      "Comercio",
+    ]);
+    expect(rubros[0]).toHaveValue("todos");
+    expect(rubros[3]).toHaveValue("gastronomia");
+    expect(within(casos).getAllByRole("textbox", { name: "Texto principal" })[0]).toHaveValue(defaultSiteConfig().content.casos.items[0].title);
+    expect(within(casos).getAllByRole("textbox", { name: "Detalle (opcional)" })).toHaveLength(14);
+
+    fireEvent.change(rubros[0], { target: { value: "comercio" } });
+    await save(fetchMock, 1);
+    expect(Object.keys(lastBody().content)).toEqual(["casos"]);
+    expect(lastBody().content.casos.items[0]).toEqual({ ...defaultSiteConfig().content.casos.items[0], rubro: "comercio" });
+  });
+
+  it("casos: uno nuevo parte 'Para todos' y los textos recomendados reponen los 14 sin guardar", () => {
+    const { fetchMock } = renderEditor();
+    const casos = screen.getByRole("region", { name: "Ejemplos" });
+    fireEvent.click(within(casos).getByRole("button", { name: /Agregar ejemplo/ }));
+    const rubros = within(casos).getAllByRole("combobox", { name: "Rubro" });
+    expect(rubros).toHaveLength(15);
+    expect(rubros[14]).toHaveValue("todos");
+    fireEvent.change(rubros[3], { target: { value: "automotriz" } });
+
+    fireEvent.click(within(casos).getByRole("button", { name: "Usar los textos recomendados" }));
+    const repuestos = within(casos).getAllByRole("combobox", { name: "Rubro" });
+    expect(repuestos).toHaveLength(14);
+    expect(repuestos[3]).toHaveValue("gastronomia");
+    expect(within(casos).getByText(NOTICE)).toBeInTheDocument();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("restablecer Servicios guardados con la forma antigua envía la sección completa con el destacado", async () => {
     const base = defaultSiteConfig().content;
     const viejo = { ...base, servicios: { ...base.servicios, title: "Vendemos resultados", items: [{ title: "Sistemas y agentes IA", body: "x", result: "y" }] } };

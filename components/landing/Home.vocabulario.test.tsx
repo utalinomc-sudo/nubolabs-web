@@ -63,7 +63,7 @@ describe("portada: vocabulario", () => {
     root.querySelectorAll("[data-nota-tecnica]").forEach((n) => n.remove());
     const text = visibleText(root);
     // El barrido no es vacío: incluye menú, panel del hero, secciones, rótulos fijos, formulario y pie.
-    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "Nuestro compromiso contigo", "Medimos cada proyecto", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por una conversación", "Hecho en Chile"]) {
+    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "Nuestro compromiso contigo", "Medimos cada proyecto", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por una conversación", "Hecho en Chile", "Para todos", "Servicios profesionales"]) {
       expect(text).toContain(s);
     }
     expect([...(text.match(FORBIDDEN_CI) ?? []), ...(text.match(FORBIDDEN_CS) ?? [])]).toEqual([]);

@@ -1,11 +1,11 @@
 ## Purpose
 
-Define cómo la portada de nubolabs.cl muestra ejemplos concretos de lo que Nubolabs deja funcionando, clasificados por rubro y filtrables, para que un dueño de pyme encuentre en segundos uno que suene a su negocio.
+Define cómo la portada de nubolabs.cl muestra ejemplos concretos de lo que Nubolabs deja funcionando, clasificados por rubro y filtrables, para que un dueño de negocio encuentre en segundos uno que suene a su negocio.
 
 ## ADDED Requirements
 
 ### Requirement: Casos con rubro
-Cada caso SHALL tener un texto principal, un texto secundario opcional y un rubro. El rubro SHALL ser "todos" o uno de los rubros de la lista compartida con el formulario de contacto, excepto "otro": gastronomía, automotriz, construcción, servicios profesionales o comercio. Un caso guardado sin rubro, con un rubro desconocido o con "otro" SHALL tratarse como "todos". Los casos sin texto principal MUST NOT mostrarse.
+Cada caso SHALL tener un texto principal, un texto secundario opcional y un rubro. El rubro SHALL ser "todos" o uno de los rubros de la lista compartida con el formulario de contacto, excepto "otro": gastronomía, automotriz, construcción, servicios profesionales o comercio. Un caso guardado sin rubro, con un rubro desconocido o con "otro" SHALL tratarse como "todos". Los casos sin texto principal MUST NOT mostrarse. Como en las demás listas de largo variable de la portada (`landing/contenido-pyme`), si lo guardado no es una lista o no queda ningún caso con texto principal, SHALL mostrarse la lista por defecto; se muestran como máximo 18 casos.
 
 #### Scenario: Caso antiguo sin rubro
 - **WHEN** `config/site.content.casos.items` trae `{ title: "Cobranzas y seguimiento", body: "…" }` sin `rubro`
@@ -15,8 +15,16 @@ Cada caso SHALL tener un texto principal, un texto secundario opcional y un rubr
 - **WHEN** un caso trae `rubro: "mineria"`
 - **THEN** se trata como "todos"
 
+#### Scenario: Sin casos válidos
+- **WHEN** el CMS trae una lista de casos vacía o solo con casos sin texto
+- **THEN** la sección muestra los casos por defecto; para ocultarla se usa su casilla de visibilidad en el admin
+
+#### Scenario: Texto principal invisible
+- **WHEN** un caso trae como texto principal solo espacios o caracteres invisibles (por ejemplo, un espacio de ancho cero)
+- **THEN** ese caso no se muestra ni cuenta para los chips
+
 ### Requirement: Casos por defecto
-Sin casos en el CMS, la sección SHALL mostrar los 14 casos por defecto: para todos "La información del mes le llega sola a tu contador.", "Cobranza con recordatorios amables y automáticos." y "Cotizaciones listas el mismo día."; gastronomía "Reservas y consultas por WhatsApp respondidas al instante, incluso de noche.", "Pedidos a proveedores según lo que de verdad queda en bodega." y "Ventas del día y costo de insumos en tu celular al cierre."; automotriz "Presupuestos de repuestos y mano de obra que se arman solos." y "Aviso al cliente cuando su auto está listo y recordatorio de su próxima mantención."; construcción "Estados de pago y documentos de obra ordenados y enviados a tiempo." y "Gastos por obra al día, sin copiar facturas a mano."; servicios profesionales "Plazos y vencimientos que nadie olvida, con aviso al responsable." e "Informes a clientes que se preparan solos desde tus datos."; comercio "Stock y ventas al día, con aviso antes de quedarte sin producto." y "Clientes que vuelven con mensajes según lo que compraron." El encabezado por defecto SHALL ser el eyebrow "EJEMPLOS POR RUBRO" y el título "Esto es lo que dejamos funcionando en negocios como el tuyo". Los textos por defecto MUST NOT contener "n8n", "Make", "API", "CRM", "ERP", "IA" ni "horas".
+Sin casos en el CMS, la sección SHALL mostrar los 14 casos por defecto: para todos "La información del mes le llega sola a tu contador.", "Cobranza con recordatorios amables y automáticos." y "Cotizaciones listas el mismo día."; gastronomía "Reservas y consultas por WhatsApp respondidas al instante, incluso de noche.", "Pedidos a proveedores según lo que de verdad queda en bodega." y "Ventas del día y costo de insumos en tu celular al cierre."; automotriz "Presupuestos de repuestos y mano de obra que se arman solos." y "Aviso al cliente cuando su auto está listo y recordatorio de su próxima mantención."; construcción "Estados de pago y documentos de obra ordenados y enviados a tiempo." y "Gastos por obra al día, sin copiar facturas a mano."; servicios profesionales "Plazos y vencimientos que nadie olvida, con aviso al responsable." e "Informes a clientes que se preparan solos desde tus datos."; comercio "Stock y ventas al día, con aviso antes de quedarte sin producto." y "Clientes que vuelven con mensajes según lo que compraron." El encabezado por defecto SHALL ser la etiqueta "Ejemplos por rubro" (se muestra en mayúsculas, como las demás etiquetas de sección) y el título "Esto es lo que dejamos funcionando en negocios como el tuyo", sin bajada. Los textos por defecto MUST NOT contener "n8n", "Make", "API", "CRM", "ERP", "IA" ni "horas".
 
 #### Scenario: Portada sin casos en el CMS
 - **WHEN** `config/site` no trae `content.casos.items`
@@ -27,7 +35,7 @@ Sin casos en el CMS, la sección SHALL mostrar los 14 casos por defecto: para to
 - **THEN** no aparece ninguna de las palabras prohibidas
 
 ### Requirement: Filtro por rubro
-La sección SHALL mostrar un chip "Todos", seleccionado al cargar, y un chip por cada rubro con al menos un caso, en el orden de la lista de rubros. Al elegir un rubro SHALL mostrar solo los casos de ese rubro y los "todos", manteniendo su orden; al elegir "Todos" SHALL mostrar todos los casos. El chip elegido SHALL indicar su estado presionado a tecnologías de asistencia, y el cambio de resultados SHALL anunciarse con un texto como "Mostrando 6 ejemplos de Gastronomía". El filtro MUST NOT cambiar la URL ni recargar la página.
+La sección SHALL mostrar un chip "Todos", seleccionado al cargar, y un chip por cada rubro con al menos un caso, en el orden de la lista de rubros. Si hay menos de dos rubros con casos (por ejemplo, todos son "para todos" o son de un solo rubro), los chips MUST NOT mostrarse, porque elegir un rubro no cambiaría lo que se ve. Pulsar de nuevo el chip de un rubro ya elegido SHALL volver a "Todos". Al elegir un rubro SHALL mostrar solo los casos de ese rubro y los "todos", manteniendo su orden; al elegir "Todos" SHALL mostrar todos los casos. El chip elegido SHALL indicar su estado presionado a tecnologías de asistencia, y el cambio de resultados SHALL anunciarse con un texto como "Mostrando 6 ejemplos de Gastronomía". El filtro MUST NOT cambiar la URL ni recargar la página.
 
 #### Scenario: Elegir un rubro
 - **WHEN** con los casos por defecto el visitante elige "Automotriz"
@@ -38,15 +46,23 @@ La sección SHALL mostrar un chip "Todos", seleccionado al cargar, y un chip por
 - **THEN** vuelven a verse los 14 casos
 
 #### Scenario: Chips de rubros sin casos
-- **WHEN** el CMS solo trae casos de gastronomía y para todos
-- **THEN** solo aparecen los chips "Todos" y "Gastronomía"
+- **WHEN** el CMS solo trae casos de gastronomía, de comercio y para todos
+- **THEN** solo aparecen los chips "Todos", "Gastronomía" y "Comercio"
 
-#### Scenario: Sin casos válidos
-- **WHEN** el CMS trae una lista de casos vacía o solo con casos sin texto
-- **THEN** la sección no se muestra
+#### Scenario: Solo casos para todos
+- **WHEN** el CMS trae casos sin rubro (por ejemplo, los guardados antes de este cambio)
+- **THEN** se muestran todos con la etiqueta "Para todos" y sin chips de filtro
+
+#### Scenario: Un solo rubro
+- **WHEN** el CMS solo trae casos de gastronomía y para todos
+- **THEN** se muestran todos, cada uno con su etiqueta, y sin chips de filtro
+
+#### Scenario: Soltar el chip elegido
+- **WHEN** con "Gastronomía" elegido el visitante vuelve a pulsar "Gastronomía"
+- **THEN** queda presionado "Todos" y se ven todos los casos
 
 ### Requirement: Edición desde el admin
-En `/admin/config`, el editor de Casos SHALL permitir, por caso, editar texto principal, texto secundario y rubro (selector con "Para todos" y los 5 rubros), además de agregar y quitar casos. El botón "Usar los textos recomendados" SHALL cargar en el formulario el encabezado y los 14 casos por defecto, reemplazando los del formulario sin guardar. Los cambios guardados SHALL verse en la portada en la siguiente carga, sin despliegue.
+En `/admin/config`, el editor de Casos SHALL permitir, por caso, editar texto principal, texto secundario y rubro (selector con "Para todos" y los 5 rubros), además de agregar y quitar casos (entre 1 y 18; uno nuevo parte como "Para todos"). El botón "Usar los textos recomendados" SHALL cargar en el formulario el encabezado y los 14 casos por defecto, reemplazando los del formulario sin guardar. Los cambios guardados SHALL verse en la portada en la siguiente carga, sin despliegue.
 
 #### Scenario: Selector de rubro
 - **WHEN** el admin cambia el rubro de un caso a "Comercio" y guarda

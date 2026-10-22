@@ -1,5 +1,6 @@
 // Configuración pura del sitio: tipos, secciones, defaults y mezcla con lo guardado en Firestore (config/site).
 // Sin "server-only" para poder usarla en tests y en el admin (cliente). La lectura de Firestore vive en lib/site.ts.
+import { INDUSTRIES, type IndustryKey } from "@/lib/leadOptions";
 
 // ── Tipos ────────────────────────────────────────────────────────────
 export interface ServiceItem {
@@ -7,9 +8,16 @@ export interface ServiceItem {
   body: string;
   result: string; // se muestra como "lo que ganas"
 }
+// Rubro de un caso (cambio casos-por-rubro, design.md decisión 1): los del formulario de contacto sin "otro", o "todos".
+export type CaseRubroKey = Exclude<IndustryKey, "otro">;
+export type CaseRubro = CaseRubroKey | "todos";
+export const CASE_RUBROS = INDUSTRIES.filter(
+  (i): i is { key: CaseRubroKey; label: string } => i.key !== "otro",
+) as readonly { key: CaseRubroKey; label: string }[];
 export interface CaseItem {
-  title: string;
-  body: string;
+  title: string; // texto principal (la frase del caso)
+  body: string; // detalle opcional
+  rubro: CaseRubro;
 }
 export interface TextItem {
   title: string;
@@ -112,7 +120,7 @@ export const SECTIONS: { key: string; label: string; hint: string; defaultHidden
   { key: "resultados", label: "Lo que ganas", hint: "Los 4 resultados para tu negocio" },
   { key: "enfoque", label: "Enfoque", hint: "Primero ordenamos, después automatizamos" },
   { key: "servicios", label: "Servicios", hint: "Qué hacemos por tu negocio" },
-  { key: "casos", label: "Ejemplos", hint: "Ejemplos concretos" },
+  { key: "casos", label: "Ejemplos", hint: "Ejemplos por rubro con filtro" },
   { key: "cifras", label: "Cifras de resultados", hint: "Oculta hasta tener datos reales con fuente", defaultHidden: true },
   { key: "proceso", label: "Cómo trabajamos", hint: "Los 4 pasos y lo que recibes" },
   { key: "contacto", label: "Contacto", hint: "Formulario de contacto del home" },
@@ -254,18 +262,26 @@ export function defaultSiteConfig(): SiteConfig {
         notaTecnica:
           "**Cómo lo hacemos:** con herramientas probadas de automatización e inteligencia artificial (como n8n y Make), conectadas a lo que ya usas: WhatsApp, correo, Excel o Google Sheets y tu sistema de facturación. Sin cambiar tus sistemas.",
       },
-      // Casos sin jerga (design.md decisión 6, tabla de HDU-02). El rediseño por rubro es HDU-05.
+      // Casos por rubro (cambio casos-por-rubro, HDU-08 §4): una frase por caso, sin detalle y sin bajada.
       casos: {
-        eyebrow: "Ejemplos",
-        title: "Ejemplos concretos",
-        subtitle: "Ejemplos reales de lo que dejamos funcionando en empresas como la tuya.",
+        eyebrow: "Ejemplos por rubro",
+        title: "Esto es lo que dejamos funcionando en negocios como el tuyo",
+        subtitle: "",
         items: [
-          { title: "Correos ordenados solos", body: "Se clasifican y responden sin que nadie los revise uno por uno." },
-          { title: "Cotizaciones e informes listos", body: "Documentos y minutas que se arman solos desde tus datos." },
-          { title: "Cobranzas al día", body: "Recordatorios de pago y seguimiento a clientes que salen a tiempo, sin planillas." },
-          { title: "Tus números en un reporte", body: "Ventas, gastos y pendientes en un reporte que te llega solo." },
-          { title: "Respuestas automáticas por WhatsApp y correo", body: "Consultas, reservas y pedidos respondidos al instante, incluso de noche." },
-          { title: "Solicitudes y aprobaciones sin cadenas de correos", body: "Cada solicitud llega a quien la aprueba y sabes en qué va." },
+          { title: "La información del mes le llega sola a tu contador.", body: "", rubro: "todos" },
+          { title: "Cobranza con recordatorios amables y automáticos.", body: "", rubro: "todos" },
+          { title: "Cotizaciones listas el mismo día.", body: "", rubro: "todos" },
+          { title: "Reservas y consultas por WhatsApp respondidas al instante, incluso de noche.", body: "", rubro: "gastronomia" },
+          { title: "Pedidos a proveedores según lo que de verdad queda en bodega.", body: "", rubro: "gastronomia" },
+          { title: "Ventas del día y costo de insumos en tu celular al cierre.", body: "", rubro: "gastronomia" },
+          { title: "Presupuestos de repuestos y mano de obra que se arman solos.", body: "", rubro: "automotriz" },
+          { title: "Aviso al cliente cuando su auto está listo y recordatorio de su próxima mantención.", body: "", rubro: "automotriz" },
+          { title: "Estados de pago y documentos de obra ordenados y enviados a tiempo.", body: "", rubro: "construccion" },
+          { title: "Gastos por obra al día, sin copiar facturas a mano.", body: "", rubro: "construccion" },
+          { title: "Plazos y vencimientos que nadie olvida, con aviso al responsable.", body: "", rubro: "servicios" },
+          { title: "Informes a clientes que se preparan solos desde tus datos.", body: "", rubro: "servicios" },
+          { title: "Stock y ventas al día, con aviso antes de quedarte sin producto.", body: "", rubro: "comercio" },
+          { title: "Clientes que vuelven con mensajes según lo que compraron.", body: "", rubro: "comercio" },
         ],
       },
       // Sin cifras de ejemplo: solo datos reales con su fuente, cargados desde el admin.
@@ -456,6 +472,15 @@ const mergeTitle: MergeItem<{ title: string }> = (raw, fb) => ({ title: pickTrim
 const mergeTextItem: MergeItem<TextItem> = (raw, fb) => ({
   title: pickTrim(raw.title, fb.title),
   body: pickTrim(raw.body, fb.body),
+});
+// Rubro guardado → rubro válido; ausente, desconocido u "otro" → "todos" (cambio casos-por-rubro, decisión 2).
+export function normalizeCaseRubro(value: unknown): CaseRubro {
+  return CASE_RUBROS.some((r) => r.key === value) ? (value as CaseRubroKey) : "todos";
+}
+const mergeCase: MergeItem<CaseItem> = (raw, fb) => ({
+  title: pickTrim(raw.title, fb.title),
+  body: pickTrim(raw.body, fb.body),
+  rubro: normalizeCaseRubro(raw.rubro),
 });
 const mergeService: MergeItem<ServiceItem> = (raw, fb) => ({
   title: pickTrim(raw.title, fb.title),
@@ -666,7 +691,10 @@ export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): Si
         eyebrow: pickText(casos.eyebrow, b.casos.eyebrow),
         title: pickText(casos.title, b.casos.title),
         subtitle: pickText(casos.subtitle, b.casos.subtitle),
-        items: mergeList(casos.items, b.casos.items, { min: 1, max: 12 }, mergeTextItem, { title: "", body: "" }),
+        // Un caso vale si su texto principal tiene letras o números (sin invisibles ni solo signos; revisión adversarial).
+        items: mergeList(casos.items, b.casos.items, { min: 1, max: 18 }, mergeCase, { title: "", body: "", rubro: "todos" }, (raw) =>
+          hasContent(pickTrim(raw.title, "")),
+        ),
       },
       cifras: {
         items: normalizeCifras(cifras.items),

@@ -38,13 +38,13 @@ app/
   admin/(panel)/layout.tsx  server: redirect a /admin/login si no hay sesión; sidebar
   admin/(panel)/{page,leads,leads/[id],config,equipo}/page.tsx
 components/
-  landing/   Nav (client), Hero, HeroPanel (client), Trust, MiniQuote, SectionHead, Problem, Results, Approach, Services, UseCases, Metrics, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
+  landing/   Nav (client), Hero, HeroPanel (client), Trust, MiniQuote, SectionHead, Problem, Results, Approach, Services, UseCases (+ UseCasesFilter client y casesFilter.ts), Metrics, Process, ContactForm (client, 2 pasos, prop `aside`), ContactSuccess (client), WhatsappCard, Faq, FinalCta, StickyCta (client), Footer
   diagnostico/  DiagnosticoFlow.tsx (client), AhorroEstimator.tsx (client), cuestionario.ts, ahorro.ts
   admin/     ConfigEditor (contenedor de /admin/config), TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
-  admin/config/  Field, SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Confianza, Problema, Resultados, Enfoque, Servicios, Casos, Cifras, Proceso, Contact, Faq, Cierre, Nosotros, Privacidad)
+  admin/config/  Field (+ SelectField), SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Confianza, Problema, Resultados, Enfoque, Servicios, Casos, Cifras, Proceso, Contact, Faq, Cierre, Nosotros, Privacidad)
   Logo.tsx (Logo, LogoMark) · icons.tsx · LinkedInIcon.tsx
-lib/content.ts      textos fijos fuera del CMS (nav, trustLabels, metricsLabels, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, contactSection, contact, ctaNote, footerLinks, whatsappCard, newTabNote)
-lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig() (todos los textos editables por defecto), mergeConfig(), mergeFixedList(), mergeList(), normalizeTags(), renderHighlight(), normalizeContact(), formatWhatsapp(), whatsappLink(), normalizeTestimonios(), pickTestimonios(), contactQuote(), initials(), normalizeCifras(), visibleCifras(), hasContent()  (puro: tests y admin)
+lib/content.ts      textos fijos fuera del CMS (nav, trustLabels, metricsLabels, casesLabels, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, contactSection, contact, ctaNote, footerLinks, whatsappCard, newTabNote)
+lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig() (todos los textos editables por defecto), mergeConfig(), mergeFixedList(), mergeList(), normalizeTags(), renderHighlight(), normalizeContact(), formatWhatsapp(), whatsappLink(), normalizeTestimonios(), pickTestimonios(), contactQuote(), initials(), normalizeCifras(), visibleCifras(), hasContent(), CASE_RUBROS, normalizeCaseRubro()  (puro: tests y admin)
 lib/inlineLinks.ts  parseInlineLinks(): enlaces internos [texto](/ruta) en textos del CMS, sin HTML  (puro)
 lib/qrSvg.ts        qrPath()/qrSvg(): código QR dibujado en el servidor con qrcode-generator
 lib/brandColors.ts  colores de marca que se necesitan como valor (NAVY_950); tailwind.config.ts los importa
@@ -119,6 +119,7 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 | Sección con contenido del CMS y fallback a defaults | `components/landing/Hero.tsx` |
 | Formulario cliente con estados y manejo de `{ error }` | `components/landing/ContactForm.tsx` |
 | Flujo multi-paso con cálculo puro separado | `components/diagnostico/DiagnosticoFlow.tsx` + `ahorro.ts` / `cuestionario.ts` |
+| Filtro en el cliente con lógica pura testeada (el servidor entrega todo; sin JavaScript se ve completo) | `components/landing/UseCases.tsx` (server) + `UseCasesFilter.tsx` (client) + `casesFilter.ts` |
 | Editor del admin que hace POST y refresca | `components/admin/TeamEditor.tsx`, `ConfigEditor.tsx` |
 | Acción destructiva con confirmación escrita | `components/admin/DeleteLeadButton.tsx` |
 | Nav cliente con visibilidad por props | `components/landing/Nav.tsx` |

@@ -17,7 +17,7 @@ La sección de casos de uso es genérica ("Correos con IA", "Portales internos")
 - `landing/casos-por-rubro`: ejemplos de lo que Nubolabs deja funcionando, clasificados por rubro y filtrables en la portada, editables desde el CMS.
 
 ### Modified Capabilities
-<!-- Ninguna: no hay specs vigentes de la landing. -->
+- `landing/contenido-pyme` (*ajuste del apply*): "Textos de los Casos sin jerga" fijaba la bajada por defecto de HDU-02; ahora el encabezado por defecto es el de `landing/casos-por-rubro`, sin bajada.
 
 ## Non-goals
 
@@ -50,7 +50,7 @@ La sección de casos de uso es genérica ("Correos con IA", "Portales internos")
 
 ## Impact
 
-- **Código:** `lib/siteConfig.ts` (+ `lib/siteConfig.test.ts`), `lib/content.ts` (`useCases` → 14 casos por defecto), `components/landing/casesFilter.ts` (nuevo, + `casesFilter.test.ts`), `components/landing/UseCases.tsx` (server, rediseño), `components/landing/UseCasesFilter.tsx` (nuevo, cliente), `components/icons.tsx` (íconos de rubro), el editor de la sección Casos en `components/admin/`.
+- **Código:** `lib/siteConfig.ts` (14 casos por defecto en `defaultSiteConfig()`, + `lib/siteConfig.casos.test.ts`), `lib/content.ts` (`casesLabels`), `components/landing/casesFilter.ts` (nuevo, + `casesFilter.test.ts`), `components/landing/UseCases.tsx` (server, rediseño), `components/landing/UseCasesFilter.tsx` (nuevo, cliente), `components/landing/Metrics.tsx` (la banda de cifras deja de continuar la de Ejemplos), `components/icons.tsx` (íconos de rubro), `components/admin/config/CasosEditor.tsx` y `Field.tsx` (`SelectField`).
 - **API y datos:** sin endpoints nuevos ni cambios en `app/api/**`. `config/site.content.casos.items[]` gana `rubro`; `POST /api/admin/config` ya lo acepta.
 - **Variables de entorno:** ninguna.
 - **Documentos a actualizar** (`docs/documentation-standards.md` §3): `docs/data-model.md` (`casos.items[].rubro` y sus valores), `docs/api-spec.yml` (`SiteContentPartial.casos.items[].rubro`), `docs/ESTADO-PROYECTO.md`, estado de HDU-05 en `docs/backlog/prospectos-oa.md`.

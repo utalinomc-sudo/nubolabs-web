@@ -222,6 +222,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 ## HDU-05 · Casos de uso reconocibles por rubro
 
+**Estado (2026-10-22):** implementada en la rama `feature/casos-por-rubro`, en preview; pendiente de aprobación y mezcla.
+
 **Cambio OpenSpec:** `casos-por-rubro` · Fase 2 · Tamaño M · Depende de HDU-02
 
 ### Original
@@ -258,6 +260,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 **Archivos previstos.** `lib/site.ts` (tipo, defaults, merge, constante de rubros compartida con HDU-03), `lib/content.ts`, `components/landing/UseCases.tsx` (+ `UseCasesFilter.tsx` cliente), `components/admin/ConfigEditor.tsx`, `docs/data-model.md`, `docs/api-spec.yml`.
 
 **Riesgos.** Demasiados chips en móvil: máximo 6, con scroll horizontal si no caben.
+
+**Ajustes al implementar (2026-10-22).** Los chips pasan a varias líneas (sin scroll horizontal, que la spec prohíbe) y solo aparecen con 2 o más rubros con casos. "Sin saltos de layout": el servidor entrega todos los casos con "Todos" elegido, así que la carga no se reacomoda; al filtrar, la grilla se acorta a propósito. Detalle en `openspec/changes/casos-por-rubro/design.md`.
 
 ---
 
@@ -372,11 +376,11 @@ Claude crea propuesta, diseño y tareas; Mauro revisa; `/opsx:apply`; verificaci
 | HDU | Estado |
 |---|---|
 | HDU-01 mensaje-principal-pyme | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-mensaje-principal-pyme/`, spec `openspec/specs/landing/hero/`). Revisión adversarial con sus 2 Major corregidos; sin "Para dueños de pymes" (decisión del mismo día). Pendiente post-merge (Mauro): `/admin/config` → Hero → "Usar los textos recomendados" → "Guardar cambios" |
-| HDU-02 lenguaje-sin-jerga | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-02 lenguaje-sin-jerga | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-lenguaje-sin-jerga/`, spec `openspec/specs/landing/contenido-pyme/`) |
 | HDU-03 formulario-minimo-consentimiento | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-formulario-minimo-consentimiento/`, specs `openspec/specs/leads/formulario-contacto/` y `openspec/specs/sitio/privacidad/`). Revisión adversarial con su Major corregido; incluye el detalle escrito de "Otra cosa" y del rubro "Otro" (70 caracteres). Pendiente post-merge (Mauro): `NEXT_PUBLIC_SCHEDULE_URL` en Vercel cuando exista la agenda, lead de prueba (revisarlo y borrarlo) y validación legal de `/privacidad` antes del 1-dic-2026 |
-| HDU-04 confianza-recomendacion | en curso: artefactos OpenSpec creados (2026-10-21) |
-| HDU-05 casos-por-rubro | en curso: artefactos OpenSpec creados (2026-10-21) |
-| HDU-06 cifras-con-respaldo | en curso: artefactos OpenSpec creados (2026-10-21) |
+| HDU-04 confianza-recomendacion | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-confianza-recomendacion/`, spec `openspec/specs/landing/confianza/`) |
+| HDU-05 casos-por-rubro | en preview (2026-10-22): implementada en `feature/casos-por-rubro`; pendiente de aprobación y mezcla |
+| HDU-06 cifras-con-respaldo | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-cifras-con-respaldo/`, spec `openspec/specs/landing/cifras/`) |
 | HDU-07 landing-referidos-oa | en curso: artefactos OpenSpec creados (2026-10-21) |
 | HDU-09 diagnostico-mapa-oportunidades | en curso: artefactos OpenSpec creados (2026-10-21) |
-| HDU-10 cierre-landing-faq-cta | en curso: artefactos OpenSpec creados (2026-10-21); actualizados el 2026-10-22 con el WhatsApp de contacto configurable (`content.contact`, apagado por defecto; HDU-08 §14 fila 8) |
+| HDU-10 cierre-landing-faq-cta | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-cierre-landing-faq-cta/`, spec `openspec/specs/landing/cierre/`) |

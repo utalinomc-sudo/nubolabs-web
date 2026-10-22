@@ -217,3 +217,48 @@ export const IconGrid = ({ className }: P) => (
 
 // Ícono de cada compromiso del bloque de confianza, por posición.
 export const promiseIcons = [IconCalendar, IconGrid, IconShield];
+
+// ── Íconos de rubro de "Ejemplos por rubro" (cambio casos-por-rubro); "para todos" usa IconGrid ──
+export const IconUtensils = ({ className }: P) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <path {...stroke} d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+    <path {...stroke} d="M7 2v20" />
+    <path {...stroke} d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+  </svg>
+);
+
+export const IconCar = ({ className }: P) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <path
+      {...stroke}
+      d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"
+    />
+    <circle {...stroke} cx="7" cy="17" r="2" />
+    <path {...stroke} d="M9 17h6" />
+    <circle {...stroke} cx="17" cy="17" r="2" />
+  </svg>
+);
+
+export const IconBuilding = ({ className }: P) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <path {...stroke} d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z" />
+    <path {...stroke} d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" />
+    <path {...stroke} d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2" />
+    <path {...stroke} d="M10 6h4M10 10h4M10 14h4M10 18h4" />
+  </svg>
+);
+
+export const IconBriefcase = ({ className }: P) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <path {...stroke} d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+    <rect {...stroke} width="20" height="14" x="2" y="6" rx="2" />
+  </svg>
+);
+
+export const IconBag = ({ className }: P) => (
+  <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+    <path {...stroke} d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+    <path {...stroke} d="M3 6h18" />
+    <path {...stroke} d="M16 10a4 4 0 0 1-8 0" />
+  </svg>
+);

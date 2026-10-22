@@ -23,6 +23,13 @@ describe("Metrics", () => {
     expect(screen.queryByText(frase)).toBeNull();
   });
 
+  // Cambio casos-por-rubro (design.md decisión 6): Ejemplos pasó a fondo claro, así que la banda ya no lo continúa.
+  it("con cifras es una banda navy propia, con espacio arriba y abajo y sin línea superior", () => {
+    render(<Metrics content={{ items: [c("Mismo día")], frase }} />);
+    expect(screen.getByRole("region", { name: "Resultados medibles" })).toHaveClass("bg-navy", "py-16", "lg:py-20");
+    expect(screen.getByRole("list")).not.toHaveClass("border-t");
+  });
+
   it("sin cifras válidas muestra solo la frase", () => {
     render(<Metrics content={{ items: [c("Sin fuente", "")], frase }} />);
     expect(screen.getByText(frase)).toBeInTheDocument();

@@ -46,6 +46,32 @@ export function Field({
   );
 }
 
+// Selector con etiqueta (rubro de cada caso, cambio casos-por-rubro), con el mismo estilo que Field.
+export function SelectField<V extends string>({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: V;
+  onChange: (v: V) => void;
+  options: readonly { value: V; label: string }[];
+}) {
+  return (
+    <label className="block">
+      <span className="text-[13px] font-semibold text-ink-soft">{label}</span>
+      <select className="field mt-1.5" value={value} onChange={(e) => onChange(e.target.value as V)}>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
 // Fila de dos campos lado a lado (etiqueta + título, por ejemplo).
 export function FieldRow({ children }: { children: ReactNode }) {
   return <div className="grid gap-4 sm:grid-cols-2">{children}</div>;

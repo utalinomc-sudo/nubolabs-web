@@ -507,9 +507,16 @@ components:
             subtitle: { type: string }
             items:
               type: array
+              description: "1 a 18 (cambio casos-por-rubro). Sin casos con `title` se usan los 14 por defecto"
               items:
                 type: object
-                properties: { title: { type: string }, body: { type: string } }
+                properties:
+                  title: { type: string, description: "Texto principal" }
+                  body: { type: string, description: "Detalle opcional" }
+                  rubro:
+                    type: string
+                    enum: [todos, gastronomia, automotriz, construccion, servicios, comercio]
+                    description: "Ausente, desconocido u `otro` se lee como `todos`"
         cifras:
           type: object
           description: "Cifras de resultados (cambio cifras-con-respaldo). Oculta por defecto (visible.cifras = false)"

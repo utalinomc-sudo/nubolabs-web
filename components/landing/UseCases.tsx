@@ -1,27 +1,17 @@
-// Sin cifras de ejemplo: las cifras reales con fuente van en Metrics.tsx (cambio cifras-con-respaldo).
+// Ejemplos por rubro (cambio casos-por-rubro, design.md decisión 4; referencia #ejemplos de la HDU-08). Server
+// Component: entrega todos los casos y el filtro vive en UseCasesFilter (cliente). Textos del CMS (content.casos).
+import { SectionHead } from "@/components/landing/SectionHead";
+import { UseCasesFilter } from "@/components/landing/UseCasesFilter";
 import { defaultSiteConfig, type SiteContent } from "@/lib/siteConfig";
 
 export function UseCases({ content }: { content?: SiteContent["casos"] }) {
-  const cfg = content ?? defaultSiteConfig().content.casos;
+  const c = content ?? defaultSiteConfig().content.casos;
+  if (c.items.length === 0) return null;
   return (
-    <section id="casos" className="scroll-mt-20 bg-navy py-20 text-white">
+    <section id="casos" aria-labelledby="h-casos" className="scroll-mt-20 bg-surface-soft py-[76px] lg:py-[104px]">
       <div className="container-page">
-        <div className="mb-9 flex flex-col justify-between gap-3 md:flex-row md:items-baseline">
-          <h2 className="text-[28px] font-extrabold tracking-[-1px] md:text-[32px]">{cfg.title}</h2>
-          <span className="text-[13.5px] text-[#93A5C4]">{cfg.subtitle}</span>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {cfg.items.map((c, i) => (
-            <div
-              key={`${c.title}-${i}`}
-              className="rounded-2xl border border-white/10 bg-white/[0.06] px-[22px] py-5"
-            >
-              <div className="mb-1.5 text-[15px] font-bold text-brand-light">{c.title}</div>
-              <div className="text-[13px] leading-relaxed text-[#B9C6DD]">{c.body}</div>
-            </div>
-          ))}
-        </div>
+        <SectionHead id="h-casos" eyebrow={c.eyebrow} title={c.title} subtitle={c.subtitle} className="mb-10 lg:mb-[52px]" />
+        <UseCasesFilter items={c.items} />
       </div>
     </section>
   );

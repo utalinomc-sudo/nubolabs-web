@@ -42,7 +42,7 @@ export default async function HomePage() {
         {visible.enfoque && <Approach content={content.enfoque} />}
         {visible.servicios && <Services content={content.servicios} />}
         {visible.casos && <UseCases content={content.casos} />}
-        {visible.cifras && <Metrics content={content.cifras} spaced={!visible.casos} />}
+        {visible.cifras && <Metrics content={content.cifras} />}
         {visible.proceso && <Process content={content.proceso} />}
         {visible.contacto && (
           <ContactForm
