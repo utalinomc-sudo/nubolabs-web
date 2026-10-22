@@ -1,16 +1,24 @@
 // Configuración pura del sitio: tipos, secciones, defaults y mezcla con lo guardado en Firestore (config/site).
 // Sin "server-only" para poder usarla en tests y en el admin (cliente). La lectura de Firestore vive en lib/site.ts.
-import { services as defaultServices, useCases as defaultUseCases } from "@/lib/content";
 
 // ── Tipos ────────────────────────────────────────────────────────────
 export interface ServiceItem {
   title: string;
   body: string;
-  result: string;
+  result: string; // se muestra como "lo que ganas"
 }
 export interface CaseItem {
   title: string;
   body: string;
+}
+export interface TextItem {
+  title: string;
+  body: string;
+}
+export interface ProcessStep {
+  title: string;
+  body: string;
+  recibes: string;
 }
 export interface SiteContent {
   hero: {
@@ -21,8 +29,34 @@ export interface SiteContent {
     ctaSecondary: string;
     tags: string[]; // 1 a 3 etiquetas bajo los botones (ver normalizeTags)
   };
-  servicios: { eyebrow: string; title: string; items: ServiceItem[] };
+  // Secciones de la portada del cambio lenguaje-sin-jerga (design.md decisión 1).
+  problema: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    items: { title: string }[]; // 1 a 8 dolores
+    cierre: string; // admite **resalte**
+    cierreCta: string; // texto del enlace a #resultados
+  };
+  resultados: { eyebrow: string; title: string; subtitle: string; items: TextItem[] /* siempre 4 */; cierre: string };
+  enfoque: { eyebrow: string; title: string; body: string; items: TextItem[] /* siempre 3 */ };
+  servicios: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    destacado: { etiqueta: string; title: string; body: string; result: string; incluye: string[] /* 1 a 4 */ };
+    items: ServiceItem[]; // 1 a 6
+    acompanamiento: TextItem;
+    notaTecnica: string; // único lugar de la portada donde se nombran herramientas; admite **resalte**
+  };
   casos: { eyebrow: string; title: string; subtitle: string; items: CaseItem[] };
+  proceso: {
+    eyebrow: string;
+    title: string;
+    subtitle: string;
+    items: ProcessStep[]; // siempre 4
+    exito: { title: string; items: string[] /* 1 a 6 */ };
+  };
   nosotros: { eyebrow: string; title: string; mision: string; vision: string; objetivos: string[] };
   equipo: { eyebrow: string; title: string; historia: string };
   // Página /privacidad (cambio formulario-minimo-consentimiento, design.md decisión 6). Párrafos separados por línea en blanco.
@@ -33,17 +67,18 @@ export interface SiteConfig {
   content: SiteContent;
 }
 
-// Secciones/páginas gobernadas por el toggle de visibilidad (orden = orden en la landing).
+// Secciones/páginas gobernadas por el toggle de visibilidad (orden = orden en la landing; design.md decisión 4).
 export const SECTIONS: { key: string; label: string; hint: string }[] = [
   { key: "hero", label: "Inicio (Hero)", hint: "Encabezado principal del home" },
-  { key: "problema", label: "Problemas", hint: "Tarjetas de dolores operativos" },
-  { key: "enfoque", label: "Enfoque", hint: "Cómo abordamos el trabajo" },
-  { key: "servicios", label: "Servicios", hint: "Qué ofrecemos" },
-  { key: "proceso", label: "Proceso", hint: "Pasos de trabajo" },
-  { key: "casos", label: "Casos de uso", hint: "Ejemplos concretos" },
+  { key: "problema", label: "¿Te suena?", hint: "Los dolores del día a día" },
+  { key: "resultados", label: "Lo que ganas", hint: "Los 4 resultados para tu negocio" },
+  { key: "enfoque", label: "Enfoque", hint: "Primero ordenamos, después automatizamos" },
+  { key: "servicios", label: "Servicios", hint: "Qué hacemos por tu negocio" },
+  { key: "casos", label: "Ejemplos", hint: "Ejemplos concretos" },
+  { key: "proceso", label: "Cómo trabajamos", hint: "Los 4 pasos y lo que recibes" },
+  { key: "contacto", label: "Contacto", hint: "Formulario de contacto del home" },
   { key: "nosotros", label: "Nosotros — Misión y visión (página)", hint: "Página /mision-vision y su link en el menú" },
   { key: "equipo", label: "Nuestro equipo (página)", hint: "Página /equipo y su link en el menú" },
-  { key: "contacto", label: "Contacto", hint: "Formulario de contacto del home" },
 ];
 
 // Borrador de la política de privacidad (Ley 21.719). Lo valida O&A o un abogado antes del 1-dic-2026;
@@ -60,6 +95,8 @@ const PRIVACY_DRAFT = [
 ].join("\n\n");
 
 // ── Defaults (fallback si Firestore no tiene overrides) ──────────────
+// Textos de la HDU-08 (§2, §3, §5.1) y de docs/design/propuesta-web-hdu-08.html. Sin jerga técnica ni "pyme":
+// lo prueba lib/siteConfig.sections.test.ts (design.md decisión 7).
 export function defaultSiteConfig(): SiteConfig {
   return {
     visible: Object.fromEntries(SECTIONS.map((s) => [s.key, true])),
@@ -75,16 +112,140 @@ export function defaultSiteConfig(): SiteConfig {
         ctaSecondary: "Ver cómo trabajamos",
         tags: ["30 minutos, gratis y sin compromiso", "Sin cambiar tus sistemas", "Respuesta en menos de 24 horas"],
       },
-      servicios: {
-        eyebrow: "SERVICIOS",
-        title: "Vendemos resultados, no herramientas",
-        items: defaultServices.map((s) => ({ title: s.title, body: s.body, result: s.result })),
+      problema: {
+        eyebrow: "El día a día",
+        title: "¿Te suena?",
+        subtitle:
+          "Son las cosas que frenan a casi todos los negocios que conocemos. Ninguna se arregla trabajando más; se arreglan ordenando cómo se hacen.",
+        items: [
+          { title: "Respondes WhatsApp a las 11 de la noche." },
+          { title: "Una cotización tarda días y el cliente se va con otro." },
+          { title: "Fin de mes es perseguir pagos y juntar papeles para el contador." },
+          { title: "No sabes cuánto ganaste hasta que alguien arma la planilla." },
+          { title: "Todo depende de que alguien se acuerde." },
+          { title: "Si alguien falta, nadie sabe en qué estaba." },
+        ],
+        cierre: "No es falta de ganas: **tu negocio creció y la forma de trabajar no.**",
+        cierreCta: "Mira lo que cambia",
       },
+      resultados: {
+        eyebrow: "Lo que ganas",
+        title: "Resultados que se notan en tu negocio, no solo en una planilla.",
+        subtitle: "No vendemos herramientas. Partimos por lo que tú quieres lograr y lo dejamos funcionando.",
+        items: [
+          {
+            title: "Vendes más",
+            body: "Respondes al instante, cotizas el mismo día y ningún cliente se queda sin seguimiento.",
+          },
+          {
+            title: "Tienes el control",
+            body: "Ventas, gastos, cobranzas y pendientes al día, en tu celular, sin pedirle un informe a nadie.",
+          },
+          {
+            title: "Nada se olvida",
+            body: "Cobros, plazos, pedidos y papeles que avanzan solos y a tiempo. Menos errores, menos sustos.",
+          },
+          {
+            title: "Creces sin desordenarte",
+            body: "Atiendes más clientes sin que tu equipo colapse ni tengas que contratar al mismo ritmo.",
+          },
+        ],
+        cierre: "Y tu equipo deja la pega repetitiva para dedicarse a lo que de verdad hace crecer tu negocio.",
+      },
+      enfoque: {
+        eyebrow: "Nuestro sello",
+        title: "Primero ordenamos, después automatizamos.",
+        body: "Automatizar el desorden solo lo hace más rápido. Por eso partimos entendiendo cómo trabajas, sacamos los pasos que sobran y recién ahí dejamos funcionando solo lo que vale la pena.",
+        items: [
+          { title: "Entendemos cómo trabajas", body: "Tu negocio, tus clientes, tus herramientas." },
+          { title: "Sacamos lo que sobra", body: "Menos pasos, menos idas y vueltas." },
+          { title: "Dejamos funcionando lo que vale la pena", body: "Solo donde tu negocio gana de verdad." },
+        ],
+      },
+      servicios: {
+        eyebrow: "Servicios",
+        title: "Lo que hacemos por tu negocio",
+        subtitle: "Cada servicio parte de lo que quieres lograr. La tecnología es solo el medio.",
+        destacado: {
+          etiqueta: "Empieza aquí · primera sesión gratis",
+          title: "Diagnóstico y plan de mejora",
+          body: "Conversamos 30 minutos sobre tu negocio y te mostramos dónde está tu mayor oportunidad: qué ordenar, qué dejar funcionando solo y por dónde partir.",
+          result: "Sabes qué hacer primero y por qué.",
+          incluye: ["Sesión de 30 min, sin costo", "Resumen con tus prioridades", "Plan por etapas con costos claros"],
+        },
+        items: [
+          {
+            title: "Tareas que avanzan solas",
+            body: "Cotizaciones, cobranzas, pedidos a proveedores, recordatorios y traspaso de datos entre planillas: lo que hoy depende de alguien, pasa solo.",
+            result: "Nada se olvida y hay menos errores.",
+          },
+          {
+            title: "Clientes atendidos al instante",
+            body: "Asistentes que responden WhatsApp y correo, agendan, toman pedidos y hacen seguimiento con el tono de tu negocio. Si hace falta una persona, te avisan.",
+            result: "Más ventas y clientes que vuelven.",
+          },
+          {
+            title: "Tus números claros, siempre",
+            body: "Ventas, gastos, márgenes y cobranzas en un panel simple o en un reporte que te llega solo. Tu contador recibe la información del mes lista.",
+            result: "Decides con datos, no a ciegas.",
+          },
+          {
+            title: "Herramientas a tu medida",
+            body: "Cuando lo que existe no calza, construimos algo simple para tu forma de trabajar: portal de solicitudes, control de obras, agenda de taller.",
+            result: "Creces sin desordenarte.",
+          },
+        ],
+        acompanamiento: {
+          title: "Acompañamiento mensual",
+          body: "Soporte, ajustes y nuevas mejoras cada mes. No te dejamos solo con la tecnología.",
+        },
+        notaTecnica:
+          "**Cómo lo hacemos:** con herramientas probadas de automatización e inteligencia artificial (como n8n y Make), conectadas a lo que ya usas: WhatsApp, correo, Excel o Google Sheets y tu sistema de facturación. Sin cambiar tus sistemas.",
+      },
+      // Casos sin jerga (design.md decisión 6, tabla de HDU-02). El rediseño por rubro es HDU-05.
       casos: {
-        eyebrow: "CASOS DE USO",
-        title: "Casos de uso concretos",
-        subtitle: "Ejemplos que implementamos con n8n, Make, APIs e IA.",
-        items: defaultUseCases.map((c) => ({ title: c.title, body: c.body })),
+        eyebrow: "Ejemplos",
+        title: "Ejemplos concretos",
+        subtitle: "Ejemplos reales de lo que dejamos funcionando en empresas como la tuya.",
+        items: [
+          { title: "Correos ordenados solos", body: "Se clasifican y responden sin que nadie los revise uno por uno." },
+          { title: "Cotizaciones e informes listos", body: "Documentos y minutas que se arman solos desde tus datos." },
+          { title: "Cobranzas al día", body: "Recordatorios de pago y seguimiento a clientes que salen a tiempo, sin planillas." },
+          { title: "Tus números en un reporte", body: "Ventas, gastos y pendientes en un reporte que te llega solo." },
+          { title: "Respuestas automáticas por WhatsApp y correo", body: "Consultas, reservas y pedidos respondidos al instante, incluso de noche." },
+          { title: "Solicitudes y aprobaciones sin cadenas de correos", body: "Cada solicitud llega a quien la aprueba y sabes en qué va." },
+        ],
+      },
+      proceso: {
+        eyebrow: "Cómo trabajamos contigo",
+        title: "Cuatro pasos, sin letra chica",
+        subtitle: "Avanzas a tu ritmo y en cada paso sabes qué recibes.",
+        items: [
+          {
+            title: "Conversamos",
+            body: "30 minutos, gratis. Nos cuentas cómo funciona tu negocio y qué te gustaría lograr.",
+            recibes: "Un resumen con tus prioridades.",
+          },
+          {
+            title: "Ordenamos y proponemos",
+            body: "Vemos cómo se hacen hoy las cosas, sacamos lo que sobra y te proponemos un plan por etapas.",
+            recibes: "Plan y presupuesto claros, sin letra chica.",
+          },
+          {
+            title: "Lo dejamos funcionando",
+            body: "Con lo que ya usas, partiendo por lo que más impacto tiene, y enseñándole a tu equipo.",
+            recibes: "La mejora andando y tu equipo usándola.",
+          },
+          {
+            title: "Medimos y mejoramos",
+            body: "Seguimos los resultados que tú elegiste y vamos sumando mejoras.",
+            recibes: "Un reporte simple de resultados y nuevas ideas.",
+          },
+        ],
+        exito: {
+          title: "Tú defines qué es éxito:",
+          items: ["Más ventas", "Cobros al día", "Respuestas más rápidas", "Menos errores", "Más control"],
+        },
       },
       nosotros: {
         eyebrow: "NOSOTROS",
@@ -133,46 +294,174 @@ function pickText(value: unknown, fallback: string): string {
   return typeof value === "string" && value.trim().length > 0 ? value : fallback;
 }
 
+// Igual que pickText, pero recorta: para los textos dentro de listas.
+function pickTrim(value: unknown, fallback: string): string {
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : fallback;
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+// Visibilidad: solo valores booleanos guardados ganan; cualquier otra cosa (null, texto) usa el default. Así la portada,
+// el menú y el admin leen lo mismo (revisión adversarial de lenguaje-sin-jerga).
+function mergeVisible(base: Record<string, boolean>, stored: unknown): Record<string, boolean> {
+  const out = { ...base };
+  for (const [k, v] of Object.entries(asRecord(stored))) {
+    if (typeof v === "boolean") out[k] = v;
+  }
+  return out;
+}
+
+type MergeItem<T> = (raw: Record<string, unknown>, fallback: T) => T;
+
+// Lista de largo fijo (las ilustraciones y el diseño dependen de la posición; design.md decisión 2): devuelve siempre
+// defaults.length ítems. En cada posición mezcla el ítem guardado sobre el default de esa posición, campo a campo;
+// si en esa posición no hay un objeto, va el default completo. Lo que sobra se descarta.
+export function mergeFixedList<T>(stored: unknown, defaults: T[], mergeItem: MergeItem<T>): T[] {
+  if (!Array.isArray(stored)) return defaults;
+  return defaults.map((fallback, i) => (isRecord(stored[i]) ? mergeItem(stored[i] as Record<string, unknown>, fallback) : fallback));
+}
+
+// Lista de largo variable: un ítem es válido si es objeto con "title" no vacío. Si el valor no es arreglo o quedan
+// menos de `min` válidos, se usan los defaults. Los campos vacíos de un ítem válido toman los de `blank` (no los de
+// otra posición, que no corresponden a ese ítem). Se corta en `max`.
+export function mergeList<T>(
+  stored: unknown,
+  defaults: T[],
+  { min, max }: { min: number; max: number },
+  mergeItem: MergeItem<T>,
+  blank: T,
+): T[] {
+  if (!Array.isArray(stored)) return defaults;
+  const valid = stored.filter((raw): raw is Record<string, unknown> => isRecord(raw) && pickTrim(raw.title, "") !== "");
+  if (valid.length < min) return defaults;
+  return valid.slice(0, max).map((raw) => mergeItem(raw, blank));
+}
+
+// Lista de textos (incluye del destacado, ejemplos de éxito): recorta, descarta vacíos y no-strings.
+function mergeTextList(stored: unknown, defaults: string[], { min, max }: { min: number; max: number }): string[] {
+  if (!Array.isArray(stored)) return defaults;
+  const texts = stored.map((t) => pickTrim(t, "")).filter((t) => t !== "");
+  return texts.length < min ? defaults : texts.slice(0, max);
+}
+
+const mergeTitle: MergeItem<{ title: string }> = (raw, fb) => ({ title: pickTrim(raw.title, fb.title) });
+const mergeTextItem: MergeItem<TextItem> = (raw, fb) => ({
+  title: pickTrim(raw.title, fb.title),
+  body: pickTrim(raw.body, fb.body),
+});
+const mergeService: MergeItem<ServiceItem> = (raw, fb) => ({
+  title: pickTrim(raw.title, fb.title),
+  body: pickTrim(raw.body, fb.body),
+  result: pickTrim(raw.result, fb.result),
+});
+const mergeStep: MergeItem<ProcessStep> = (raw, fb) => ({
+  title: pickTrim(raw.title, fb.title),
+  body: pickTrim(raw.body, fb.body),
+  recibes: pickTrim(raw.recibes, fb.recibes),
+});
+
 // Mezcla lo guardado en config/site sobre los defaults. Cada campo guardado válido gana sobre su default.
 export function mergeConfig(base: SiteConfig, data: Record<string, unknown>): SiteConfig {
-  const c = (data.content ?? {}) as Partial<SiteContent>;
+  const c = asRecord(data.content);
+  const b = base.content;
   const hero = asRecord(c.hero);
-  const baseHero = base.content.hero;
+  const problema = asRecord(c.problema);
+  const resultados = asRecord(c.resultados);
+  const enfoque = asRecord(c.enfoque);
+  const servicios = asRecord(c.servicios);
+  const destacado = asRecord(servicios.destacado);
+  const acompanamiento = asRecord(servicios.acompanamiento);
+  const casos = asRecord(c.casos);
+  const proceso = asRecord(c.proceso);
+  const exito = asRecord(proceso.exito);
+  const nosotros = c.nosotros as Partial<SiteContent["nosotros"]> | undefined;
+  const equipo = c.equipo as Partial<SiteContent["equipo"]> | undefined;
   return {
-    visible: { ...base.visible, ...((data.visible as Record<string, boolean>) ?? {}) },
+    visible: mergeVisible(base.visible, data.visible),
     content: {
       hero: {
-        eyebrow: pickText(hero.eyebrow, baseHero.eyebrow),
-        title: pickText(hero.title, baseHero.title),
-        subtitle: pickText(hero.subtitle, baseHero.subtitle),
-        ctaPrimary: pickText(hero.ctaPrimary, baseHero.ctaPrimary),
-        ctaSecondary: pickText(hero.ctaSecondary, baseHero.ctaSecondary),
-        tags: normalizeTags(hero.tags) ?? baseHero.tags,
+        eyebrow: pickText(hero.eyebrow, b.hero.eyebrow),
+        title: pickText(hero.title, b.hero.title),
+        subtitle: pickText(hero.subtitle, b.hero.subtitle),
+        ctaPrimary: pickText(hero.ctaPrimary, b.hero.ctaPrimary),
+        ctaSecondary: pickText(hero.ctaSecondary, b.hero.ctaSecondary),
+        tags: normalizeTags(hero.tags) ?? b.hero.tags,
+      },
+      problema: {
+        eyebrow: pickText(problema.eyebrow, b.problema.eyebrow),
+        title: pickText(problema.title, b.problema.title),
+        subtitle: pickText(problema.subtitle, b.problema.subtitle),
+        items: mergeList(problema.items, b.problema.items, { min: 1, max: 8 }, mergeTitle, { title: "" }),
+        cierre: pickText(problema.cierre, b.problema.cierre),
+        cierreCta: pickText(problema.cierreCta, b.problema.cierreCta),
+      },
+      resultados: {
+        eyebrow: pickText(resultados.eyebrow, b.resultados.eyebrow),
+        title: pickText(resultados.title, b.resultados.title),
+        subtitle: pickText(resultados.subtitle, b.resultados.subtitle),
+        items: mergeFixedList(resultados.items, b.resultados.items, mergeTextItem),
+        cierre: pickText(resultados.cierre, b.resultados.cierre),
+      },
+      enfoque: {
+        eyebrow: pickText(enfoque.eyebrow, b.enfoque.eyebrow),
+        title: pickText(enfoque.title, b.enfoque.title),
+        body: pickText(enfoque.body, b.enfoque.body),
+        items: mergeFixedList(enfoque.items, b.enfoque.items, mergeTextItem),
       },
       servicios: {
-        ...base.content.servicios,
-        ...(c.servicios ?? {}),
-        items: c.servicios?.items ?? base.content.servicios.items,
+        eyebrow: pickText(servicios.eyebrow, b.servicios.eyebrow),
+        title: pickText(servicios.title, b.servicios.title),
+        subtitle: pickText(servicios.subtitle, b.servicios.subtitle),
+        destacado: {
+          etiqueta: pickText(destacado.etiqueta, b.servicios.destacado.etiqueta),
+          title: pickText(destacado.title, b.servicios.destacado.title),
+          body: pickText(destacado.body, b.servicios.destacado.body),
+          result: pickText(destacado.result, b.servicios.destacado.result),
+          incluye: mergeTextList(destacado.incluye, b.servicios.destacado.incluye, { min: 1, max: 4 }),
+        },
+        items: mergeList(servicios.items, b.servicios.items, { min: 1, max: 6 }, mergeService, {
+          title: "",
+          body: "",
+          result: "",
+        }),
+        acompanamiento: {
+          title: pickText(acompanamiento.title, b.servicios.acompanamiento.title),
+          body: pickText(acompanamiento.body, b.servicios.acompanamiento.body),
+        },
+        notaTecnica: pickText(servicios.notaTecnica, b.servicios.notaTecnica),
       },
       casos: {
-        ...base.content.casos,
-        ...(c.casos ?? {}),
-        items: c.casos?.items ?? base.content.casos.items,
+        eyebrow: pickText(casos.eyebrow, b.casos.eyebrow),
+        title: pickText(casos.title, b.casos.title),
+        subtitle: pickText(casos.subtitle, b.casos.subtitle),
+        items: mergeList(casos.items, b.casos.items, { min: 1, max: 12 }, mergeTextItem, { title: "", body: "" }),
+      },
+      proceso: {
+        eyebrow: pickText(proceso.eyebrow, b.proceso.eyebrow),
+        title: pickText(proceso.title, b.proceso.title),
+        subtitle: pickText(proceso.subtitle, b.proceso.subtitle),
+        items: mergeFixedList(proceso.items, b.proceso.items, mergeStep),
+        exito: {
+          title: pickText(exito.title, b.proceso.exito.title),
+          items: mergeTextList(exito.items, b.proceso.exito.items, { min: 1, max: 6 }),
+        },
       },
       nosotros: {
-        ...base.content.nosotros,
-        ...(c.nosotros ?? {}),
-        objetivos: c.nosotros?.objetivos ?? base.content.nosotros.objetivos,
+        ...b.nosotros,
+        ...(nosotros ?? {}),
+        objetivos: nosotros?.objetivos ?? b.nosotros.objetivos,
       },
-      equipo: { ...base.content.equipo, ...(c.equipo ?? {}) },
+      equipo: { ...b.equipo, ...(equipo ?? {}) },
       // Un título o texto vacío cae al borrador, para no publicar una página en blanco.
       privacidad: {
-        titulo: pickText(asRecord(c.privacidad).titulo, base.content.privacidad.titulo),
-        texto: pickText(asRecord(c.privacidad).texto, base.content.privacidad.texto),
+        titulo: pickText(asRecord(c.privacidad).titulo, b.privacidad.titulo),
+        texto: pickText(asRecord(c.privacidad).texto, b.privacidad.texto),
       },
     },
   };

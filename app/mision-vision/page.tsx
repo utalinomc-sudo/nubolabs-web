@@ -19,7 +19,7 @@ export default async function MisionVisionPage() {
 
   return (
     <>
-      <Nav showEquipo={visible.equipo} showMision={visible.nosotros} showContact={visible.contacto} />
+      <Nav showEquipo={visible.equipo} showMision={visible.nosotros} showContact={visible.contacto} sections={visible} />
       <main>
         <section className="container-page py-16 md:py-20">
           <div className="mb-3 text-xs font-bold tracking-[2.5px] text-brand">{n.eyebrow}</div>

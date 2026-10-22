@@ -9,10 +9,13 @@ interface NavProps {
   showMision?: boolean;
   // Con la sección de contacto oculta, "Diagnóstico gratis" lleva al cuestionario (spec landing/hero).
   showContact?: boolean;
+  // Visibilidad de las secciones de la portada: los ítems de secciones ocultas no se muestran.
+  sections?: Record<string, boolean>;
 }
 
-export function Nav({ showEquipo = true, showMision = true, showContact = true }: NavProps) {
+export function Nav({ showEquipo = true, showMision = true, showContact = true, sections = {} }: NavProps) {
   const [open, setOpen] = useState(false);
+  const items = baseNav.filter((item) => sections[item.section] !== false);
   const ctaHref = showContact ? "/#contacto" : "/diagnostico";
 
   // "Nosotros" agrupa las páginas Misión y visión + Equipo (según visibilidad).
@@ -29,16 +32,9 @@ export function Nav({ showEquipo = true, showMision = true, showContact = true }
         </a>
 
         <nav className="hidden items-center gap-8 text-sm font-semibold text-ink-soft lg:flex">
-          {baseNav.map((item, i) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className={
-                i === 0
-                  ? "border-b-2 border-brand pb-[3px] text-brand"
-                  : "transition hover:text-brand"
-              }
-            >
+          {/* Sin ítem activo fijo (spec landing/contenido-pyme, "Orden de secciones y navegación"). */}
+          {items.map((item) => (
+            <a key={item.href} href={item.href} className="transition hover:text-brand">
               {item.label}
             </a>
           ))}
@@ -96,7 +92,7 @@ export function Nav({ showEquipo = true, showMision = true, showContact = true }
       {open && (
         <div className="border-t border-[#EEF2F8] bg-white lg:hidden">
           <nav className="container-page flex flex-col gap-1 py-3">
-            {baseNav.map((item) => (
+            {items.map((item) => (
               <a
                 key={item.href}
                 href={item.href}

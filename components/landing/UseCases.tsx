@@ -1,10 +1,10 @@
 import { metrics } from "@/lib/content";
-import { defaultSiteConfig, type SiteContent } from "@/lib/site";
+import { defaultSiteConfig, type SiteContent } from "@/lib/siteConfig";
 
 export function UseCases({ content }: { content?: SiteContent["casos"] }) {
   const cfg = content ?? defaultSiteConfig().content.casos;
   return (
-    <section id="casos" className="bg-navy py-20 text-white">
+    <section id="casos" className="scroll-mt-20 bg-navy py-20 text-white">
       <div className="container-page">
         <div className="mb-9 flex flex-col justify-between gap-3 md:flex-row md:items-baseline">
           <h2 className="text-[28px] font-extrabold tracking-[-1px] md:text-[32px]">{cfg.title}</h2>
@@ -30,7 +30,7 @@ export function UseCases({ content }: { content?: SiteContent["casos"] }) {
               <div className="text-[13px] text-[#93A5C4]">{m.label}</div>
             </div>
           ))}
-          <div className="ml-auto font-mono text-[11px] text-ink-muted">
+          <div className="ml-auto font-mono text-[11px] text-inverse-muted">
             * cifras referenciales de ejemplo
           </div>
         </div>

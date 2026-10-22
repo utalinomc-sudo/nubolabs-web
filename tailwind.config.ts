@@ -44,6 +44,13 @@ const config: Config = {
           soft: "#3D4E6B",
           faint: "#93A5C4", // solo decorativo: no cumple contraste para texto
         },
+        // Texto sobre fondos navy (cambio lenguaje-sin-jerga). Todos cumplen AA (≥ 4,5:1) sobre navy y sobre navy con velo blanco.
+        inverse: {
+          DEFAULT: "#B8C7E0", // texto secundario
+          strong: "#DCE6F7", // texto de listas destacadas
+          muted: "#9FB2D4", // rótulos en mono
+          faint: "#7F93B5", // pasos tachados del ejemplo antes/después
+        },
         surface: {
           DEFAULT: "#FFFFFF",
           soft: "#F6F9FE",

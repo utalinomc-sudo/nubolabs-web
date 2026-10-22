@@ -4,7 +4,7 @@ import { DiagnosticoFlow } from "@/components/diagnostico/DiagnosticoFlow";
 export const metadata: Metadata = {
   title: "Diagnóstico operativo — Nubolabs",
   description:
-    "Identifica en 3 minutos dónde está la mayor fricción operativa de tu empresa y, opcionalmente, estima cuánto podrías ahorrar automatizando. Diagnóstico gratuito de Nubolabs.",
+    "Descubre en 5 minutos dónde está la mayor oportunidad de tu negocio: ventas, control, orden y crecimiento. Autodiagnóstico gratuito de Nubolabs.",
 };
 
 export default function DiagnosticoPage() {

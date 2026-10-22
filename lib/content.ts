@@ -1,10 +1,12 @@
 // Contenido de la landing centralizado — un solo lugar para editar textos.
 
+// Menú principal (cambio lenguaje-sin-jerga, design.md decisión 4). Sin "Inicio": el logo lleva a /#inicio.
+// `section` = clave de SECTIONS: si esa sección está oculta, el ítem no se muestra.
 export const nav = [
-  { label: "Inicio", href: "/#inicio" },
-  { label: "Servicios", href: "/#servicios" },
-  { label: "Cómo trabajamos", href: "/#modelo" },
-  { label: "Casos de uso", href: "/#casos" },
+  { label: "Lo que ganas", href: "/#resultados", section: "resultados" },
+  { label: "Servicios", href: "/#servicios", section: "servicios" },
+  { label: "Ejemplos", href: "/#casos", section: "casos" },
+  { label: "Cómo trabajamos", href: "/#modelo", section: "proceso" },
 ];
 
 // Panel "Tu negocio hoy" del hero (cambio mensaje-principal-pyme, design.md decisión 4).
@@ -38,84 +40,57 @@ export const heroFeedMore: HeroFeedItem[] = [
   { icon: "package", tone: "success", title: "Stock bajo: pedido sugerido", detail: "Bodega · esperando tu visto bueno" },
 ];
 
-export const problems = [
-  {
-    title: "Correos manuales",
-    body: "Clasificar, responder y reenviar correos uno por uno.",
+// Ilustraciones decorativas de "Lo que ganas" (una por posición; Results.tsx). Ejemplos genéricos: sin cifras de
+// resultados ni nombres de clientes (spec landing/contenido-pyme). No van al CMS.
+export const resultsVisuals = {
+  chat: {
+    incoming: { text: "Hola, ¿me pueden cotizar para el jueves?", time: "21:47" },
+    outgoing: { text: "¡Claro! Aquí tienes tu cotización. ¿Te reservo el jueves a las 10:00?", time: "21:47 · respuesta automática" },
   },
-  {
-    title: "Datos dispersos",
-    body: "Información copiada a mano entre planillas y sistemas.",
-  },
-  {
-    title: "Reportes lentos",
-    body: "Informes que toman días en armarse y llegan tarde.",
-  },
-  {
-    title: "Seguimiento frágil",
-    body: "Cobranzas y tareas que dependen de recordatorios.",
-  },
-];
+  bars: [
+    { day: "Lun", height: 42 },
+    { day: "Mar", height: 58 },
+    { day: "Mié", height: 50 },
+    { day: "Jue", height: 72 },
+    { day: "Hoy", height: 88 },
+  ],
+  checks: [
+    { text: "Factura 1043 cobrada", done: true },
+    { text: "Estado de pago enviado", done: true },
+    { text: "Declaración mensual · avisa el día 10", done: false },
+  ],
+  grow: { team: "Tu equipo", tasks: "Tareas que avanzan solas", result: "Más clientes, mismo orden" },
+};
 
-export const approach = [
-  {
-    n: 1,
-    title: "Entender y simplificar",
-    body: "Mapeamos el flujo real y eliminamos pasos innecesarios.",
-  },
-  {
-    n: 2,
-    title: "Automatizar lo que vale",
-    body: "Flujos, reportes y agentes IA donde hay retorno claro.",
-  },
-  {
-    n: 3,
-    title: "Medir y escalar",
-    body: "Horas ahorradas, menos errores, trazabilidad total.",
-    accent: true,
-  },
-];
+// Ejemplo "antes / después" del Enfoque (Approach.tsx): los pasos que sobran van tachados. No va al CMS.
+export const approachExample = {
+  label: "Ejemplo: una cotización antes y después",
+  antesTitle: "Hoy: una cotización",
+  antes: [
+    { text: "Llega la consulta por WhatsApp", cut: false },
+    { text: "Copiar los datos a una planilla", cut: true },
+    { text: "Buscar precios en otro archivo", cut: true },
+    { text: "Armar el documento a mano", cut: false },
+    { text: "Reenviar por correo para revisión", cut: true },
+    { text: "Preguntar \"¿en qué va?\"", cut: true },
+  ],
+  despuesTitle: "Después",
+  despues: [
+    "Llega la consulta",
+    "La cotización se arma sola y la revisas con un clic",
+    "El cliente la recibe el mismo día",
+    "Seguimiento automático si no responde",
+  ],
+};
 
-export const services = [
-  {
-    title: "Diagnóstico y rediseño de procesos",
-    body: "Mapa de oportunidades, simplificación y priorización por retorno. Un entregable tangible desde la primera sesión.",
-    result: "Evita automatizar procesos mal diseñados",
-  },
-  {
-    title: "Automatización operativa en la nube",
-    body: "Flujos automáticos para correos, ingreso de datos, cobranzas, cotizaciones y notificaciones internas.",
-    result: "Ahorro rápido de horas al mes, menos errores",
-  },
-  {
-    title: "Reportería y entregables automáticos",
-    body: "Reportes, minutas, documentos y presentaciones generados directo desde tus datos.",
-    result: "De días u horas, a minutos",
-  },
-  {
-    title: "Sistemas y agentes IA a medida",
-    body: "Portales internos, aplicaciones y agentes conectados a CRM, ERP, WhatsApp y bases de datos.",
-    result: "Soluciones que escalan con tu operación",
-  },
-];
+// Rótulos fijos de las secciones de contenido (no van al CMS).
+export const sectionLabels = {
+  recibes: "Recibes", // caja de cada paso del Proceso
+  ganas: "Lo que ganas: ", // prefijo solo para lectores de pantalla en Servicios
+  pasoSobra: " (paso que sobra)", // solo para lectores de pantalla en el ejemplo antes/después
+};
 
-export const steps = [
-  { n: 1, title: "Diagnóstico", body: "Procesos, dolores y ROI estimado.", color: "#1565FF" },
-  { n: 2, title: "Rediseño", body: "Simplificar antes de automatizar.", color: "#1565FF" },
-  { n: 3, title: "Implementación", body: "Automatizaciones, reportes y agentes.", color: "#00A9E0" },
-  { n: 4, title: "Medición", body: "Horas ahorradas y errores reducidos.", color: "#00C2FF" },
-  { n: 5, title: "Mejora continua", body: "Soporte, optimización y escala.", color: "#FF6B5E" },
-];
-
-export const useCases = [
-  { title: "Correos con IA", body: "Clasificación automática y respuestas asistidas." },
-  { title: "Cotizaciones e informes", body: "Generación automática de documentos y minutas." },
-  { title: "Cobranzas y seguimiento", body: "Tareas comerciales y operaciones recurrentes sin planillas." },
-  { title: "Reportes ejecutivos", body: "Dashboards e informes creados desde tus datos." },
-  { title: "Agentes IA conectados", body: "WhatsApp, CRM, ERP y bases internas." },
-  { title: "Portales internos", body: "Solicitudes, aprobaciones y trazabilidad operacional." },
-];
-
+// Cifras de Casos: siguen hasta HDU-06 (fuera de la prueba de vocabulario a propósito).
 export const metrics = [
   { value: "+120 h", label: "ahorradas al mes por cliente" },
   { value: "minutos", label: "donde antes había días de reportería" },

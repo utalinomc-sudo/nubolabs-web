@@ -28,7 +28,7 @@ export default async function PrivacidadPage() {
 
   return (
     <>
-      <Nav showEquipo={visible.equipo} showMision={visible.nosotros} showContact={visible.contacto} />
+      <Nav showEquipo={visible.equipo} showMision={visible.nosotros} showContact={visible.contacto} sections={visible} />
       <main>
         <article className="container-page max-w-3xl py-16 md:py-20">
           <div className="mb-3 text-xs font-bold tracking-[2.5px] text-brand">PRIVACIDAD</div>

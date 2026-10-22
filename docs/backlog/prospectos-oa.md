@@ -52,6 +52,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 
 **Cambio OpenSpec:** `mensaje-principal-pyme` · Fase 1 · Tamaño S
 
+**Estado (2026-10-22):** ✅ en producción; archivado en `openspec/changes/archive/2026-10-22-mensaje-principal-pyme/`.
+
 ### Original
 "El mensaje principal — traducirlo a dolor concreto. HOY: 'Rediseñamos procesos y los convertimos en automatizaciones con IA que trabajan en la nube.' MEJOR: 'Te devolvemos las horas que tu equipo pierde en tareas repetitivas.' / 'Menos pega manual, menos errores, más tiempo para tu negocio.'"
 
@@ -90,6 +92,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 ## HDU-02 · Toda la landing en lenguaje de pyme (sin jerga)
 
 **Cambio OpenSpec:** `lenguaje-sin-jerga` · Fase 1 · Tamaño M · Depende de HDU-01
+
+**Estado (2026-10-22):** implementada en la rama `feature/lenguaje-sin-jerga`, en preview; pendiente de aprobación y mezcla. Tras mezclar: "Usar los textos recomendados" en Servicios y Ejemplos en `/admin/config` y guardar (ver `docs/ESTADO-PROYECTO.md`). En `/diagnostico` solo cambia el encabezado; el panel de resultados ("Índice de fricción", estimador, "ahorrar automatizándolos") pasa a HDU-09.
 
 ### Original
 "Sacar o bajar el vocabulario técnico. 'n8n, Make, APIs, CRM, ERP, agentes IA conectados' es ruido para este prospecto. No borrarlo del todo (da seriedad), pero que no sea lo primero: primero el resultado en su idioma, el 'cómo' técnico abajo y en chico."
@@ -137,6 +141,8 @@ Cada HDU se arranca con: `/opsx:ff <cambio> partiendo de docs/backlog/prospectos
 ## HDU-03 · Formulario mínimo con pregunta abierta, consentimiento y botón para agendar
 
 **Cambio OpenSpec:** `formulario-minimo-consentimiento` · Fase 1 · Tamaño M
+
+**Estado (2026-10-22):** ✅ en producción; archivado en `openspec/changes/archive/2026-10-22-formulario-minimo-consentimiento/`.
 
 ### Original
 "Pocos campos, consentimiento claro. Nombre, correo (el que queremos anclar), teléfono/WhatsApp, empresa y rubro para calificar, pregunta abierta corta '¿Qué tarea te gustaría dejar de hacer a mano?'. Checkbox 'Quiero recibir información y novedades de Nubolabs' (Ley 21.719, vigencia diciembre 2026). Decisión de diseño: primer paso mínimo —correo + agendar— y el resto se pide en la videollamada. El objetivo nº1 es que agenden."

@@ -1,123 +1,90 @@
 "use client";
 
+// Contenedor de /admin/config: visibilidad, un editor por sección y guardado único (cambio lenguaje-sin-jerga,
+// design.md decisión 5). Cada editor vive en components/admin/config/.
 import { useState } from "react";
-import { defaultSiteConfig, type CaseItem, type ServiceItem, type SiteContent } from "@/lib/siteConfig";
+import { CasosEditor } from "@/components/admin/config/CasosEditor";
+import { EnfoqueEditor } from "@/components/admin/config/EnfoqueEditor";
+import { HeroEditor } from "@/components/admin/config/HeroEditor";
+import { NosotrosEditor } from "@/components/admin/config/NosotrosEditor";
+import { PrivacidadEditor } from "@/components/admin/config/PrivacidadEditor";
+import { ProblemaEditor } from "@/components/admin/config/ProblemaEditor";
+import { ProcesoEditor } from "@/components/admin/config/ProcesoEditor";
+import { ResultadosEditor } from "@/components/admin/config/ResultadosEditor";
+import { SaveVersionContext } from "@/components/admin/config/SectionCard";
+import { ServiciosEditor } from "@/components/admin/config/ServiciosEditor";
+import type { SiteContent } from "@/lib/siteConfig";
 
-// Secciones que edita esta pantalla (los tipos vienen de lib/siteConfig.ts, sin duplicarlos).
-type Content = Pick<SiteContent, "hero" | "servicios" | "casos" | "nosotros" | "privacidad">;
-type HeroTextKey = Exclude<keyof Content["hero"], "tags">;
+// Claves de content que administra esta pantalla. `equipo` se edita en /admin/equipo y nunca se envía, para no pisarla.
+// Regla: cada sección nueva del CMS suma su editor aquí y su clave a esta lista; si no, sus cambios no se guardan.
+export const MANAGED_KEYS = [
+  "hero",
+  "problema",
+  "resultados",
+  "enfoque",
+  "servicios",
+  "casos",
+  "proceso",
+  "nosotros",
+  "privacidad",
+] as const satisfies readonly (keyof SiteContent)[];
 
-const HERO_TAG_SLOTS = 3;
+export type ManagedKey = (typeof MANAGED_KEYS)[number];
+export type ManagedContent = Pick<SiteContent, ManagedKey>;
+
+// Arma el content que se envía al guardar con las claves pedidas (por defecto, todas las de MANAGED_KEYS).
+export function pickManaged(content: ManagedContent, keys: readonly ManagedKey[] = MANAGED_KEYS): Partial<ManagedContent> {
+  return Object.fromEntries(keys.map((k) => [k, content[k]])) as Partial<ManagedContent>;
+}
+
+// Secciones que cambiaron respecto de lo último cargado o guardado. Solo esas se envían: una sección que nadie tocó no
+// queda escrita en Firestore y sigue mostrando los textos por defecto del código (revisión adversarial de
+// lenguaje-sin-jerga: guardar todo dejaba fijos los defaults y escribía de más desde el preview, que comparte Firestore).
+export function changedKeys(content: ManagedContent, saved: ManagedContent): ManagedKey[] {
+  return MANAGED_KEYS.filter((k) => JSON.stringify(content[k]) !== JSON.stringify(saved[k]));
+}
 
 interface Props {
   sections: { key: string; label: string; hint: string }[];
   initialVisible: Record<string, boolean>;
-  initialContent: Content;
+  initialContent: ManagedContent;
+  defaults: ManagedContent; // textos recomendados vigentes (defaultSiteConfig().content)
 }
 
-function Field({ label, value, onChange, hint, textarea, rows = 3 }: {
-  label: string;
-  value: string;
-  onChange: (v: string) => void;
-  hint?: string;
-  textarea?: boolean;
-  rows?: number;
-}) {
-  return (
-    <label className="block">
-      <span className="text-[13px] font-semibold text-ink-soft">{label}</span>
-      {textarea ? (
-        <textarea
-          className={`field mt-1.5 ${rows > 3 ? "resize-y" : "resize-none"}`}
-          rows={rows}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        />
-      ) : (
-        <input className="field mt-1.5" value={value} onChange={(e) => onChange(e.target.value)} />
-      )}
-      {hint ? <span className="mt-1 block text-[11px] text-ink-muted">{hint}</span> : null}
-    </label>
-  );
-}
-
-export function ConfigEditor({ sections, initialVisible, initialContent }: Props) {
+export function ConfigEditor({ sections, initialVisible, initialContent, defaults }: Props) {
   const [visible, setVisible] = useState<Record<string, boolean>>(initialVisible);
-  const [content, setContent] = useState<Content>(initialContent);
+  const [content, setContent] = useState<ManagedContent>(initialContent);
+  const [saved, setSaved] = useState<ManagedContent>(initialContent); // base para saber qué secciones cambiaron
   const [status, setStatus] = useState<"idle" | "saving" | "ok" | "error">("idle");
   const [error, setError] = useState("");
-  const [heroReset, setHeroReset] = useState(false);
-  const [privacyReset, setPrivacyReset] = useState(false);
+  const [saveVersion, setSaveVersion] = useState(0);
 
-  function setPrivacidad(k: "titulo" | "texto", v: string) {
-    setContent((c) => ({ ...c, privacidad: { ...c.privacidad, [k]: v } }));
-  }
-  // Carga el borrador de privacidad sin guardar (cambio formulario-minimo-consentimiento, design.md decisión 6).
-  function loadRecommendedPrivacy() {
-    setContent((c) => ({ ...c, privacidad: defaultSiteConfig().content.privacidad }));
-    setPrivacyReset(true);
-  }
-
-  function setHero(k: HeroTextKey, v: string) {
-    setContent((c) => ({ ...c, hero: { ...c.hero, [k]: v } }));
-  }
-  // Etiquetas del hero: siempre 3 casillas; las vacías no se muestran en la portada (normalizeTags).
-  function setHeroTag(i: number, v: string) {
-    setContent((c) => {
-      const tags = Array.from({ length: HERO_TAG_SLOTS }, (_, idx) => c.hero.tags[idx] ?? "");
-      tags[i] = v;
-      return { ...c, hero: { ...c.hero, tags } };
-    });
-  }
-  // Carga en el formulario los textos recomendados del hero sin guardar (design.md decisión 6).
-  function loadRecommendedHero() {
-    setContent((c) => ({ ...c, hero: defaultSiteConfig().content.hero }));
-    setHeroReset(true);
-  }
-  function setServiciosMeta(k: "eyebrow" | "title", v: string) {
-    setContent((c) => ({ ...c, servicios: { ...c.servicios, [k]: v } }));
-  }
-  function setServicioItem(i: number, k: keyof ServiceItem, v: string) {
-    setContent((c) => {
-      const items = c.servicios.items.map((it, idx) => (idx === i ? { ...it, [k]: v } : it));
-      return { ...c, servicios: { ...c.servicios, items } };
-    });
-  }
-  function setCasosMeta(k: "eyebrow" | "title" | "subtitle", v: string) {
-    setContent((c) => ({ ...c, casos: { ...c.casos, [k]: v } }));
-  }
-  function setCasoItem(i: number, k: keyof CaseItem, v: string) {
-    setContent((c) => {
-      const items = c.casos.items.map((it, idx) => (idx === i ? { ...it, [k]: v } : it));
-      return { ...c, casos: { ...c.casos, items } };
-    });
-  }
-  function setNosotros(k: "eyebrow" | "title" | "mision" | "vision", v: string) {
-    setContent((c) => ({ ...c, nosotros: { ...c.nosotros, [k]: v } }));
-  }
-  function setObjetivo(i: number, v: string) {
-    setContent((c) => ({ ...c, nosotros: { ...c.nosotros, objetivos: c.nosotros.objetivos.map((o, idx) => (idx === i ? v : o)) } }));
-  }
-  function addObjetivo() {
-    setContent((c) => ({ ...c, nosotros: { ...c.nosotros, objetivos: [...c.nosotros.objetivos, ""] } }));
-  }
-  function removeObjetivo(i: number) {
-    setContent((c) => ({ ...c, nosotros: { ...c.nosotros, objetivos: c.nosotros.objetivos.filter((_, idx) => idx !== i) } }));
+  // Props de cada editor: su valor, cómo cambiarlo y sus textos recomendados.
+  function bind<K extends keyof ManagedContent>(key: K) {
+    return {
+      value: content[key],
+      onChange: (value: ManagedContent[K]) => setContent((c) => ({ ...c, [key]: value })),
+      defaults: defaults[key],
+    };
   }
 
   async function save() {
     setStatus("saving");
     setError("");
+    const snapshot = content;
+    const keys = changedKeys(snapshot, saved);
+    const payload: Record<string, unknown> = { visible };
+    if (keys.length > 0) payload.content = pickManaged(snapshot, keys);
     try {
       const res = await fetch("/api/admin/config", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visible, content }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
+      setSaved(snapshot);
       setStatus("ok");
-      setHeroReset(false); // el aviso de "textos recomendados cargados" ya no aplica tras guardar
-      setPrivacyReset(false);
+      setSaveVersion((v) => v + 1); // los avisos de "textos recomendados cargados" ya no aplican
       setTimeout(() => setStatus("idle"), 2500);
     } catch {
       setStatus("error");
@@ -125,246 +92,57 @@ export function ConfigEditor({ sections, initialVisible, initialContent }: Props
     }
   }
 
-  const btnRow = (
-    <div className="flex items-center gap-3">
-      <button
-        onClick={save}
-        disabled={status === "saving"}
-        className="rounded-xl bg-brand px-6 py-3 text-sm font-bold text-white transition hover:brightness-95 disabled:opacity-60"
-      >
-        {status === "saving" ? "Guardando…" : "Guardar cambios"}
-      </button>
-      {status === "ok" && <span className="text-sm font-semibold text-[#18A45C]">✓ Guardado</span>}
-      {status === "error" && <span className="text-sm font-semibold text-accent">{error}</span>}
-    </div>
-  );
-
   return (
-    <div className="max-w-3xl space-y-8">
-      {/* Visibilidad */}
-      <section className="card p-6">
-        <h2 className="font-extrabold">Secciones visibles</h2>
-        <p className="mt-1 text-sm text-ink-muted">Elige qué secciones y páginas se muestran en el sitio.</p>
-        <div className="mt-4 divide-y divide-line">
-          {sections.map((s) => (
-            <label key={s.key} className="flex cursor-pointer items-center justify-between gap-4 py-3">
-              <span>
-                <span className="block text-sm font-semibold">{s.label}</span>
-                <span className="block text-[12px] text-ink-muted">{s.hint}</span>
-              </span>
-              <input
-                type="checkbox"
-                checked={visible[s.key] ?? true}
-                onChange={(e) => setVisible((v) => ({ ...v, [s.key]: e.target.checked }))}
-                className="h-5 w-5 accent-brand"
-              />
-            </label>
-          ))}
-        </div>
-      </section>
-
-      {/* Hero */}
-      <section className="card p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-extrabold">Inicio (Hero)</h2>
-          <button
-            type="button"
-            onClick={loadRecommendedHero}
-            className="rounded-lg border border-line-strong px-3 py-2 text-[13px] font-semibold text-ink-soft transition hover:border-brand hover:text-brand"
-          >
-            Usar los textos recomendados
-          </button>
-        </div>
-        {heroReset && (
-          <p role="status" className="mt-2 text-[12px] font-semibold text-brand">
-            Textos recomendados cargados. Revísalos y pulsa “Guardar cambios” para publicarlos.
-          </p>
-        )}
-        <div className="mt-4 space-y-4">
-          <Field
-            label="Etiqueta superior (opcional)"
-            value={content.hero.eyebrow}
-            onChange={(v) => setHero("eyebrow", v)}
-            hint="Texto corto sobre el título. Déjala vacía para no mostrar etiqueta (recomendado)."
-          />
-          <Field
-            label="Título"
-            value={content.hero.title}
-            onChange={(v) => setHero("title", v)}
-            textarea
-            hint="Envuelve texto en **dobles asteriscos** para destacarlo con el degradado de marca."
-          />
-          <Field label="Subtítulo" value={content.hero.subtitle} onChange={(v) => setHero("subtitle", v)} textarea />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Botón principal" value={content.hero.ctaPrimary} onChange={(v) => setHero("ctaPrimary", v)} />
-            <Field label="Botón secundario" value={content.hero.ctaSecondary} onChange={(v) => setHero("ctaSecondary", v)} />
-          </div>
-          <div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {Array.from({ length: HERO_TAG_SLOTS }, (_, i) => (
-                <Field
-                  key={i}
-                  label={`Etiqueta ${i + 1}`}
-                  value={content.hero.tags[i] ?? ""}
-                  onChange={(v) => setHeroTag(i, v)}
+    <SaveVersionContext.Provider value={saveVersion}>
+      <div className="max-w-3xl space-y-8">
+        <section className="card p-6" aria-labelledby="config-visibles">
+          <h2 id="config-visibles" className="font-extrabold">
+            Secciones visibles
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">Elige qué secciones y páginas se muestran en el sitio.</p>
+          <div className="mt-4 divide-y divide-line">
+            {sections.map((s) => (
+              <label key={s.key} className="flex cursor-pointer items-center justify-between gap-4 py-3">
+                <span>
+                  <span className="block text-sm font-semibold">{s.label}</span>
+                  <span className="block text-[12px] text-ink-muted">{s.hint}</span>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={visible[s.key] ?? true}
+                  onChange={(e) => setVisible((v) => ({ ...v, [s.key]: e.target.checked }))}
+                  className="h-5 w-5 accent-brand"
                 />
-              ))}
-            </div>
-            <span className="mt-1 block text-[11px] text-ink-muted">
-              Frases cortas bajo los botones, con un ✓. Deja una vacía para ocultarla; si las tres quedan vacías se usan las recomendadas.
-            </span>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        {/* En el orden de la portada (SECTIONS). */}
+        <HeroEditor {...bind("hero")} />
+        <ProblemaEditor {...bind("problema")} />
+        <ResultadosEditor {...bind("resultados")} />
+        <EnfoqueEditor {...bind("enfoque")} />
+        <ServiciosEditor {...bind("servicios")} />
+        <CasosEditor {...bind("casos")} />
+        <ProcesoEditor {...bind("proceso")} />
+        <NosotrosEditor {...bind("nosotros")} />
+        <PrivacidadEditor {...bind("privacidad")} />
+
+        <div className="sticky bottom-4 rounded-xl border border-line bg-white/95 p-4 shadow-float backdrop-blur">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={save}
+              disabled={status === "saving"}
+              className="rounded-xl bg-brand px-6 py-3 text-sm font-bold text-white transition hover:brightness-95 disabled:opacity-60"
+            >
+              {status === "saving" ? "Guardando…" : "Guardar cambios"}
+            </button>
+            {status === "ok" && <span className="text-sm font-semibold text-success-strong">✓ Guardado</span>}
+            {status === "error" && <span className="text-sm font-semibold text-accent-strong">{error}</span>}
           </div>
         </div>
-      </section>
-
-      {/* Servicios */}
-      <section className="card p-6">
-        <h2 className="font-extrabold">Servicios</h2>
-        <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Field label="Etiqueta" value={content.servicios.eyebrow} onChange={(v) => setServiciosMeta("eyebrow", v)} />
-          <Field label="Título" value={content.servicios.title} onChange={(v) => setServiciosMeta("title", v)} />
-        </div>
-        <div className="mt-4 space-y-3">
-          {content.servicios.items.map((it, i) => (
-            <div key={i} className="rounded-xl border border-line p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-[12px] font-bold uppercase tracking-wide text-ink-muted">Servicio {i + 1}</span>
-                <button
-                  onClick={() =>
-                    setContent((c) => ({ ...c, servicios: { ...c.servicios, items: c.servicios.items.filter((_, idx) => idx !== i) } }))
-                  }
-                  className="text-[12px] font-semibold text-accent hover:underline"
-                >
-                  Quitar
-                </button>
-              </div>
-              <div className="space-y-3">
-                <Field label="Título" value={it.title} onChange={(v) => setServicioItem(i, "title", v)} />
-                <Field label="Descripción" value={it.body} onChange={(v) => setServicioItem(i, "body", v)} textarea />
-                <Field label="Resultado (línea naranja)" value={it.result} onChange={(v) => setServicioItem(i, "result", v)} />
-              </div>
-            </div>
-          ))}
-          <button
-            onClick={() =>
-              setContent((c) => ({ ...c, servicios: { ...c.servicios, items: [...c.servicios.items, { title: "", body: "", result: "" }] } }))
-            }
-            className="text-sm font-semibold text-brand hover:underline"
-          >
-            + Agregar servicio
-          </button>
-        </div>
-      </section>
-
-      {/* Casos de uso */}
-      <section className="card p-6">
-        <h2 className="font-extrabold">Casos de uso</h2>
-        <div className="mt-4 space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Etiqueta" value={content.casos.eyebrow} onChange={(v) => setCasosMeta("eyebrow", v)} />
-            <Field label="Título" value={content.casos.title} onChange={(v) => setCasosMeta("title", v)} />
-          </div>
-          <Field label="Bajada (a la derecha del título)" value={content.casos.subtitle} onChange={(v) => setCasosMeta("subtitle", v)} />
-        </div>
-        <div className="mt-4 space-y-3">
-          {content.casos.items.map((it, i) => (
-            <div key={i} className="rounded-xl border border-line p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-[12px] font-bold uppercase tracking-wide text-ink-muted">Caso {i + 1}</span>
-                <button
-                  onClick={() =>
-                    setContent((c) => ({ ...c, casos: { ...c.casos, items: c.casos.items.filter((_, idx) => idx !== i) } }))
-                  }
-                  className="text-[12px] font-semibold text-accent hover:underline"
-                >
-                  Quitar
-                </button>
-              </div>
-              <div className="space-y-3">
-                <Field label="Título" value={it.title} onChange={(v) => setCasoItem(i, "title", v)} />
-                <Field label="Descripción" value={it.body} onChange={(v) => setCasoItem(i, "body", v)} textarea />
-              </div>
-            </div>
-          ))}
-          <button
-            onClick={() => setContent((c) => ({ ...c, casos: { ...c.casos, items: [...c.casos.items, { title: "", body: "" }] } }))}
-            className="text-sm font-semibold text-brand hover:underline"
-          >
-            + Agregar caso
-          </button>
-        </div>
-      </section>
-
-      {/* Misión y visión (página /mision-vision) */}
-      <section className="card p-6">
-        <h2 className="font-extrabold">Misión y visión</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          Se muestra en la página <b>/mision-vision</b> (menú “Nosotros”).
-        </p>
-        <div className="mt-4 space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Etiqueta" value={content.nosotros.eyebrow} onChange={(v) => setNosotros("eyebrow", v)} />
-            <Field label="Título" value={content.nosotros.title} onChange={(v) => setNosotros("title", v)} />
-          </div>
-          <Field label="Misión" value={content.nosotros.mision} onChange={(v) => setNosotros("mision", v)} textarea />
-          <Field label="Visión" value={content.nosotros.vision} onChange={(v) => setNosotros("vision", v)} textarea />
-          <div>
-            <span className="text-[13px] font-semibold text-ink-soft">Objetivos</span>
-            <div className="mt-2 space-y-2">
-              {content.nosotros.objetivos.map((o, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 flex-none items-center justify-center rounded-md bg-surface-soft text-xs font-bold text-ink-muted">
-                    {i + 1}
-                  </span>
-                  <input className="field flex-1" value={o} onChange={(e) => setObjetivo(i, e.target.value)} placeholder={`Objetivo ${i + 1}`} />
-                  <button onClick={() => removeObjetivo(i)} className="px-2 text-[12px] font-semibold text-accent hover:underline">
-                    Quitar
-                  </button>
-                </div>
-              ))}
-              <button onClick={addObjetivo} className="text-sm font-semibold text-brand hover:underline">
-                + Agregar objetivo
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Privacidad (página /privacidad, siempre visible) */}
-      <section className="card p-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-extrabold">Privacidad</h2>
-          <button
-            type="button"
-            onClick={loadRecommendedPrivacy}
-            className="rounded-lg border border-line-strong px-3 py-2 text-[13px] font-semibold text-ink-soft transition hover:border-brand hover:text-brand"
-          >
-            Usar los textos recomendados
-          </button>
-        </div>
-        <p className="mt-1 text-sm text-ink-muted">
-          Se muestra en <b>/privacidad</b> y se enlaza desde los formularios. Es un borrador: debe validarlo O&amp;A o un abogado
-          antes del 1-dic-2026.
-        </p>
-        {privacyReset && (
-          <p role="status" className="mt-2 text-[12px] font-semibold text-brand">
-            Borrador recomendado cargado. Revísalo y pulsa “Guardar cambios” para publicarlo.
-          </p>
-        )}
-        <div className="mt-4 space-y-4">
-          <Field label="Título" value={content.privacidad.titulo} onChange={(v) => setPrivacidad("titulo", v)} />
-          <Field
-            label="Texto"
-            value={content.privacidad.texto}
-            onChange={(v) => setPrivacidad("texto", v)}
-            textarea
-            rows={14}
-            hint="Separa los párrafos con una línea en blanco. Se muestra como texto (sin HTML). Si lo dejas vacío, se publica el borrador."
-          />
-        </div>
-      </section>
-
-      <div className="sticky bottom-4 rounded-xl border border-line bg-white/95 p-4 shadow-float backdrop-blur">{btnRow}</div>
-    </div>
+      </div>
+    </SaveVersionContext.Provider>
   );
 }

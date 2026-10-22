@@ -247,13 +247,14 @@ export function DiagnosticoFlow() {
 
       {/* HEADER */}
       <header style={{ ...wrap, paddingTop: 48, paddingBottom: 8 }}>
-        <span style={badge}>◈&nbsp;FRICCIÓN OPERATIVA</span>
+        {/* Textos sin jerga (cambio lenguaje-sin-jerga, design.md decisión 6). El panel de resultados es HDU-09. */}
+        <span style={badge}>◈&nbsp;AUTODIAGNÓSTICO</span>
         <h1 style={{ margin: "18px 0 12px", fontSize: 38, fontWeight: 800, letterSpacing: "-1.4px", lineHeight: 1.1, maxWidth: 720 }}>
-          ¿Dónde se está trabando la operación de tu empresa?
+          ¿Dónde está la mayor oportunidad de tu negocio?
         </h1>
         <p style={{ margin: 0, fontSize: 16, lineHeight: 1.6, color: C.muted, maxWidth: 640 }}>
-          18 preguntas, 3 minutos. Marca con qué frecuencia ocurre cada situación en tu equipo hoy — no hay respuestas
-          correctas. Al final verás tu índice de fricción y las áreas donde la automatización tendría más impacto.
+          18 preguntas, 5 minutos. Marca con qué frecuencia ocurre cada situación en tu equipo hoy; no hay respuestas
+          correctas. Al final verás en qué áreas tu negocio puede mejorar más.
         </p>
       </header>
 

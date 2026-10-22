@@ -22,6 +22,35 @@ describe("Nav", () => {
     expect(ctaHrefs()).toEqual(["/diagnostico", "/diagnostico"]);
   });
 
+  // Cambio lenguaje-sin-jerga (spec landing/contenido-pyme, "Orden de secciones y navegación").
+  it("ofrece Lo que ganas, Servicios, Ejemplos y Cómo trabajamos en escritorio y móvil, sin ítem activo fijo", () => {
+    render(<Nav />);
+    fireEvent.click(screen.getByRole("button", { name: "Abrir menú" }));
+    const expected = [
+      ["Lo que ganas", "/#resultados"],
+      ["Servicios", "/#servicios"],
+      ["Ejemplos", "/#casos"],
+      ["Cómo trabajamos", "/#modelo"],
+    ];
+    for (const [label, href] of expected) {
+      const links = screen.getAllByRole("link", { name: label });
+      expect(links).toHaveLength(2);
+      for (const a of links) {
+        expect(a).toHaveAttribute("href", href);
+        expect(a).not.toHaveAttribute("aria-current");
+        expect(a.className).not.toMatch(/border-b-2/);
+      }
+    }
+    expect(screen.queryByRole("link", { name: "Inicio" })).toBeNull();
+  });
+
+  it("no muestra el ítem de una sección oculta", () => {
+    render(<Nav sections={{ resultados: false, proceso: false }} />);
+    expect(screen.queryByRole("link", { name: "Lo que ganas" })).toBeNull();
+    expect(screen.queryByRole("link", { name: "Cómo trabajamos" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Servicios" })).toBeInTheDocument();
+  });
+
   it("el botón que abre el menú mide 44 × 44 px", () => {
     render(<Nav />);
     const toggle = screen.getByRole("button", { name: "Abrir menú" });

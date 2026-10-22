@@ -1,5 +1,5 @@
 import { ConfigEditor } from "@/components/admin/ConfigEditor";
-import { getSiteConfig, SECTIONS } from "@/lib/site";
+import { defaultSiteConfig, getSiteConfig, SECTIONS } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -16,13 +16,8 @@ export default async function AdminConfig() {
         <ConfigEditor
           sections={SECTIONS}
           initialVisible={visible}
-          initialContent={{
-            hero: content.hero,
-            servicios: content.servicios,
-            casos: content.casos,
-            nosotros: content.nosotros,
-            privacidad: content.privacidad,
-          }}
+          initialContent={content}
+          defaults={defaultSiteConfig().content}
         />
       </div>
     </div>

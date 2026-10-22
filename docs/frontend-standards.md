@@ -38,19 +38,20 @@ app/
   admin/(panel)/layout.tsx  server: redirect a /admin/login si no hay sesión; sidebar
   admin/(panel)/{page,leads,leads/[id],config,equipo}/page.tsx
 components/
-  landing/   Nav (client), Hero, HeroPanel (client), Problem, Approach, Services, Process, UseCases, ContactForm (client, 2 pasos), ContactSuccess (client), Footer
+  landing/   Nav (client), Hero, HeroPanel (client), SectionHead, Problem, Results, Approach, Services, UseCases, Process, ContactForm (client, 2 pasos), ContactSuccess (client), Footer
   diagnostico/  DiagnosticoFlow.tsx (client), AhorroEstimator.tsx (client), cuestionario.ts, ahorro.ts
-  admin/     ConfigEditor, TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
+  admin/     ConfigEditor (contenedor de /admin/config), TeamEditor, DeleteLeadButton, LeadPdfButton, LogoutButton (todos client)
+  admin/config/  Field, SectionCard, ListField, types.ts y un <Seccion>Editor por sección del CMS (Hero, Problema, Resultados, Enfoque, Servicios, Casos, Proceso, Nosotros, Privacidad)
   Logo.tsx (Logo, LogoMark) · icons.tsx · LinkedInIcon.tsx
-lib/content.ts      textos por defecto (nav, heroFeed/heroFeedMore del panel del hero, problems, approach, services, useCases…)
-lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig(), mergeConfig(), normalizeTags(), renderHighlight()  (puro: tests y admin)
+lib/content.ts      textos fijos fuera del CMS (nav, heroFeed/heroFeedMore, resultsVisuals, approachExample, sectionLabels, metrics, contactSection)
+lib/siteConfig.ts   tipos, SECTIONS, defaultSiteConfig() (todos los textos editables por defecto), mergeConfig(), mergeFixedList(), mergeList(), normalizeTags(), renderHighlight()  (puro: tests y admin)
 lib/site.ts         getSiteConfig(), getTeamMembers() + re-exports de lib/siteConfig.ts  (server-only)
 lib/leadOptions.ts  GOALS, INDUSTRIES, CONSENT_TEXTS, CONSENT_VERSION y helpers  (puro: formulario, API, correo, PDF y admin)
 lib/leads.ts        normalizeLead(), validadores (correo, WhatsApp), honeypot, LEAD_SOURCES, safeScheduleUrl()  (puro)
 lib/leadSummary.ts  rubro, objetivos y novedades de un lead para el equipo (correo, ficha PDF y admin)  (puro)
 ```
 
-Regla: una sección de landing = un componente en `components/landing/`; un editor del admin = un componente en `components/admin/`; lógica pura del diagnóstico en archivos `.ts` junto a sus componentes.
+Regla: una sección de landing = un componente en `components/landing/`; un editor de sección del CMS = un `<Seccion>Editor.tsx` en `components/admin/config/`; otros editores del admin en `components/admin/`; lógica pura del diagnóstico en archivos `.ts` junto a sus componentes.
 
 ## 4. Convenciones
 
@@ -58,19 +59,21 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 - Componentes: archivo PascalCase `.tsx` con **export nombrado** (`export function Hero(...)`). Las páginas (`page.tsx`, `layout.tsx`) son `export default`.
 - Props tipadas inline o con `interface Props`; contenido del CMS tipado con `SiteContent["hero"]` etc.
 - Identificadores nuevos en inglés; se conservan los nombres de dominio ya existentes en español (`ahorro`, `cuestionario`, `nombre`, `cargo`…).
-- Ids de sección para anclas del nav: `inicio`, `servicios`, `modelo`, `casos` (ver `nav` en `lib/content.ts`).
+- Ids de sección de la portada, en orden: `inicio`, `problema`, `resultados`, `enfoque`, `servicios`, `casos`, `modelo` (Proceso), `contacto`. El menú (`nav` en `lib/content.ts`) enlaza `resultados`, `servicios`, `casos` y `modelo`; cada ítem declara su `section` y no se muestra si esa sección está oculta. Sin ítem activo fijo. Las secciones ancladas llevan `scroll-mt-20` para quedar bajo el menú fijo.
 
 ### Server vs client
 - Por defecto todo es Server Component. `"use client"` **solo** en componentes con estado, eventos o Firebase cliente.
 - Las páginas que leen el CMS declaran `export const dynamic = "force-dynamic"` y llaman `getSiteConfig()` / `getTeamMembers()` en el servidor; pasan `content` y `visible` por props.
 - Prohibido importar `lib/firebaseAdmin.ts`, `lib/site.ts`, `lib/email.ts`, `lib/report.ts`, `lib/leadReport.ts` desde código cliente (`server-only`). Lo único de Firebase en cliente es `lib/firebase.ts` para el login.
-- Los componentes de sección aceptan `content?` y caen a `defaultSiteConfig()` si no viene (patrón de `Hero`, `Services`, `UseCases`).
+- Los componentes de sección aceptan `content?` y caen a `defaultSiteConfig()` si no viene (patrón de `Hero`, `Problem`, `Results`, `Approach`, `Services`, `UseCases`, `Process`). El encabezado de sección (etiqueta mono, h2 y bajada) es `SectionHead`.
 
 ### CMS y visibilidad
 - Cada sección o página tiene toggle en `SECTIONS` (`lib/siteConfig.ts`, re-exportado por `lib/site.ts`). Se renderiza solo si `visible[key]`; las páginas ocultas devuelven `notFound()`.
-- Sección nueva editable: agregar clave a `SECTIONS`, default en `defaultSiteConfig()`, mezcla en `mergeConfig()`, tipo en `SiteContent`, editor en `components/admin/ConfigEditor.tsx` y fila en `docs/data-model.md`.
+- Sección nueva editable: agregar clave a `SECTIONS`, default en `defaultSiteConfig()`, mezcla tolerante en `mergeConfig()` (`pickText` para textos, `mergeFixedList` si el diseño depende de la posición, `mergeList` si el largo es variable), tipo en `SiteContent`, editor `<Seccion>Editor.tsx` en `components/admin/config/` montado en `ConfigEditor.tsx`, **clave en `MANAGED_KEYS`** (si falta, sus ediciones no se guardan; `ConfigEditor.test.tsx` compara `MANAGED_KEYS` con las claves de `SiteContent`). El guardado envía solo las secciones modificadas (`changedKeys`) y fila en `docs/data-model.md`.
+- Patrón "Usar los textos recomendados": cada editor envuelve sus campos en `SectionCard` con `onReset={() => onChange(defaults)}`; solo cambia el formulario, muestra un aviso y nada se publica hasta "Guardar cambios". Las listas de largo fijo usan `ListField` con `fixed` (sin agregar, quitar ni mover).
+- Vocabulario: los textos por defecto de la portada no usan jerga técnica ni "pyme"; `lib/siteConfig.sections.test.ts` lo prueba sobre los defaults y `components/landing/Home.vocabulario.test.tsx` sobre el render completo de la portada (incluye textos fijos). El único lugar con nombres de herramientas es `servicios.notaTecnica`.
 - Textos fijos que no son del CMS viven en `lib/content.ts`, nunca hardcodeados en el JSX.
-- `title` del hero admite `**resalte**` → `renderHighlight()` devuelve las partes y `Hero.tsx` pinta el resalte con `.text-gradient-brand`. Los textos del CMS se mezclan con `mergeConfig()`: un campo que no sea texto o quede vacío cae al default (no confiar en la forma de lo guardado).
+- `title` del hero, `problema.cierre` y `servicios.notaTecnica` admiten `**resalte**` → `renderHighlight()` devuelve las partes y cada componente pinta el resalte (degradado en el hero, celeste en el cierre, negrita en la nota). Los textos del CMS se mezclan con `mergeConfig()`: un campo que no sea texto o quede vacío cae al default (no confiar en la forma de lo guardado).
 
 ### Estado y datos
 - Estado local con `useState`; sin librerías de estado global.
@@ -79,11 +82,13 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 - Los formularios públicos no deben bloquearse por fallos secundarios (`DiagnosticoFlow` confirma aunque el backend falle).
 
 ### Estilos y diseño
-- Solo tokens de `tailwind.config.ts`: colores `navy` (+ `navy-950/800/700`), `brand` (+ `brand-dark` para hover, `brand-deep` para texto y degradados cian sobre blanco, `brand-50/100`), `brand-light` (+ `brand-light-50`), `accent` (+ `accent-strong` para texto chico, `accent-50`), `success` (+ `success-strong`, `success-50`, `success-live`), `ink`/`ink-muted`/`ink-soft`/`ink-faint` (este último solo decorativo: no cumple contraste para texto), `surface`/`surface-soft`/`surface-muted`, `line`/`line-strong`; sombras `shadow-card`, `shadow-float`, `shadow-cta`, `shadow-lift`, `shadow-form`; animaciones `animate-feed-in`, `animate-bob`, `animate-bob-slow`, `animate-live-pulse` (siempre con `motion-safe:`); ancho `max-w-content` (1200 px). Los tonos nuevos son los de la HDU-08 §7. **No introducir hex nuevos**; si hace falta un color, agregarlo como token.
+- Solo tokens de `tailwind.config.ts`: colores `navy` (+ `navy-950/800/700`), `brand` (+ `brand-dark` para hover, `brand-deep` para texto y degradados cian sobre blanco, `brand-50/100`), `brand-light` (+ `brand-light-50`), `accent` (+ `accent-strong` para texto chico, `accent-50`), `success` (+ `success-strong`, `success-50`, `success-live`), `ink`/`ink-muted`/`ink-soft`/`ink-faint` (este último solo decorativo: no cumple contraste para texto), `inverse`/`inverse-strong`/`inverse-muted`/`inverse-faint` (texto sobre fondos navy, todos ≥ 5:1), `surface`/`surface-soft`/`surface-muted`, `line`/`line-strong`; sombras `shadow-card`, `shadow-float`, `shadow-cta`, `shadow-lift`, `shadow-form`; animaciones `animate-feed-in`, `animate-bob`, `animate-bob-slow`, `animate-live-pulse` (siempre con `motion-safe:`); ancho `max-w-content` (1200 px). Los tonos nuevos son los de la HDU-08 §7. **No introducir hex nuevos**; si hace falta un color, agregarlo como token.
 - No usar `brand-light` (`#00C2FF`, 2,1:1) para texto sobre blanco; para eso está `brand-deep` (3,5:1, solo texto grande).
-- Primitivas antes que clases repetidas: `.container-page`, `.btn-primary`, `.btn-ghost`, `.pill`, `.card`, `.field`, `.text-gradient-brand` (resalte con degradado `brand` → `brand-deep`; sin soporte de `background-clip` queda en `brand`) y `.bg-dots` (trama de puntos; la máscara la pone cada sección).
+- Primitivas antes que clases repetidas: `.container-page`, `.btn-primary`, `.btn-ghost`, `.pill`, `.card`, `.field`, `.text-gradient-brand` (resalte con degradado `brand` → `brand-deep`; sin soporte de `background-clip` queda en `brand`), `.bg-dots` (trama de puntos; la máscara la pone cada sección) y `.bg-dots-inverse` (trama para secciones navy).
+- Tarjetas en fila con partes de largo variable (título, texto, caja inferior): usar subgrilla (`row-span-N grid grid-rows-subgrid`) para que las partes queden a la misma altura (ver `Process.tsx` y `Services.tsx`).
+- El desplazamiento suave a las anclas solo aplica con `prefers-reduced-motion: no-preference` (`app/globals.css`).
 - En grids que mezclan texto con paneles de ancho mínimo grande, usar columnas `minmax(0, …)` para que en móvil no crezcan más que el contenedor.
-- Tipografía: títulos `font-extrabold` con `tracking` negativo y `text-balance`; cuerpo `text-ink-muted leading-relaxed`; eyebrows de sección `text-xs font-bold tracking-[2.5px] text-brand`. El eyebrow del hero es opcional y por defecto no se muestra; si el admin escribe uno, va en una píldora blanca con check (`font-mono text-xs font-semibold tracking-[1.6px] text-navy`).
+- Tipografía: títulos `font-extrabold` con `tracking` negativo y `text-balance`; cuerpo `text-ink-muted leading-relaxed`; eyebrows de sección con `SectionHead` (`font-mono text-[12.5px] uppercase tracking-[2.2px] text-brand` con línea degradada; `text-brand-light` sobre navy). El eyebrow del hero es opcional y por defecto no se muestra; si el admin escribe uno, va en una píldora blanca con check (`font-mono text-xs font-semibold tracking-[1.6px] text-navy`).
 - Público: los textos públicos no se dirigen solo a pymes (nada de "para dueños de pymes"); hablar de "tu negocio" o "tu empresa" (decisión de Mauro del 2026-10-22, HDU-08 §14 fila 9).
 - `success` (`#138A4D`) es para íconos y marcas de completado; para texto chico sobre `success-50` usar `success-strong` (5,02:1; `success` da 4,09:1 y no cumple).
 - Responsive mobile-first con breakpoints `md`/`lg`; el sidebar del admin se oculta bajo `md`.

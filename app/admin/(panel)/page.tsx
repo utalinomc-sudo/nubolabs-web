@@ -1,5 +1,5 @@
 import { getDb } from "@/lib/firebaseAdmin";
-import { services } from "@/lib/content";
+import { getSiteConfig } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -23,13 +23,13 @@ async function getStats() {
 }
 
 export default async function AdminDashboard() {
-  const stats = await getStats();
+  const [stats, { content }] = await Promise.all([getStats(), getSiteConfig()]);
 
   const kpis = [
     { label: "Leads este mes", value: stats.configured ? String(stats.mes) : "—" },
     { label: "Leads en total", value: stats.configured ? String(stats.total) : "—" },
     { label: "Vía diagnóstico", value: stats.configured ? String(stats.diagnosticos) : "—" },
-    { label: "Servicios activos", value: String(services.length) },
+    { label: "Servicios activos", value: String(content.servicios.items.length) },
   ];
 
   return (

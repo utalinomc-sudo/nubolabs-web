@@ -46,7 +46,9 @@ describe("firebase-admin/auth: jose que carga jwks-rsa", () => {
     expect(typeof requireEntry, `jose ${pkg.version} no expone exports["."].require`).toBe("string");
   });
 
-  it("ese jose expone las funciones que usa jwks-rsa", () => {
+  // Cargar jose completo con require() toma 1–6 s cuando corre en paralelo con los tests de componentes (jsdom);
+  // el límite de 5 s por defecto lo hacía fallar sin que hubiera un error (cambio lenguaje-sin-jerga).
+  it("ese jose expone las funciones que usa jwks-rsa", { timeout: 20_000 }, () => {
     const { requireFromJwksRsa } = resolveJoseFromJwksRsa();
     const jose = requireFromJwksRsa("jose") as Record<string, unknown>;
     for (const fn of ["importJWK", "exportSPKI", "decodeJwt", "decodeProtectedHeader"]) {

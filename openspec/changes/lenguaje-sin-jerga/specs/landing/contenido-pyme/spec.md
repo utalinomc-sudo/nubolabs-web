@@ -5,7 +5,7 @@ Define las secciones de contenido de la portada de nubolabs.cl (¿Te suena?, Lo 
 ## ADDED Requirements
 
 ### Requirement: Vocabulario para dueños de negocio
-Con los textos por defecto, el texto visible de la portada MUST NOT contener las palabras "n8n", "Make", "API", "APIs", "CRM", "ERP", "agente", "agentes", "IA", "ROI" ni la expresión "horas ahorradas", salvo dentro de la nota técnica de Servicios. La nota técnica SHALL ser un único párrafo de texto pequeño ubicado al final de Servicios.
+Con los textos por defecto, el texto visible de la portada MUST NOT contener las palabras "n8n", "Make", "API", "APIs", "CRM", "ERP", "agente", "agentes", "IA", "ROI", "nube" ni la expresión "horas ahorradas", salvo dentro de la nota técnica de Servicios. Las cifras de Casos ("+120 h", "minutos", "−90%") quedan fuera de esta regla hasta HDU-06, que las reemplaza. Tampoco MUST contener "pyme" ni "pymes" en ningún lugar (decisión de Mauro del 2026-10-22: no excluir a empresas grandes). La nota técnica SHALL ser un único párrafo de texto pequeño ubicado al final de Servicios.
 
 #### Scenario: Barrido de la portada
 - **WHEN** se extrae el texto visible de `/` con los textos por defecto y se excluye la nota técnica
@@ -16,7 +16,7 @@ Con los textos por defecto, el texto visible de la portada MUST NOT contener las
 - **THEN** aparece una sola vez, dentro de la nota técnica de Servicios
 
 ### Requirement: Sección "¿Te suena?"
-La portada SHALL mostrar, si la sección `problema` está visible, el título "¿Te suena?", una bajada, una lista de dolores (por defecto 6: "Respondes WhatsApp a las 11 de la noche.", "Una cotización tarda días y el cliente se va con otro.", "Fin de mes es perseguir pagos y juntar papeles para el contador.", "No sabes cuánto ganaste hasta que alguien arma la planilla.", "Todo depende de que alguien se acuerde.", "Si alguien falta, nadie sabe en qué estaba.") y la línea de cierre "No es falta de ganas: tu negocio creció y la forma de trabajar no." con un enlace a `#resultados`. Eyebrow, título, bajada, dolores (entre 1 y 8) y cierre SHALL ser editables desde el CMS.
+La portada SHALL mostrar, si la sección `problema` está visible, el título "¿Te suena?", una bajada, una lista de dolores (por defecto 6: "Respondes WhatsApp a las 11 de la noche.", "Una cotización tarda días y el cliente se va con otro.", "Fin de mes es perseguir pagos y juntar papeles para el contador.", "No sabes cuánto ganaste hasta que alguien arma la planilla.", "Todo depende de que alguien se acuerde.", "Si alguien falta, nadie sabe en qué estaba.") y la línea de cierre "No es falta de ganas: tu negocio creció y la forma de trabajar no." con un enlace a `#resultados`. Eyebrow, título, bajada, dolores (entre 1 y 8) y cierre SHALL ser editables desde el CMS. En esta y en las demás secciones de este cambio, un texto guardado que no sea string o quede vacío SHALL reemplazarse por su default, y la portada MUST NOT fallar por datos con forma inesperada. Excepción en las listas de largo variable (dolores, servicios, ejemplos de Casos, "qué incluye" y ejemplos de éxito): un ítem sin título (o un texto vacío) no se publica; si no queda ningún ítem válido o quedan menos que el mínimo, se usa la lista por defecto; y un campo vacío de un ítem válido se muestra vacío (no toma el texto del default de su posición, que describe otro ítem).
 
 #### Scenario: Dolores por defecto
 - **WHEN** `config/site` no tiene `content.problema`
@@ -25,6 +25,10 @@ La portada SHALL mostrar, si la sección `problema` está visible, el título "�
 #### Scenario: Dolores editados
 - **WHEN** el admin deja 4 dolores y guarda
 - **THEN** la portada muestra esos 4, sin despliegue
+
+#### Scenario: Lista variable con ítems vacíos
+- **WHEN** `content.servicios.items` guardado trae un servicio con título y descripción vacía, y otro sin título
+- **THEN** la portada muestra solo el primero, con la descripción vacía, y no falla
 
 ### Requirement: Sección "Lo que ganas"
 La portada SHALL incluir, entre "¿Te suena?" y el Enfoque, una sección con ancla `resultados` y clave de visibilidad `resultados` (visible por defecto) que muestra exactamente 4 resultados, cada uno con título, texto y una ilustración decorativa, más una línea de cierre. Los defaults SHALL ser: "Vendes más" / "Respondes al instante, cotizas el mismo día y ningún cliente se queda sin seguimiento."; "Tienes el control" / "Ventas, gastos, cobranzas y pendientes al día, en tu celular, sin pedirle un informe a nadie."; "Nada se olvida" / "Cobros, plazos, pedidos y papeles que avanzan solos y a tiempo. Menos errores, menos sustos."; "Creces sin desordenarte" / "Atiendes más clientes sin que tu equipo colapse ni tengas que contratar al mismo ritmo."; cierre "Y tu equipo deja la pega repetitiva para dedicarse a lo que de verdad hace crecer tu negocio." Los textos SHALL ser editables desde el CMS; la cantidad de resultados MUST mantenerse en 4. Las ilustraciones MUST NOT mostrar cifras de resultados ni nombres de clientes y MUST estar ocultas para lectores de pantalla.
@@ -85,11 +89,15 @@ Los textos por defecto de Casos SHALL no usar jerga: la bajada por defecto SHALL
 - **THEN** la bajada y los casos de la sección no contienen palabras prohibidas
 
 ### Requirement: Textos recomendados en el admin
-En `/admin/config`, cada sección editable de este cambio (¿Te suena?, Lo que ganas, Enfoque, Servicios, Casos y Proceso) SHALL ofrecer la acción "Usar los textos recomendados", que reemplaza en el formulario los textos de esa sección por los defaults vigentes sin guardar. Los cambios solo se publican al pulsar "Guardar cambios".
+En `/admin/config`, cada sección editable de este cambio (¿Te suena?, Lo que ganas, Enfoque, Servicios, Casos y Proceso) SHALL ofrecer la acción "Usar los textos recomendados", que reemplaza en el formulario los textos de esa sección por los defaults vigentes sin guardar. Los cambios solo se publican al pulsar "Guardar cambios". Al guardar, el admin SHALL enviar la visibilidad y solo las secciones del contenido que cambiaron desde la carga o el último guardado; MUST NOT enviar `content.equipo`, que se edita en `/admin/equipo`.
 
 #### Scenario: Restablecer una sección
 - **WHEN** el admin pulsa "Usar los textos recomendados" en Proceso
 - **THEN** los 4 pasos y la franja de éxito del formulario muestran los defaults, el resto de las secciones no cambia y nada se guarda hasta pulsar "Guardar cambios"
+
+#### Scenario: Guardar solo lo modificado
+- **WHEN** el admin edita un dolor de "¿Te suena?" y pulsa "Guardar cambios"
+- **THEN** se envían la visibilidad y solo `content.problema`; las secciones que no tocó siguen mostrando los textos por defecto del código
 
 ### Requirement: Encabezado del autodiagnóstico sin jerga
 El encabezado de `/diagnostico` (etiqueta, título y bajada) y su metadata `description` MUST NOT contener "automatización", "fricción operativa" ni "ahorrar automatizando"; las preguntas, la escala y el cálculo no cambian.

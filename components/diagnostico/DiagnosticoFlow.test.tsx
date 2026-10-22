@@ -89,3 +89,16 @@ describe("DiagnosticoFlow: paso de contacto", () => {
     expect(body).toMatchObject({ source: "diagnostico", contactConsent: true, marketingConsent: false, phone: "+56 9 5555 1234" });
   });
 });
+
+// Cambio lenguaje-sin-jerga (spec landing/contenido-pyme, "Encabezado del autodiagnóstico sin jerga").
+describe("DiagnosticoFlow: encabezado", () => {
+  it("habla de oportunidades del negocio, sin 'automatización' ni 'fricción operativa', y mantiene las 18 preguntas", () => {
+    render(<DiagnosticoFlow />);
+    const header = screen.getByRole("heading", { level: 1 }).closest("header") as HTMLElement;
+    expect(header).toHaveTextContent("AUTODIAGNÓSTICO");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("¿Dónde está la mayor oportunidad de tu negocio?");
+    expect(header).toHaveTextContent("18 preguntas, 5 minutos.");
+    expect(header.textContent ?? "").not.toMatch(/automatizaci[oó]n|fricci[oó]n operativa|ahorrar automatizando/i);
+    expect(screen.getAllByText("Seguido")).toHaveLength(18);
+  });
+});

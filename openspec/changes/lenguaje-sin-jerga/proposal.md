@@ -4,7 +4,7 @@ Después del hero (HDU-01) y del formulario (HDU-03), el resto de la portada sig
 
 ## What Changes
 
-- **Barrido de vocabulario** de la landing con la tabla de reemplazos de HDU-02 (`docs/backlog/prospectos-oa.md`) más los ajustes de la HDU-08: fuera "n8n", "Make", "API", "CRM", "ERP", "agentes", "IA", "nube", "ROI estimado" y "horas ahorradas" de todo texto visible, salvo una única **nota técnica** chica al final de Servicios.
+- **Barrido de vocabulario** (incluye "pyme(s)", decisión de Mauro del 2026-10-22) de la landing con la tabla de reemplazos de HDU-02 (`docs/backlog/prospectos-oa.md`) más los ajustes de la HDU-08: fuera "n8n", "Make", "API", "CRM", "ERP", "agentes", "IA", "nube", "ROI estimado" y "horas ahorradas" de todo texto visible, salvo una única **nota técnica** chica al final de Servicios.
 - **"¿Te suena?" (Problemas) editable desde el CMS** (`content.problema`): 6 dolores en idioma de dueño y la línea de cierre "No es falta de ganas: tu negocio creció y la forma de trabajar no."
 - **Sección nueva "Lo que ganas"** (clave `resultados`, ancla `#resultados`): 4 resultados (Vendes más, Tienes el control, Nada se olvida, Creces sin desordenarte) con mini-ilustraciones decorativas y la línea de cierre sobre el equipo. Textos en el CMS.
 - **Enfoque editable** (`content.enfoque`): "Primero ordenamos, después automatizamos." con 3 pasos y la ilustración "antes / después" de una cotización (texto ilustrativo en código).

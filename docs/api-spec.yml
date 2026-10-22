@@ -163,7 +163,8 @@ paths:
                 visible:
                   type: object
                   additionalProperties: { type: boolean }
-                  example: { hero: true, problema: false }
+                  description: "Claves de SECTIONS: hero, problema, resultados, enfoque, servicios, casos, proceso, contacto, nosotros, equipo"
+                  example: { hero: true, problema: true, resultados: false }
                 content:
                   $ref: "#/components/schemas/SiteContentPartial"
       responses:
@@ -401,7 +402,7 @@ components:
 
     SiteContentPartial:
       type: object
-      description: Subconjunto de `SiteContent` (`lib/siteConfig.ts`); se mezcla sobre los defaults con `mergeConfig()`
+      description: "Subconjunto de `SiteContent` (`lib/siteConfig.ts`); se mezcla sobre los defaults con `mergeConfig()`, que tolera textos vacíos o con forma inesperada. El admin envía solo las secciones modificadas de `MANAGED_KEYS` (nunca `equipo`, que guarda /admin/equipo); sin cambios de contenido envía solo `visible`"
       properties:
         hero:
           type: object
@@ -416,16 +417,63 @@ components:
               description: "Etiquetas bajo los botones. Al leer se recortan, se descartan vacías y se usan como máximo 3; si queda vacía o no es arreglo se usan los defaults."
               items: { type: string }
               example: ["30 minutos, gratis y sin compromiso", "Sin cambiar tus sistemas", "Respuesta en menos de 24 horas"]
+        problema:
+          type: object
+          description: "¿Te suena? (cambio lenguaje-sin-jerga)"
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            subtitle: { type: string }
+            items:
+              type: array
+              description: "1 a 8 dolores"
+              items: { type: object, properties: { title: { type: string } } }
+            cierre: { type: string, description: "Admite **resalte**" }
+            cierreCta: { type: string, description: "Texto del enlace a #resultados" }
+        resultados:
+          type: object
+          description: "Lo que ganas. La visibilidad usa la clave `resultados`"
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            subtitle: { type: string }
+            items:
+              type: array
+              description: "Siempre 4 al leer: faltantes o inválidos toman el default de su posición; los sobrantes se descartan"
+              items: { type: object, properties: { title: { type: string }, body: { type: string } } }
+            cierre: { type: string }
+        enfoque:
+          type: object
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            body: { type: string }
+            items:
+              type: array
+              description: "Siempre 3 al leer"
+              items: { type: object, properties: { title: { type: string }, body: { type: string } } }
         servicios:
           type: object
           properties:
             eyebrow: { type: string }
             title: { type: string }
+            subtitle: { type: string }
+            destacado:
+              type: object
+              properties:
+                etiqueta: { type: string }
+                title: { type: string }
+                body: { type: string }
+                result: { type: string }
+                incluye: { type: array, description: "1 a 4", items: { type: string } }
             items:
               type: array
+              description: "1 a 6; `result` se muestra como \"lo que ganas\""
               items:
                 type: object
                 properties: { title: { type: string }, body: { type: string }, result: { type: string } }
+            acompanamiento: { type: object, properties: { title: { type: string }, body: { type: string } } }
+            notaTecnica: { type: string, description: "Único texto de la portada que nombra herramientas (n8n, Make). Admite **resalte**" }
         casos:
           type: object
           properties:
@@ -437,6 +485,22 @@ components:
               items:
                 type: object
                 properties: { title: { type: string }, body: { type: string } }
+        proceso:
+          type: object
+          description: "Cómo trabajamos (ancla #modelo)"
+          properties:
+            eyebrow: { type: string }
+            title: { type: string }
+            subtitle: { type: string }
+            items:
+              type: array
+              description: "Siempre 4 al leer"
+              items: { type: object, properties: { title: { type: string }, body: { type: string }, recibes: { type: string } } }
+            exito:
+              type: object
+              properties:
+                title: { type: string }
+                items: { type: array, description: "1 a 6", items: { type: string } }
         nosotros:
           type: object
           properties:
@@ -451,6 +515,12 @@ components:
             eyebrow: { type: string }
             title: { type: string }
             historia: { type: string }
+        privacidad:
+          type: object
+          description: "Página /privacidad. Un campo vacío cae al borrador por defecto"
+          properties:
+            titulo: { type: string }
+            texto: { type: string, description: "Párrafos separados por línea en blanco; se muestra como texto plano" }
 
     EmailResult:
       type: object
