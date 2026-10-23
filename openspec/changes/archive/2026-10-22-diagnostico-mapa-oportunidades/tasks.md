@@ -58,7 +58,7 @@
 ## N+3. Documentación (OBLIGATORIO)
 
 - [x] N+3.1 Actualizar `docs/data-model.md` (§2.1: `areas[].id`, `oportunidades`, `ahorro` solo en leads antiguos; `visible.autodiagnostico`; `content.autodiagnostico`), `docs/api-spec.yml` (`DiagnosticoMeta`, condición del 400 de `/api/diagnostico/report`, `SiteContentPartial.autodiagnostico`), `docs/frontend-standards.md` (estructura: `oportunidades.ts`, `/admin/estimador`, `SelfDiagnosis.tsx`), `docs/project-profile.md` §8 (glosario: "Mapa de oportunidades", "Ahorro estimado" como herramienta interna), `docs/ESTADO-PROYECTO.md` y el estado de HDU-09 en `docs/backlog/prospectos-oa.md`.
-- [ ] N+3.2 Al archivar (`/opsx:archive`), actualizar el `## Purpose` de `openspec/specs/diagnostico/estimador-ahorro/spec.md` para decir que el estimador es una herramienta interna del panel y que sus montos no se muestran al cliente; verificar con `openspec validate --specs --strict`.
+- [x] N+3.2 Al archivar (`/opsx:archive`), actualizar el `## Purpose` de `openspec/specs/diagnostico/estimador-ahorro/spec.md` para decir que el estimador es una herramienta interna del panel y que sus montos no se muestran al cliente; verificar con `openspec validate --specs --strict`.
 
 ## R. Revisión adversarial (2026-10-22, agente independiente: FAIL, 1 Major)
 

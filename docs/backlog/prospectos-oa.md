@@ -341,7 +341,7 @@ Derivada de "Usar la recomendación de O&A" y del contexto: el correo lleva el l
 
 ## HDU-09 · Diagnóstico con mapa de oportunidades (sin ahorro en horas)
 
-**Estado (2026-10-22):** implementada en la rama `feature/diagnostico-mapa-oportunidades`, en preview; pendiente de aprobación y mezcla.
+**Estado (2026-10-22):** ✅ en producción; archivado en `openspec/changes/archive/2026-10-22-diagnostico-mapa-oportunidades/` (specs `openspec/specs/diagnostico/mapa-oportunidades/` y `openspec/specs/landing/autodiagnostico/`).
 
 **Cambio OpenSpec:** `diagnostico-mapa-oportunidades` · Fase 2 · Tamaño M · Depende de HDU-02 · Detalle completo en HDU-08 §5.3.
 
@@ -386,5 +386,5 @@ Claude crea propuesta, diseño y tareas; Mauro revisa; `/opsx:apply`; verificaci
 | HDU-05 casos-por-rubro | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-casos-por-rubro/`, spec `openspec/specs/landing/casos-por-rubro/`) |
 | HDU-06 cifras-con-respaldo | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-cifras-con-respaldo/`, spec `openspec/specs/landing/cifras/`) |
 | HDU-07 landing-referidos-oa | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-landing-referidos-oa/`, spec `openspec/specs/leads/origen-referidos/`) |
-| HDU-09 diagnostico-mapa-oportunidades | en preview (2026-10-22): implementada en `feature/diagnostico-mapa-oportunidades`; pendiente de aprobación y mezcla |
+| HDU-09 diagnostico-mapa-oportunidades | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-diagnostico-mapa-oportunidades/`, specs `openspec/specs/diagnostico/mapa-oportunidades/` y `openspec/specs/landing/autodiagnostico/`) |
 | HDU-10 cierre-landing-faq-cta | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-cierre-landing-faq-cta/`, spec `openspec/specs/landing/cierre/`) |

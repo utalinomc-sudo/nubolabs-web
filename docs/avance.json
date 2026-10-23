@@ -65,8 +65,8 @@
       "nombre": "Puesta en marcha",
       "descripcion": "Preview y aprobación de cada cambio, textos en el admin y envío del correo de O&A",
       "peso": 0.15,
-      "avance": 0.5,
-      "nota": "Sitio, dominio, Vercel, Firebase y Resend ya operan; HDU-01 cumplió su parte (publicada y hero con los textos recomendados, 30 % → 35 %); HDU-03 y HDU-02 con preview aprobado y publicadas (35 % → 40 %); HDU-10 (40 % → 42 %), HDU-04 (42 % → 44 %), HDU-06 (44 % → 46 %), HDU-05 (46 % → 48 %) y HDU-07 (48 % → 50 %) con preview aprobado y publicadas el 2026-10-22. Falta cargar los textos recomendados en el admin (Servicios y Ejemplos; Ejemplos activa además el filtro por rubro), revisar la franja de /oa, la URL de agenda, la validación legal de /privacidad y de la respuesta sobre datos, el testimonio autorizado de Mauricio O., la cifra real del piloto, confirmar con Mauricio O. el link https://www.nubolabs.cl/oa, el preview y la aprobación de HDU-09 y enviar el correo de O&A"
+      "avance": 0.52,
+      "nota": "Sitio, dominio, Vercel, Firebase y Resend ya operan; HDU-01 cumplió su parte (publicada y hero con los textos recomendados, 30 % → 35 %); HDU-03 y HDU-02 con preview aprobado y publicadas (35 % → 40 %); HDU-10 (40 % → 42 %), HDU-04 (42 % → 44 %), HDU-06 (44 % → 46 %), HDU-05 (46 % → 48 %), HDU-07 (48 % → 50 %) y HDU-09 (50 % → 52 %) con preview aprobado y publicadas el 2026-10-22. Falta cargar los textos recomendados en el admin (Servicios y Ejemplos; Ejemplos activa además el filtro por rubro), revisar la franja de /oa y el bloque Autodiagnóstico, hacer un diagnóstico de prueba en producción, la URL de agenda, la validación legal de /privacidad y de la respuesta sobre datos, el testimonio autorizado de Mauricio O., la cifra real del piloto, confirmar con Mauricio O. el link https://www.nubolabs.cl/oa y enviar el correo de O&A"
     }
   ],
   "historias": [
@@ -161,8 +161,10 @@
       "fase": "Fase 2",
       "entrega": "Fase 2",
       "sp": 5,
-      "estado": "pendiente",
-      "nota": "Artefactos OpenSpec creados (diagnostico-mapa-oportunidades)"
+      "estado": "produccion",
+      "nota": "Mezclada a main (787f6bb) y publicada por el deploy automático de Vercel: /diagnostico entrega el mapa de oportunidades, sin índice ni montos; estimador interno en /admin/estimador y bloque Autodiagnóstico en la portada",
+      "fecha": "2026-10-22",
+      "entregadaEn": "Fase 2"
     },
     {
       "id": "HDU-10",
