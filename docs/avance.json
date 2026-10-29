@@ -70,7 +70,7 @@
       "descripcion": "Preview y aprobación de cada cambio, textos en el admin y envío del correo de O&A",
       "peso": 0.15,
       "avance": 0.52,
-      "nota": "Sitio, dominio, Vercel, Firebase y Resend ya operan; HDU-01 cumplió su parte (publicada y hero con los textos recomendados, 30 % → 35 %); HDU-03 y HDU-02 con preview aprobado y publicadas (35 % → 40 %); HDU-10 (40 % → 42 %), HDU-04 (42 % → 44 %), HDU-06 (44 % → 46 %), HDU-05 (46 % → 48 %), HDU-07 (48 % → 50 %) y HDU-09 (50 % → 52 %) con preview aprobado y publicadas el 2026-10-22. Falta cargar los textos recomendados en el admin (Servicios y Ejemplos; Ejemplos activa además el filtro por rubro), revisar la franja de /oa y el bloque Autodiagnóstico, hacer un diagnóstico de prueba en producción, la URL de agenda, la validación legal de /privacidad y de la respuesta sobre datos, el testimonio autorizado de Mauricio O., la cifra real del piloto, confirmar con Mauricio O. el link https://www.nubolabs.cl/oa y enviar el correo de O&A"
+      "nota": "Sitio, dominio, Vercel, Firebase y Resend ya operan; HDU-01 cumplió su parte (publicada y hero con los textos recomendados, 30 % → 35 %); HDU-03 y HDU-02 con preview aprobado y publicadas (35 % → 40 %); HDU-10 (40 % → 42 %), HDU-04 (42 % → 44 %), HDU-06 (44 % → 46 %), HDU-05 (46 % → 48 %), HDU-07 (48 % → 50 %) y HDU-09 (50 % → 52 %) con preview aprobado y publicadas el 2026-10-22. Falta cargar los textos recomendados en el admin (Servicios y Ejemplos; Ejemplos activa además el filtro por rubro), revisar la franja de /oa y el bloque Autodiagnóstico, hacer un diagnóstico de prueba en producción, la URL de agenda, la validación legal de /privacidad y de la respuesta sobre datos, el testimonio autorizado de Mauricio O., la cifra real del piloto, confirmar con Mauricio O. el link https://www.nubolabs.cl/oa y enviar el correo de O&A. HDU-11 publicada el 2026-10-29 (52 % se mantiene): faltan P.0 a P.3, cargar los textos recomendados nuevos en todas las secciones del admin, pegar la historia del equipo y revisar producción"
     }
   ],
   "historias": [
@@ -189,8 +189,10 @@
       "fase": "Fase 3",
       "entrega": "Fase 3",
       "sp": 5,
-      "estado": "pendiente",
-      "nota": "2026-10-29: archivada en feature/enfoque-soluciones-a-medida (openspec/changes/archive/2026-10-29-enfoque-soluciones-a-medida/) con lint, tipos, 379 tests, build y E2E en verde y la revisión adversarial aplicada (2 Major y 6 Minor corregidos); commit local. Pendiente: mezcla a main y preview. Post-merge: Usar los textos recomendados en todas las secciones del admin salvo Autodiagnóstico y pegar la historia del equipo"
+      "estado": "produccion",
+      "nota": "Mezclada a main (300c0a1) y publicada por el deploy automático de Vercel el 2026-10-29; pie, metadatos, panel y lema nuevos comprobados en www.nubolabs.cl. Pendiente del dueño: Usar los textos recomendados en todas las secciones del admin salvo Autodiagnóstico (las guardadas en Firestore siguen con los textos viejos) y pegar la historia del equipo",
+      "fecha": "2026-10-29",
+      "entregadaEn": "Fase 3"
     }
   ]
 }
