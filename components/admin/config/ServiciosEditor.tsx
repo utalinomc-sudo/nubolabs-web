@@ -80,7 +80,7 @@ export function ServiciosEditor({ value, onChange, defaults }: EditorProps<"serv
         value={value.notaTecnica}
         onChange={(v) => set({ notaTecnica: v })}
         textarea
-        hint="Letra pequeña al final de Servicios: el único lugar de la portada donde se nombran herramientas. **Dobles asteriscos** = negrita."
+        hint="Letra pequeña al final de Servicios: explica cómo trabajamos, sin nombrar herramientas ni canales. **Dobles asteriscos** = negrita."
       />
     </SectionCard>
   );

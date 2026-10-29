@@ -21,7 +21,8 @@ export const GOALS: readonly { key: GoalKey; label: string; topic: string | null
   { key: "clear_numbers", label: "Tener mis números claros", topic: "tener tus números claros" },
   { key: "collect_on_time", label: "Cobrar a tiempo", topic: "cobrar a tiempo" },
   { key: "organize_team", label: "Ordenar el trabajo del equipo", topic: "ordenar el trabajo del equipo" },
-  { key: "drop_spreadsheets", label: "Dejar atrás las planillas", topic: "dejar atrás las planillas" },
+  // Clave persistida en leads antiguos; la etiqueta cambió en enfoque-soluciones-a-medida (design.md decisión 6).
+  { key: "drop_spreadsheets", label: "Resolver un problema puntual de mi operación", topic: "resolver un problema puntual de tu operación" },
   { key: "grow_orderly", label: "Crecer sin desordenarme", topic: "crecer sin desordenarte" },
   { key: "other", label: "Otra cosa", topic: null },
 ];

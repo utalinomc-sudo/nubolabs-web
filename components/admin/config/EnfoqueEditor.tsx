@@ -5,13 +5,13 @@ import { ListField } from "./ListField";
 import { SectionCard } from "./SectionCard";
 import type { EditorProps } from "./types";
 
-// Enfoque: siempre 3 pasos. El ejemplo "antes / después" de la cotización es fijo.
+// Enfoque: siempre 3 pasos. El ejemplo "antes / después" del informe del mes es fijo (lib/content.ts).
 export function EnfoqueEditor({ value, onChange, defaults }: EditorProps<"enfoque">) {
   const set = (patch: Partial<typeof value>) => onChange({ ...value, ...patch });
   return (
     <SectionCard
       title="Enfoque"
-      description="Sección oscura “Primero ordenamos, después automatizamos”. El ejemplo antes/después es fijo."
+      description="Sección oscura “Primero entendemos tu problema, después construimos la solución”. El ejemplo antes/después (el informe del mes) es fijo."
       onReset={() => onChange(defaults)}
     >
       <FieldRow>

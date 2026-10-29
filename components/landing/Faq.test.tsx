@@ -8,17 +8,18 @@ import { defaultSiteConfig } from "@/lib/siteConfig";
 afterEach(cleanup);
 
 describe("Faq", () => {
-  it("muestra las 6 preguntas como details/summary cerrados, con ancla #preguntas", () => {
+  it("muestra las 7 preguntas como details/summary cerrados, con ancla #preguntas", () => {
     const { container } = render(<Faq />);
     expect(container.querySelector("section#preguntas")).not.toBeNull();
     expect(screen.getByRole("heading", { level: 2, name: "Lo que nos preguntan antes de partir" })).toBeInTheDocument();
     const details = container.querySelectorAll("details");
-    expect(details).toHaveLength(6);
+    expect(details).toHaveLength(7);
     details.forEach((d) => {
       expect(d.open).toBe(false);
       expect(d.querySelector("summary")).not.toBeNull();
     });
-    expect(details[2].querySelector("summary")).toHaveTextContent("¿Cuánto cuesta?");
+    expect(details[1].querySelector("summary")).toHaveTextContent("¿Es una solución estándar o hecha para mi negocio?");
+    expect(details[3].querySelector("summary")).toHaveTextContent("¿Cuánto cuesta?");
   });
 
   it("la respuesta sobre datos enlaza a /privacidad", () => {

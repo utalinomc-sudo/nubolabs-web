@@ -28,7 +28,7 @@ describe("casos por defecto", () => {
 
   it("encabezado por rubro, sin bajada", () => {
     expect(c.eyebrow).toBe("Ejemplos por rubro");
-    expect(c.title).toBe("Esto es lo que dejamos funcionando en negocios como el tuyo");
+    expect(c.title).toBe("Problemas concretos que resolvemos en negocios como el tuyo");
     expect(c.subtitle).toBe("");
   });
 
@@ -43,14 +43,14 @@ describe("casos por defecto", () => {
       "comercio", "comercio",
     ]);
     expect(c.items.every((i) => i.body === "")).toBe(true);
-    expect(c.items[0].title).toBe("La información del mes le llega sola a tu contador.");
-    expect(c.items[3].title).toBe("Reservas y consultas por WhatsApp respondidas al instante, incluso de noche.");
-    expect(c.items[13].title).toBe("Clientes que vuelven con mensajes según lo que compraron.");
+    expect(c.items[0].title).toBe("Un reporte mensual con ventas, costos y márgenes que se arma solo.");
+    expect(c.items[3].title).toBe("Reservas y pedidos en un solo lugar, con la ocupación del día a la vista.");
+    expect(c.items[13].title).toBe("Sabes qué productos dejan margen y cuáles no, antes de reponer.");
   });
 
-  it("sin jerga ni 'horas'", () => {
+  it("sin jerga, 'horas', herramientas, canales ni contabilidad (cambio enfoque-soluciones-a-medida)", () => {
     const text = [c.eyebrow, c.title, ...c.items.map((i) => i.title)].join(" ");
-    expect(text).not.toMatch(/\bn8n\b|\bAPIs?\b|\bCRM\b|\bERP\b|horas/i);
+    expect(text).not.toMatch(/\bn8n\b|\bAPIs?\b|\bCRM\b|\bERP\b|horas|WhatsApp|Excel|Sheets|planilla|contador|contable/i);
     expect(text).not.toMatch(/\bMake\b|\bIA\b/);
   });
 });

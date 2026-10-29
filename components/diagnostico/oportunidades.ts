@@ -28,8 +28,9 @@ export const DIMENSIONS: readonly Dimension[] = [
     id: "control",
     nombre: "Control y números",
     areas: ["info"],
-    logro: "Tienes el control: decides con datos, sin pedir informes.",
-    proximoPaso: "Tener ventas, gastos y cobranzas al día en un panel simple.",
+    // Cambio enfoque-soluciones-a-medida: la dimensión habla de decidir con datos y de un reporte claro.
+    logro: "Decides con datos: ventas, costos y pendientes al día, sin pedir informes.",
+    proximoPaso: "Tener ventas, costos y cobranzas al día en un reporte claro.",
   },
   {
     id: "orden",

@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Nuestro equipo — Nubolabs",
-  description: "Las personas detrás de Nubolabs: rediseño de procesos, ingeniería e IA.",
+  description: "Las personas detrás de Nubolabs: análisis de procesos, ingeniería y datos.",
 };
 
 function Inicial({ nombre }: { nombre: string }) {

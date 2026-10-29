@@ -1,11 +1,11 @@
 {
   "nombre": "Nubolabs · Web para los prospectos de O&A",
-  "actualizado": "2026-10-22",
+  "actualizado": "2026-10-29",
   "descripcion": "Registro del avance del proyecto por puntos de historia. Lo lee la skill avance-backlog; se actualiza después de cada fusión a main o publicación en producción. Mide las historias de docs/backlog/prospectos-oa.md (la HDU-08 cuenta en documentación y diseño). SP referenciales desde el tamaño de cada HDU: S = 3, M = 5.",
   "alcances": [
     {
       "nombre": "Todo el backlog",
-      "descripcion": "Las 9 historias de la campaña O&A (HDU-01 a 07, 09 y 10)"
+      "descripcion": "Las 10 historias del sitio: las 9 de la campaña O&A (HDU-01 a 07, 09 y 10) y el cambio de enfoque HDU-11"
     },
     {
       "nombre": "Fase 1",
@@ -23,12 +23,16 @@
     {
       "nombre": "Fase 2",
       "descripcion": "Completa el rediseño: confianza, casos por rubro, cifras, cierre con preguntas frecuentes, entrada /oa y diagnóstico con mapa de oportunidades"
+    },
+    {
+      "nombre": "Fase 3",
+      "descripcion": "Enfoque nuevo de todos los textos: soluciones a medida para cada cliente y datos para decidir (HDU-11)"
     }
   ],
   "modulos": {
     "EP-MSJ": {
       "nombre": "Mensaje",
-      "descripcion": "Hero y textos de la landing en el idioma del dueño de pyme"
+      "descripcion": "Hero y textos de la landing en el idioma del dueño del negocio; desde HDU-11, con el enfoque de soluciones a medida y datos para decidir"
     },
     "EP-CAP": {
       "nombre": "Captación",
@@ -177,6 +181,16 @@
       "nota": "Mezclada a main (016c9c2) y publicada por el deploy automático de Vercel; preguntas frecuentes, CTA final, CTA fija en móvil y pie nuevo comprobados en www.nubolabs.cl. WhatsApp configurable, apagado por defecto",
       "fecha": "2026-10-22",
       "entregadaEn": "Fase 2"
+    },
+    {
+      "id": "HDU-11",
+      "titulo": "Enfoque: soluciones a medida para cada cliente y datos para decidir",
+      "epica": "EP-MSJ",
+      "fase": "Fase 3",
+      "entrega": "Fase 3",
+      "sp": 5,
+      "estado": "pendiente",
+      "nota": "2026-10-29: archivada en feature/enfoque-soluciones-a-medida (openspec/changes/archive/2026-10-29-enfoque-soluciones-a-medida/) con lint, tipos, 379 tests, build y E2E en verde y la revisión adversarial aplicada (2 Major y 6 Minor corregidos); commit local. Pendiente: mezcla a main y preview. Post-merge: Usar los textos recomendados en todas las secciones del admin salvo Autodiagnóstico y pegar la historia del equipo"
     }
   ]
 }

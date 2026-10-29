@@ -212,15 +212,15 @@ describe("ConfigEditor", () => {
   });
 
   // Cambio cierre-landing-faq-cta: preguntas frecuentes, CTA final y WhatsApp.
-  it("preguntas frecuentes: 1 a 10, con ayuda de enlaces; restablecer devuelve las 6 sin guardar", () => {
+  it("preguntas frecuentes: 1 a 10, con ayuda de enlaces; restablecer devuelve las 7 sin guardar", () => {
     const { fetchMock } = renderEditor();
     const faq = screen.getByRole("region", { name: "Preguntas frecuentes" });
     expect(within(faq).getByText(/\[texto\]\(\/ruta\)/)).toBeInTheDocument();
     fireEvent.click(within(faq).getByRole("button", { name: "Quitar Pregunta 1" }));
     fireEvent.click(within(faq).getByRole("button", { name: "Quitar Pregunta 1" }));
-    expect(within(faq).getAllByRole("button", { name: /^Quitar Pregunta/ })).toHaveLength(4);
+    expect(within(faq).getAllByRole("button", { name: /^Quitar Pregunta/ })).toHaveLength(5);
     fireEvent.click(within(faq).getByRole("button", { name: "Usar los textos recomendados" }));
-    expect(within(faq).getAllByRole("button", { name: /^Quitar Pregunta/ })).toHaveLength(6);
+    expect(within(faq).getAllByRole("button", { name: /^Quitar Pregunta/ })).toHaveLength(7);
     expect(fetchMock).not.toHaveBeenCalled();
     expect(screen.getByRole("region", { name: "CTA final" })).toBeInTheDocument();
   });
@@ -317,6 +317,23 @@ describe("ConfigEditor", () => {
     await save(fetchMock, 1);
     expect(Object.keys(lastBody().content)).toEqual(["referidos"]);
     expect(lastBody().content.referidos).toEqual({ oa: { titulo: "Hola, cliente de O&A.", texto: referidos.oa.texto } });
+  });
+
+  // Cambio enfoque-soluciones-a-medida: Misión y visión también se puede restablecer, para cargar los textos nuevos en producción.
+  it("misión y visión: 'Usar los textos recomendados' repone misión, visión y objetivos sin guardar", async () => {
+    const base = defaultSiteConfig().content;
+    const viejo = { ...base, nosotros: { ...base.nosotros, mision: "Operar en piloto automático.", objetivos: ["Uno"] } };
+    const { fetchMock, lastBody } = renderEditor(viejo);
+    const region = screen.getByRole("region", { name: "Misión y visión" });
+    const mision = within(region).getByRole("textbox", { name: "Misión" });
+    expect(mision).toHaveValue("Operar en piloto automático.");
+    fireEvent.click(within(region).getByRole("button", { name: "Usar los textos recomendados" }));
+    expect(mision).toHaveValue(base.nosotros.mision);
+    expect(within(region).getAllByRole("textbox", { name: /^Objetivo \d/ })).toHaveLength(base.nosotros.objetivos.length);
+    expect(fetchMock).not.toHaveBeenCalled();
+    await save(fetchMock, 1);
+    expect(Object.keys(lastBody().content)).toEqual(["nosotros"]);
+    expect(lastBody().content.nosotros).toEqual(base.nosotros);
   });
 
   it("restablecer Servicios guardados con la forma antigua envía la sección completa con el destacado", async () => {

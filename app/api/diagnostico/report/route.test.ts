@@ -50,6 +50,9 @@ describe("POST /api/diagnostico/report", () => {
     expect(text).toContain("PRÓXIMO PASO SUGERIDO");
     expect(text).toContain("Responder más rápido");
     expect(text).not.toMatch(/fricci|ahorro|\$|h\/mes|automatiz/i);
+    // Lema del sitio en la cabecera (cambio enfoque-soluciones-a-medida).
+    expect(text).toContain("Soluciones a tu medida, decisiones con datos.");
+    expect(text).not.toMatch(/piloto autom|WhatsApp|planilla|contador/i);
   });
 
   it("meta antiguo (índice, áreas por nombre y ahorro): PDF con el mapa calculado y sin montos", async () => {

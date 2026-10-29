@@ -103,7 +103,8 @@ Regla: una sección de landing = un componente en `components/landing/`; un edit
 - Dirección de diseño "1b claro & azul": fondo blanco/`surface-soft`, acento azul `brand`, detalles cian y naranjo puntuales.
 
 ### Copy, formato y locale
-- Textos en español de Chile, tono directo de Nubolabs ("Tu operación, en piloto automático").
+- Textos en español de Chile, tono directo de Nubolabs. Lema del sitio: "Soluciones a tu medida, decisiones con datos." (`siteSlogan` en `lib/content.ts`; lo usan el pie, `/diagnostico`, el informe PDF y el correo al cliente).
+- Enfoque del mensaje (decisión de Mauro del 2026-10-29, cambio `enfoque-soluciones-a-medida`): Nubolabs identifica el problema particular de cada cliente, construye una solución a su medida y deja datos y reportes para decidir. En los textos públicos no se presenta la automatización de WhatsApp como servicio, no se ofrecen servicios contables ni se nombra al contador, y no se nombran herramientas ni canales concretos (WhatsApp, Excel, Google Sheets, n8n, Make, planillas); lo prueban `lib/siteConfig.sections.test.ts` y `components/landing/Home.vocabulario.test.tsx`. El canal de contacto por WhatsApp (campo del formulario, número y QR configurables desde el admin) sí puede nombrarse: es un dato de contacto.
 - Moneda con `fmtCLP` (`Intl.NumberFormat("es-CL", { currency: "CLP" })`, en `components/diagnostico/ahorro.ts`); fechas con `timeZone: "America/Santiago"`.
 - Mensajes de error visibles al usuario provienen del `{ error }` de la API o son frases cortas en español.
 

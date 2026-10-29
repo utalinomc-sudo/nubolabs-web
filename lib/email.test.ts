@@ -24,6 +24,9 @@ describe("buildClientReportHtml", () => {
     expect(html).toContain("mapa de oportunidades");
     expect(html).toContain('href="https://agenda.ejemplo.cl"');
     expect(html).not.toMatch(/fricci|ahorro|\$|automatizar/i);
+    // Lema del sitio (cambio enfoque-soluciones-a-medida, spec diagnostico/mapa-oportunidades "Lema del sitio…").
+    expect(html).toContain("Soluciones a tu medida, decisiones con datos.");
+    expect(html).not.toMatch(/piloto automático|WhatsApp|planilla|contador/i);
   });
 
   it("sendClientReport envía a Resend el asunto del mapa con el PDF adjunto", async () => {

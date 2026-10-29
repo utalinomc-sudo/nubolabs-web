@@ -9,7 +9,8 @@ describe("content.referidos", () => {
   it("por defecto trae los textos de la spec y no es una sección de la portada", () => {
     expect(base.content.referidos.oa).toEqual({
       titulo: "Bienvenido, cliente de Osorio & Asociados.",
-      texto: "Tu contador nos recomendó porque ayudamos a empresas como la tuya a ordenarse y crecer.",
+      texto:
+        "Osorio & Asociados nos recomendó porque resolvemos problemas concretos de empresas como la tuya, con soluciones a su medida y datos claros para decidir.",
     });
     expect(SECTIONS.map((s) => s.key)).not.toContain("referidos");
     expect(base.visible).not.toHaveProperty("referidos");

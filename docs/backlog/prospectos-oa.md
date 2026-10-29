@@ -4,6 +4,8 @@
 > Fuente única de textos y decisiones de producto: este archivo. Copia de lectura en el Escritorio de Mauro.
 >
 > **Actualización 2026-10-21 — HDU-08 aprobada** (`docs/backlog/propuesta-valor-hdu-08.md`): la propuesta de valor deja de centrarse en el ahorro de horas y pasa a cuatro resultados de negocio (vendes más, tienes el control, nada se olvida, creces sin desordenarte); cambian el formulario (HDU-03) y el proceso. **Cuando un texto de este archivo choque con la HDU-08, manda la HDU-08.** Referencia visual: `docs/design/propuesta-web-hdu-08.html`. Se suman dos historias nuevas: **HDU-09** `diagnostico-mapa-oportunidades` y **HDU-10** `cierre-landing-faq-cta`.
+>
+> **Actualización 2026-10-29 — HDU-11 `enfoque-soluciones-a-medida`** (sección al final): Mauro cambió el enfoque de todos los textos del sitio: soluciones a medida para el problema particular de cada cliente, con datos y reportes para decidir. No se menciona que automatizamos WhatsApp, no se ofrecen soluciones contables ni se nombran herramientas concretas. **Cuando un texto de este archivo o de la HDU-08 choque con la HDU-11, manda la HDU-11** (fuente de los textos: los deltas de `openspec/changes/enfoque-soluciones-a-medida/specs/` y, tras archivar, `openspec/specs/`).
 
 ## 1. Resumen ejecutivo
 
@@ -355,6 +357,18 @@ Derivada de "Usar la recomendación de O&A" y del contexto: el correo lleva el l
 
 **Resumen.** Sección de preguntas frecuentes editable desde el CMS (6 preguntas por defecto de la referencia, incluida "¿Qué hacen con mis datos?" con enlace a `/privacidad`), banda de CTA final, botón fijo "Quiero mi diagnóstico gratis" en móvil (visible tras el hero y oculto cerca del formulario) y footer nuevo con columnas de servicios, Nubolabs, contacto y privacidad.
 
+## HDU-11 · Enfoque: soluciones a medida para cada cliente y datos para decidir
+
+**Cambio OpenSpec:** `enfoque-soluciones-a-medida` · Tamaño M · Depende de HDU-01 a HDU-10 (reescribe sus textos).
+
+**Estado (2026-10-29):** ✅ archivada en la rama `feature/enfoque-soluciones-a-medida` (`openspec/changes/archive/2026-10-29-enfoque-soluciones-a-medida/`, specs vigentes actualizadas); revisión adversarial aplicada (2 Major y 6 Minor corregidos); commit local hecho. **Pendiente: mezcla a `main`, preview y los pasos post-merge P.0 a P.3.**
+
+### Original
+"Quiero que le cambies el enfoque a todos los textos del sitio web. No debe mencionarse que automatizamos WhatsApp, no es nuestro foco. Debes centrar la idea en soluciones a medida para cada cliente atendiendo sus problemáticas particulares. Saca también que damos soluciones contables, saca todo referente a herramientas particulares como Google Sheets. Identificar soluciones, solucionar problemas particulares con buena data y reportabilidad para toma de decisiones."
+
+### Resumen
+Todos los textos por defecto del sitio (hero y su panel, dolores, "Lo que ganas", Enfoque, Servicios, ejemplos por rubro, compromisos, proceso, 7 preguntas frecuentes, CTA final, pie, misión y visión, equipo, franja de `/oa`, un objetivo del formulario, la dimensión "Control y números" del mapa, metadatos, informe PDF y correo) pasan al eje "soluciones a tu medida + datos para decidir", con el lema **"Soluciones a tu medida, decisiones con datos."** en lugar de "Tu operación, en piloto automático". La regla de vocabulario de los tests prohíbe además herramientas, canales y contabilidad (la nota técnica deja de ser la excepción). Se mantienen el canal de contacto por WhatsApp (campo, número y QR configurables) y el título "Nubolabs — AI & Automation Agency". Post-merge: "Usar los textos recomendados" en todas las secciones del admin (Misión y visión suma el botón) y pegar la historia del equipo.
+
 ## 4. Preguntas abiertas para Mauro
 
 > **Resueltas el 2026-10-21 con la aprobación de la HDU-08:** 5 (rubros, se agrega "Comercio"), 6 (cifras ocultas de inmediato) y 7 (eyebrow "PARA DUEÑOS DE PYMES"; **cambiado el 2026-10-22: sin eyebrow**, para no excluir a empresas grandes). Siguen abiertas 1, 2, 3 y 4 (ver HDU-08 §14).
@@ -388,3 +402,4 @@ Claude crea propuesta, diseño y tareas; Mauro revisa; `/opsx:apply`; verificaci
 | HDU-07 landing-referidos-oa | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-landing-referidos-oa/`, spec `openspec/specs/leads/origen-referidos/`) |
 | HDU-09 diagnostico-mapa-oportunidades | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-diagnostico-mapa-oportunidades/`, specs `openspec/specs/diagnostico/mapa-oportunidades/` y `openspec/specs/landing/autodiagnostico/`) |
 | HDU-10 cierre-landing-faq-cta | ✅ 2026-10-22: mezclada a `main` y archivada (`openspec/changes/archive/2026-10-22-cierre-landing-faq-cta/`, spec `openspec/specs/landing/cierre/`) |
+| HDU-11 enfoque-soluciones-a-medida | ✅ 2026-10-29: archivada en la rama `feature/enfoque-soluciones-a-medida` (`openspec/changes/archive/2026-10-29-enfoque-soluciones-a-medida/`); lint, tipos, 379 tests, build y E2E en verde; revisión adversarial con 2 Major y 6 Minor corregidos; commit local. Pendiente: mezcla a `main` y preview. Post-merge (Mauro): respaldo de `config/site`, "Usar los textos recomendados" en todas las secciones de `/admin/config` salvo Autodiagnóstico, y pegar la historia del equipo en `/admin/equipo` |

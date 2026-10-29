@@ -18,7 +18,7 @@ export function ResultadosEditor({ value, onChange, defaults }: EditorProps<"res
       <ListField
         label="Resultados"
         itemLabel="Resultado"
-        hint="Siempre 4. La ilustración de cada uno es fija: 1 chat, 2 gráfico, 3 lista de avisos, 4 “tu equipo + tareas”. Un campo vacío usa el texto recomendado."
+        hint="Siempre 4. La ilustración de cada uno es fija: 1 seguimiento de una venta, 2 gráfico, 3 lista de avisos, 4 “tu equipo + soluciones a tu medida”. Un campo vacío usa el texto recomendado."
         items={value.items}
         onChange={(items) => set({ items })}
         fixed

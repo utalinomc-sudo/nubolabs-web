@@ -21,20 +21,25 @@ export const trustLabels = {
 // hola@nubolabs.cl (HDU-08 §14, pregunta 4).
 export const contact = { webUrl: "https://www.nubolabs.cl", webLabel: "www.nubolabs.cl" };
 
+// Lema del sitio (cambio enfoque-soluciones-a-medida, design.md decisión 1): un solo punto para el pie, el pie de
+// /diagnostico, la cabecera del informe PDF y el pie del correo al cliente. La CTA final lo repite sin el punto final
+// como eyebrow por defecto (content.cierre.eyebrow, editable en el CMS).
+export const siteSlogan = "Soluciones a tu medida, decisiones con datos.";
+
 // Nota bajo los botones para agendar (CTA final).
 export const ctaNote = "30 minutos · por videollamada · sin compromiso";
 
 // Pie de página. `section` = clave de SECTIONS: si esa sección o página está oculta, el enlace no se muestra.
 export const footerLinks = {
-  tagline: "Ordenamos tu negocio y dejamos funcionando solo lo repetitivo. Tu operación, en piloto automático.",
+  tagline: "Resolvemos los problemas concretos de cada negocio con soluciones a su medida y datos claros para decidir.",
   servicios: {
     title: "Servicios",
     section: "servicios",
     links: [
       { label: "Diagnóstico y plan", href: "/#servicios" },
+      { label: "Soluciones a tu medida", href: "/#servicios" },
       { label: "Tareas que avanzan solas", href: "/#servicios" },
-      { label: "Clientes atendidos al instante", href: "/#servicios" },
-      { label: "Tus números claros", href: "/#servicios" },
+      { label: "Datos y reportes para decidir", href: "/#servicios" },
     ],
   },
   nubolabs: {
@@ -63,8 +68,9 @@ export const whatsappCard = {
   qrLabel: "Código QR para escribirnos por WhatsApp",
 };
 
-// Panel "Tu negocio hoy" del hero (cambio mensaje-principal-pyme, design.md decisión 4).
-// Ejemplos ilustrativos de producto: sin cifras de resultados, montos ni clientes reales. No van al CMS.
+// Panel "Tu negocio hoy" del hero (cambio mensaje-principal-pyme, design.md decisión 4; textos del cambio
+// enfoque-soluciones-a-medida). Ejemplos ilustrativos: sin cifras de resultados, montos ni clientes reales, y sin
+// WhatsApp, planillas ni contador (spec landing/hero). No van al CMS.
 export type HeroFeedIcon = "file" | "wallet" | "chat" | "package" | "chart" | "calendar" | "bell";
 export type HeroFeedTone = "brand" | "accent" | "cyan" | "success";
 export interface HeroFeedItem {
@@ -75,32 +81,38 @@ export interface HeroFeedItem {
 }
 
 // Las 5 tareas iniciales (render del servidor y versión estática con "reducir movimiento").
+// Largos máximos medidos (spec landing/hero; revisión adversarial del 2026-10-29): título ≤ 29 caracteres y
+// detalle ≤ 29, para que ninguna tarea se corte entre 320 y 1440 px ni con letra base de 20 px (a 1093 px un título
+// de 33 ya se corta con letra grande; a 375 px el título va en dos líneas). Lo fija HeroPanel.test.tsx.
 export const heroFeed: HeroFeedItem[] = [
-  { icon: "file", tone: "brand", title: "Cotización enviada al cliente", detail: "Ventas · el mismo día que la pidió" },
+  { icon: "file", tone: "brand", title: "Cotización lista y enviada", detail: "Ventas · el mismo día" },
+  { icon: "chart", tone: "cyan", title: "Reporte del día listo", detail: "Decisiones · margen al cierre" },
   { icon: "wallet", tone: "accent", title: "Recordatorio de pago enviado", detail: "Cobranza · factura por vencer" },
-  { icon: "chat", tone: "cyan", title: "Consulta de WhatsApp respondida", detail: "Clientes · 23:14, sin despertar a nadie" },
-  { icon: "package", tone: "success", title: "Pedido a proveedor generado", detail: "Bodega · según el stock real" },
-  { icon: "chart", tone: "brand", title: "Resumen del mes listo para tu contador", detail: "Números · enviado automáticamente" },
+  { icon: "package", tone: "success", title: "Pedido a proveedor listo", detail: "Bodega · según el stock real" },
+  { icon: "bell", tone: "brand", title: "Alerta: margen bajo detectado", detail: "Decisiones · antes de reponer" },
 ];
 
 // Las que van entrando arriba mientras el panel está a la vista (en este orden, en ciclo).
 export const heroFeedMore: HeroFeedItem[] = [
-  { icon: "chat", tone: "cyan", title: "Reserva confirmada por WhatsApp", detail: "Clientes · con recordatorio para mañana" },
-  { icon: "file", tone: "brand", title: "Presupuesto de taller listo", detail: "Ventas · repuestos y mano de obra" },
-  { icon: "wallet", tone: "accent", title: "Pago recibido y registrado", detail: "Cobranza · conciliado con la factura" },
+  { icon: "chart", tone: "cyan", title: "Panel del mes actualizado", detail: "Decisiones · mes contra mes" },
+  { icon: "file", tone: "brand", title: "Presupuesto de taller listo", detail: "Ventas · repuestos incluidos" },
+  { icon: "wallet", tone: "accent", title: "Pago recibido y registrado", detail: "Cobranza · factura cuadrada" },
   { icon: "calendar", tone: "success", title: "Estado de pago enviado", detail: "Obra · documentos adjuntos" },
-  { icon: "chart", tone: "brand", title: "Ventas del día en tu celular", detail: "Números · cierre de caja" },
-  { icon: "bell", tone: "cyan", title: "Aviso: el auto del cliente está listo", detail: "Clientes · mensaje enviado" },
-  { icon: "package", tone: "success", title: "Stock bajo: pedido sugerido", detail: "Bodega · esperando tu visto bueno" },
+  { icon: "bell", tone: "cyan", title: "Auto listo: cliente avisado", detail: "Taller · retiro coordinado" },
+  { icon: "chat", tone: "brand", title: "Consulta asignada", detail: "Clientes · mañana 10:00" },
+  { icon: "package", tone: "success", title: "Stock bajo: pedido sugerido", detail: "Bodega · falta tu visto bueno" },
 ];
 
 // Ilustraciones decorativas de "Lo que ganas" (una por posición; Results.tsx). Ejemplos genéricos: sin cifras de
-// resultados ni nombres de clientes (spec landing/contenido-pyme). No van al CMS.
+// resultados ni nombres de clientes, y sin chat (spec landing/contenido-pyme; cambio enfoque-soluciones-a-medida,
+// design.md decisión 4). No van al CMS.
 export const resultsVisuals = {
-  chat: {
-    incoming: { text: "Hola, ¿me pueden cotizar para el jueves?", time: "21:47" },
-    outgoing: { text: "¡Claro! Aquí tienes tu cotización. ¿Te reservo el jueves a las 10:00?", time: "21:47 · respuesta automática" },
-  },
+  // Seguimiento de una venta: lo que ya pasó y lo que queda programado.
+  followup: [
+    { text: "Consulta recibida", meta: "9:40", done: true },
+    { text: "Cotización enviada", meta: "10:12 · el mismo día", done: true },
+    { text: "Seguimiento al cliente", meta: "mañana 10:00", done: false },
+  ],
   bars: [
     { day: "Lun", height: 42 },
     { day: "Mar", height: 58 },
@@ -111,29 +123,30 @@ export const resultsVisuals = {
   checks: [
     { text: "Factura 1043 cobrada", done: true },
     { text: "Estado de pago enviado", done: true },
-    { text: "Declaración mensual · avisa el día 10", done: false },
+    { text: "Vencimiento del contrato · avisa 10 días antes", done: false },
   ],
-  grow: { team: "Tu equipo", tasks: "Tareas que avanzan solas", result: "Más clientes, mismo orden" },
+  grow: { team: "Tu equipo", tasks: "Soluciones hechas para ti", result: "Más clientes, mismo orden" },
 };
 
-// Ejemplo "antes / después" del Enfoque (Approach.tsx): los pasos que sobran van tachados. No va al CMS.
+// Ejemplo "antes / después" del Enfoque (Approach.tsx): el informe del mes; los pasos que sobran van tachados.
+// Sin herramientas ni canales (spec landing/contenido-pyme). No va al CMS.
 export const approachExample = {
-  label: "Ejemplo: una cotización antes y después",
-  antesTitle: "Hoy: una cotización",
+  label: "Ejemplo: el informe del mes, antes y después",
+  antesTitle: "Hoy: el informe del mes",
   antes: [
-    { text: "Llega la consulta por WhatsApp", cut: false },
-    { text: "Copiar los datos a una planilla", cut: true },
-    { text: "Buscar precios en otro archivo", cut: true },
-    { text: "Armar el documento a mano", cut: false },
-    { text: "Reenviar por correo para revisión", cut: true },
-    { text: "Preguntar \"¿en qué va?\"", cut: true },
+    { text: "Cada área manda sus datos cuando puede", cut: false },
+    { text: "Copiar todo a un informe a mano", cut: true },
+    { text: "Buscar los costos en otro archivo", cut: true },
+    { text: "Cuadrar las cifras que no coinciden", cut: true },
+    { text: "Reenviar por correo y esperar comentarios", cut: true },
+    { text: "Revisar y decidir, dos semanas después", cut: false },
   ],
   despuesTitle: "Después",
   despues: [
-    "Llega la consulta",
-    "La cotización se arma sola y la revisas con un clic",
-    "El cliente la recibe el mismo día",
-    "Seguimiento automático si no responde",
+    "Los datos se juntan solos desde donde ya están",
+    "Un reporte claro con ventas, costos y margen, al día",
+    "Un aviso cuando algo se sale de lo esperado",
+    "Revisas y decides hoy, con la información de hoy",
   ],
 };
 

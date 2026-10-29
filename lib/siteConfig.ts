@@ -85,7 +85,7 @@ export interface SiteContent {
     destacado: { etiqueta: string; title: string; body: string; result: string; incluye: string[] /* 1 a 4 */ };
     items: ServiceItem[]; // 1 a 6
     acompanamiento: TextItem;
-    notaTecnica: string; // único lugar de la portada donde se nombran herramientas; admite **resalte**
+    notaTecnica: string; // cierra Servicios explicando cómo trabajamos, sin nombrar herramientas; admite **resalte**
   };
   casos: { eyebrow: string; title: string; subtitle: string; items: CaseItem[] };
   // Oculta por defecto; sin cifras válidas muestra la frase (cambio cifras-con-respaldo).
@@ -123,7 +123,7 @@ export const SECTIONS: { key: string; label: string; hint: string; defaultHidden
   { key: "confianza", label: "Confianza (Nos recomiendan)", hint: "Texto puente, testimonios y compromisos bajo el hero" },
   { key: "problema", label: "¿Te suena?", hint: "Los dolores del día a día" },
   { key: "resultados", label: "Lo que ganas", hint: "Los 4 resultados para tu negocio" },
-  { key: "enfoque", label: "Enfoque", hint: "Primero ordenamos, después automatizamos" },
+  { key: "enfoque", label: "Enfoque", hint: "Primero entendemos tu problema, después construimos la solución" },
   { key: "servicios", label: "Servicios", hint: "Qué hacemos por tu negocio" },
   { key: "casos", label: "Ejemplos", hint: "Ejemplos por rubro con filtro" },
   { key: "cifras", label: "Cifras de resultados", hint: "Oculta hasta tener datos reales con fuente", defaultHidden: true },
@@ -141,7 +141,7 @@ export const SECTIONS: { key: string; label: string; hint: string; defaultHidden
 const PRIVACY_DRAFT = [
   "Esta página explica cómo Nubolabs cuida los datos que nos entregas en nubolabs.cl. Es un borrador en revisión legal.",
   "Responsable. Nubolabs es responsable del tratamiento de tus datos. Para cualquier consulta sobre privacidad, escríbenos a mauricio.nubolabs@gmail.com.",
-  "Qué datos guardamos. Tu nombre, correo, WhatsApp, empresa, rubro, lo que quieres lograr y el mensaje que nos dejes. Si haces el diagnóstico, también tus respuestas. Si llegaste recomendado por un aliado (por ejemplo, tu estudio contable), guardamos también de quién vino la recomendación.",
+  "Qué datos guardamos. Tu nombre, correo, WhatsApp, empresa, rubro, lo que quieres lograr y el mensaje que nos dejes. Si haces el diagnóstico, también tus respuestas. Si llegaste recomendado por un aliado (por ejemplo, un asesor de tu empresa), guardamos también de quién vino la recomendación.",
   "Para qué los usamos. Para responder tu solicitud y coordinar tu diagnóstico. Solo te enviaremos ideas y novedades si marcas esa casilla.",
   "Quién más los trata. El sitio está alojado en Vercel, guardamos los datos en Google Firebase y enviamos los correos con Resend. Los tres tienen servidores fuera de Chile, así que tus datos se transfieren al extranjero para prestar el servicio.",
   "Cuánto tiempo los guardamos. Hasta 24 meses desde nuestro último contacto, o antes si nos pides borrarlos.",
@@ -150,31 +150,33 @@ const PRIVACY_DRAFT = [
 ].join("\n\n");
 
 // ── Defaults (fallback si Firestore no tiene overrides) ──────────────
-// Textos de la HDU-08 (§2, §3, §5.1) y de docs/design/propuesta-web-hdu-08.html. Sin jerga técnica ni "pyme":
-// lo prueba lib/siteConfig.sections.test.ts (design.md decisión 7).
+// Textos del cambio enfoque-soluciones-a-medida (2026-10-29): soluciones a la medida del problema de cada cliente y
+// datos para decidir. Sin jerga técnica, sin "pyme", sin herramientas ni canales concretos (WhatsApp, Excel, Google
+// Sheets, n8n, Make, planillas) y sin servicios contables: lo prueba lib/siteConfig.sections.test.ts. Los textos
+// exactos están en la spec de cada sección (openspec/specs/landing/*).
 export function defaultSiteConfig(): SiteConfig {
   return {
     visible: Object.fromEntries(SECTIONS.map((s) => [s.key, !s.defaultHidden])),
     content: {
-      // Mensaje orientado a resultados de negocio (HDU-08 §2, spec landing/hero). Sin "horas", "IA", "nube" ni
-      // "automatización". Sin etiqueta superior por defecto: no se limita el público a pymes (design.md decisión 5b).
+      // Mensaje del enfoque (spec landing/hero). Sin "horas", "IA", "nube" ni "automatización". Sin etiqueta superior
+      // por defecto: no se limita el público a pymes (mensaje-principal-pyme, design.md decisión 5b).
       hero: {
         eyebrow: "",
-        title: "Que tu negocio **trabaje para ti**, no al revés.",
+        title: "Soluciones hechas para **tu negocio**, con datos para decidir mejor.",
         subtitle:
-          "Ordenamos cómo funciona tu empresa y dejamos andando solas las tareas que hoy te frenan: cotizaciones, cobranzas, pedidos, reportes y respuestas a clientes. Tú nos dices qué quieres lograr; nosotros lo dejamos funcionando.",
+          "Cada empresa tiene problemas propios. Los identificamos contigo, construimos la solución que calza con tu forma de trabajar y te dejamos datos ordenados y reportes claros para decidir. Tú nos cuentas qué te frena; nosotros lo resolvemos.",
         ctaPrimary: "Quiero mi diagnóstico gratis",
         ctaSecondary: "Ver cómo trabajamos",
-        tags: ["30 minutos, gratis y sin compromiso", "Sin cambiar tus sistemas", "Respuesta en menos de 24 horas"],
+        tags: ["30 minutos, gratis y sin compromiso", "A la medida de tu negocio", "Respuesta en menos de 24 horas"],
       },
       // Sin testimonios por defecto: solo se publican con autorización escrita, cargados desde el admin.
       confianza: {
         eyebrow: "Nos recomiendan",
-        textoPuente: "Trabajamos con estudios contables y empresas que nos recomiendan a sus clientes.",
+        textoPuente: "Trabajamos con empresas y asesores que nos recomiendan a sus clientes.",
         testimonios: [],
         compromisos: [
           { titulo: "Primera sesión gratis", texto: "30 minutos por videollamada, sin compromiso." },
-          { titulo: "Con lo que ya usas", texto: "WhatsApp, correo, planillas y tu sistema de facturación." },
+          { titulo: "Hecho para tu negocio", texto: "Partimos de tu problema y trabajamos con lo que ya usas, sin cambiar tus sistemas." },
           { titulo: "Sin letra chica", texto: "Plan por etapas y costos claros antes de partir." },
         ],
       },
@@ -182,102 +184,104 @@ export function defaultSiteConfig(): SiteConfig {
         eyebrow: "El día a día",
         title: "¿Te suena?",
         subtitle:
-          "Son las cosas que frenan a casi todos los negocios que conocemos. Ninguna se arregla trabajando más; se arreglan ordenando cómo se hacen.",
+          "Cada negocio tiene los suyos, pero estos se repiten. Ninguno se arregla trabajando más: se arreglan con una solución pensada para tu caso y con datos claros.",
         items: [
-          { title: "Respondes WhatsApp a las 11 de la noche." },
+          { title: "Decides a ojo porque los números llegan tarde o no cuadran." },
           { title: "Una cotización tarda días y el cliente se va con otro." },
-          { title: "Fin de mes es perseguir pagos y juntar papeles para el contador." },
-          { title: "No sabes cuánto ganaste hasta que alguien arma la planilla." },
+          { title: "Fin de mes es perseguir pagos y armar informes a mano." },
+          { title: "La información está repartida en varios lugares y nadie tiene la foto completa." },
           { title: "Todo depende de que alguien se acuerde." },
-          { title: "Si alguien falta, nadie sabe en qué estaba." },
+          { title: "Te ofrecen la misma solución que a todos, y tu negocio no funciona como todos." },
         ],
         cierre: "No es falta de ganas: **tu negocio creció y la forma de trabajar no.**",
         cierreCta: "Mira lo que cambia",
       },
       resultados: {
         eyebrow: "Lo que ganas",
-        title: "Resultados que se notan en tu negocio, no solo en una planilla.",
-        subtitle: "No vendemos herramientas. Partimos por lo que tú quieres lograr y lo dejamos funcionando.",
+        title: "Resultados que se notan en tu negocio y se ven en tus números.",
+        subtitle:
+          "No vendemos herramientas ni soluciones de catálogo. Partimos por tu problema y lo resolvemos con la información a la vista.",
         items: [
           {
             title: "Vendes más",
-            body: "Respondes al instante, cotizas el mismo día y ningún cliente se queda sin seguimiento.",
+            body: "Respondes antes, cotizas el mismo día y ningún cliente se queda sin seguimiento.",
           },
           {
-            title: "Tienes el control",
-            body: "Ventas, gastos, cobranzas y pendientes al día, en tu celular, sin pedirle un informe a nadie.",
+            title: "Decides con datos",
+            body: "Ventas, costos, márgenes y pendientes al día en reportes claros, sin pedirle un informe a nadie.",
           },
           {
             title: "Nada se olvida",
-            body: "Cobros, plazos, pedidos y papeles que avanzan solos y a tiempo. Menos errores, menos sustos.",
+            body: "Cobros, plazos, pedidos y documentos avanzan a tiempo, con aviso al responsable. Menos errores, menos sustos.",
           },
           {
             title: "Creces sin desordenarte",
-            body: "Atiendes más clientes sin que tu equipo colapse ni tengas que contratar al mismo ritmo.",
+            body: "Atiendes más clientes y más volumen sin que tu equipo colapse ni tengas que contratar al mismo ritmo.",
           },
         ],
         cierre: "Y tu equipo deja la pega repetitiva para dedicarse a lo que de verdad hace crecer tu negocio.",
       },
       enfoque: {
         eyebrow: "Nuestro sello",
-        title: "Primero ordenamos, después automatizamos.",
-        body: "Automatizar el desorden solo lo hace más rápido. Por eso partimos entendiendo cómo trabajas, sacamos los pasos que sobran y recién ahí dejamos funcionando solo lo que vale la pena.",
+        title: "Primero entendemos tu problema, después construimos la solución.",
+        body: "Una solución genérica resuelve un problema genérico. Por eso partimos por entender cómo trabaja tu negocio y qué te frena de verdad, diseñamos lo que calza con esa realidad y lo dejamos entregando datos claros para que decidas mejor.",
         items: [
-          { title: "Entendemos cómo trabajas", body: "Tu negocio, tus clientes, tus herramientas." },
-          { title: "Sacamos lo que sobra", body: "Menos pasos, menos idas y vueltas." },
-          { title: "Dejamos funcionando lo que vale la pena", body: "Solo donde tu negocio gana de verdad." },
+          { title: "Entendemos tu problema", body: "Tu negocio, tu equipo y lo que hoy te frena." },
+          { title: "Diseñamos a tu medida", body: "La solución justa para tu forma de trabajar, sin piezas de más." },
+          { title: "Te dejamos datos para decidir", body: "Reportes claros y al día, con tu equipo usándolos." },
         ],
       },
       servicios: {
         eyebrow: "Servicios",
         title: "Lo que hacemos por tu negocio",
-        subtitle: "Cada servicio parte de lo que quieres lograr. La tecnología es solo el medio.",
+        subtitle: "Cada servicio parte de un problema concreto tuyo. La tecnología es solo el medio.",
         destacado: {
           etiqueta: "Empieza aquí · primera sesión gratis",
           title: "Diagnóstico y plan de mejora",
-          body: "Conversamos 30 minutos sobre tu negocio y te mostramos dónde está tu mayor oportunidad: qué ordenar, qué dejar funcionando solo y por dónde partir.",
+          body: "Conversamos 30 minutos sobre tu negocio y te mostramos dónde está tu mayor oportunidad: qué problema atacar primero, qué solución calza y por dónde partir.",
           result: "Sabes qué hacer primero y por qué.",
           incluye: ["Sesión de 30 min, sin costo", "Resumen con tus prioridades", "Plan por etapas con costos claros"],
         },
         items: [
           {
+            title: "Soluciones a tu medida",
+            body: "Cuando lo que existe no calza con tu forma de trabajar, construimos lo justo: control de obras, agenda de taller, portal de solicitudes, seguimiento de pedidos. Pensado para tu problema, no para el promedio.",
+            result: "Resuelves lo que de verdad te frena.",
+          },
+          {
             title: "Tareas que avanzan solas",
-            body: "Cotizaciones, cobranzas, pedidos a proveedores, recordatorios y traspaso de datos entre planillas: lo que hoy depende de alguien, pasa solo.",
+            body: "Cotizaciones, cobranzas, pedidos a proveedores, recordatorios y traspasos de información: lo que hoy depende de que alguien se acuerde, pasa solo y queda registrado.",
             result: "Nada se olvida y hay menos errores.",
           },
           {
-            title: "Clientes atendidos al instante",
-            body: "Asistentes que responden WhatsApp y correo, agendan, toman pedidos y hacen seguimiento con el tono de tu negocio. Si hace falta una persona, te avisan.",
-            result: "Más ventas y clientes que vuelven.",
-          },
-          {
-            title: "Tus números claros, siempre",
-            body: "Ventas, gastos, márgenes y cobranzas en un panel simple o en un reporte que te llega solo. Tu contador recibe la información del mes lista.",
+            title: "Datos y reportes para decidir",
+            body: "Ventas, costos, márgenes, cobranzas y pendientes en un panel simple o en un reporte que te llega solo, con la información de tu negocio al día.",
             result: "Decides con datos, no a ciegas.",
           },
           {
-            title: "Herramientas a tu medida",
-            body: "Cuando lo que existe no calza, construimos algo simple para tu forma de trabajar: portal de solicitudes, control de obras, agenda de taller.",
-            result: "Creces sin desordenarte.",
+            title: "Información ordenada y conectada",
+            body: "Juntamos lo que hoy está repartido en distintos sistemas y archivos en una sola fuente confiable, para que todo tu equipo trabaje con el mismo dato.",
+            result: "Todos trabajan con el mismo dato.",
           },
         ],
         acompanamiento: {
           title: "Acompañamiento mensual",
           body: "Soporte, ajustes y nuevas mejoras cada mes. No te dejamos solo con la tecnología.",
         },
+        // Cierra Servicios explicando cómo trabajamos, sin nombrar herramientas (spec landing/contenido-pyme).
         notaTecnica:
-          "**Cómo lo hacemos:** con herramientas probadas de automatización e inteligencia artificial (como n8n y Make), conectadas a lo que ya usas: WhatsApp, correo, Excel o Google Sheets y tu sistema de facturación. Sin cambiar tus sistemas.",
+          "**Cómo lo hacemos:** partimos de tu problema, no de una herramienta. Diseñamos la solución para tu forma de trabajar, la conectamos con los sistemas que ya usas y la dejamos entregando datos ordenados y reportes claros. Sin cambiar tus sistemas.",
       },
-      // Casos por rubro (cambio casos-por-rubro, HDU-08 §4): una frase por caso, sin detalle y sin bajada.
+      // Casos por rubro (cambio casos-por-rubro): una frase por caso, sin detalle y sin bajada.
       casos: {
         eyebrow: "Ejemplos por rubro",
-        title: "Esto es lo que dejamos funcionando en negocios como el tuyo",
+        title: "Problemas concretos que resolvemos en negocios como el tuyo",
         subtitle: "",
         items: [
-          { title: "La información del mes le llega sola a tu contador.", body: "", rubro: "todos" },
+          { title: "Un reporte mensual con ventas, costos y márgenes que se arma solo.", body: "", rubro: "todos" },
           { title: "Cobranza con recordatorios amables y automáticos.", body: "", rubro: "todos" },
           { title: "Cotizaciones listas el mismo día.", body: "", rubro: "todos" },
-          { title: "Reservas y consultas por WhatsApp respondidas al instante, incluso de noche.", body: "", rubro: "gastronomia" },
+          { title: "Reservas y pedidos en un solo lugar, con la ocupación del día a la vista.", body: "", rubro: "gastronomia" },
           { title: "Pedidos a proveedores según lo que de verdad queda en bodega.", body: "", rubro: "gastronomia" },
           { title: "Ventas del día y costo de insumos en tu celular al cierre.", body: "", rubro: "gastronomia" },
           { title: "Presupuestos de repuestos y mano de obra que se arman solos.", body: "", rubro: "automotriz" },
@@ -287,7 +291,7 @@ export function defaultSiteConfig(): SiteConfig {
           { title: "Plazos y vencimientos que nadie olvida, con aviso al responsable.", body: "", rubro: "servicios" },
           { title: "Informes a clientes que se preparan solos desde tus datos.", body: "", rubro: "servicios" },
           { title: "Stock y ventas al día, con aviso antes de quedarte sin producto.", body: "", rubro: "comercio" },
-          { title: "Clientes que vuelven con mensajes según lo que compraron.", body: "", rubro: "comercio" },
+          { title: "Sabes qué productos dejan margen y cuáles no, antes de reponer.", body: "", rubro: "comercio" },
         ],
       },
       // Sin cifras de ejemplo: solo datos reales con su fuente, cargados desde el admin.
@@ -302,28 +306,28 @@ export function defaultSiteConfig(): SiteConfig {
         items: [
           {
             title: "Conversamos",
-            body: "30 minutos, gratis. Nos cuentas cómo funciona tu negocio y qué te gustaría lograr.",
+            body: "30 minutos, gratis. Nos cuentas cómo funciona tu negocio y qué problema te gustaría resolver.",
             recibes: "Un resumen con tus prioridades.",
           },
           {
-            title: "Ordenamos y proponemos",
-            body: "Vemos cómo se hacen hoy las cosas, sacamos lo que sobra y te proponemos un plan por etapas.",
+            title: "Entendemos y proponemos",
+            body: "Vemos cómo se hacen hoy las cosas, dónde está el problema de fondo y te proponemos una solución por etapas.",
             recibes: "Plan y presupuesto claros, sin letra chica.",
           },
           {
-            title: "Lo dejamos funcionando",
-            body: "Con lo que ya usas, partiendo por lo que más impacto tiene, y enseñándole a tu equipo.",
-            recibes: "La mejora andando y tu equipo usándola.",
+            title: "Lo construimos y lo dejamos funcionando",
+            body: "Pensado para cómo trabajas, conectado con lo que ya usas y enseñándole a tu equipo.",
+            recibes: "La solución andando y tu equipo usándola.",
           },
           {
             title: "Medimos y mejoramos",
-            body: "Seguimos los resultados que tú elegiste y vamos sumando mejoras.",
+            body: "Seguimos los indicadores que tú elegiste, con reportes claros, y vamos sumando mejoras.",
             recibes: "Un reporte simple de resultados y nuevas ideas.",
           },
         ],
         exito: {
           title: "Tú defines qué es éxito:",
-          items: ["Más ventas", "Cobros al día", "Respuestas más rápidas", "Menos errores", "Más control"],
+          items: ["Más ventas", "Cobros al día", "Decisiones con datos", "Menos errores", "Más control"],
         },
       },
       autodiagnostico: {
@@ -332,7 +336,7 @@ export function defaultSiteConfig(): SiteConfig {
         body: "Responde unas preguntas simples sobre tu día a día y recibe tu mapa de oportunidades en PDF, al instante. Ideal para llegar con todo a la sesión gratuita.",
         cta: "Hacer el autodiagnóstico",
       },
-      // Textos de la referencia HDU-08. La respuesta sobre datos la valida O&A o un abogado junto con /privacidad.
+      // La respuesta sobre datos la valida O&A o un abogado junto con /privacidad.
       faq: {
         eyebrow: "Preguntas frecuentes",
         title: "Lo que nos preguntan antes de partir",
@@ -343,9 +347,13 @@ export function defaultSiteConfig(): SiteConfig {
               "No. Tú nos cuentas cómo funciona tu negocio; nosotros nos encargamos de lo técnico y le enseñamos a tu equipo lo justo para usarlo.",
           },
           {
-            pregunta: "¿Tengo que cambiar mis sistemas?",
+            pregunta: "¿Es una solución estándar o hecha para mi negocio?",
             respuesta:
-              "No. Trabajamos con lo que ya usas: WhatsApp, correo, Excel o Google Sheets y tu sistema de facturación. Solo proponemos algo nuevo si de verdad te conviene.",
+              "Hecha para tu negocio. Partimos de tu problema y de cómo trabaja tu equipo; usamos piezas probadas donde conviene, pero la solución se arma para tu caso, no para el promedio.",
+          },
+          {
+            pregunta: "¿Tengo que cambiar mis sistemas?",
+            respuesta: "No. Nos conectamos con lo que ya usas y solo proponemos algo nuevo si de verdad te conviene.",
           },
           {
             pregunta: "¿Cuánto cuesta?",
@@ -369,10 +377,11 @@ export function defaultSiteConfig(): SiteConfig {
           },
         ],
       },
+      // El eyebrow es el lema del sitio sin el punto final (siteSlogan en lib/content.ts).
       cierre: {
-        eyebrow: "Tu operación, en piloto automático",
-        title: "Tu negocio puede trabajar para ti. Empecemos por una conversación.",
-        body: "Cuéntanos qué quieres lograr y te mostramos por dónde partir.",
+        eyebrow: "Soluciones a tu medida, decisiones con datos",
+        title: "Tu negocio tiene su propio problema. Empecemos por entenderlo.",
+        body: "Cuéntanos qué te frena y te mostramos por dónde partir.",
         cta: "Agendar mi diagnóstico gratis",
       },
       contact: { whatsappNumber: "56932590783", showWhatsapp: false, showWhatsappQr: false },
@@ -380,22 +389,22 @@ export function defaultSiteConfig(): SiteConfig {
         eyebrow: "NOSOTROS",
         title: "Misión, visión y objetivos",
         mision:
-          "Ayudar a las empresas a operar en piloto automático: rediseñamos sus procesos y los convertimos en automatizaciones con inteligencia artificial que ahorran horas, reducen errores y liberan al equipo para lo que realmente importa.",
+          "Resolver los problemas concretos de cada empresa con soluciones hechas a su medida: entender cómo trabaja, diseñar lo que necesita y dejarle datos claros y reportes útiles para decidir mejor.",
         vision:
-          "Ser el socio de automatización de referencia en Chile y Latinoamérica: que operar con procesos automatizados e IA deje de ser un lujo y se vuelva el estándar de cualquier organización que quiere crecer.",
+          "Ser el socio al que las empresas de Chile y Latinoamérica recurren cuando tienen un problema de operación que las soluciones genéricas no resuelven. Que decidir con buenos datos deje de ser un lujo y se vuelva el estándar de cualquier organización que quiere crecer.",
         objetivos: [
           "Entregar un diagnóstico claro y accionable desde la primera sesión.",
-          "Automatizar solo lo que genera retorno real, tras simplificar el proceso.",
-          "Reducir tareas manuales y errores con soluciones a la medida.",
-          "Medir el impacto en horas ahorradas y trazabilidad.",
-          "Acompañar a cada cliente en la mejora continua y la escala.",
+          "Diseñar cada solución a partir del problema real del cliente, no de un catálogo.",
+          "Dejar en cada proyecto datos ordenados y reportes útiles para tomar decisiones.",
+          "Medir el impacto con los indicadores que el cliente elige.",
+          "Acompañar a cada cliente en la mejora continua y el crecimiento.",
         ],
       },
       equipo: {
         eyebrow: "NUESTRO EQUIPO",
         title: "Las personas detrás de Nubolabs",
         historia:
-          "Somos un equipo que combina rediseño de procesos, ingeniería e inteligencia artificial. Nos obsesiona que la tecnología resuelva problemas reales de operación: menos tareas manuales, menos errores y más tiempo para lo que importa.",
+          "Somos un equipo que combina análisis de procesos, ingeniería y datos. Nos obsesiona que la tecnología resuelva problemas reales de cada negocio: soluciones que calzan con cómo se trabaja, información confiable y decisiones mejor tomadas.",
       },
       privacidad: {
         titulo: "Cómo cuidamos tus datos",
@@ -404,7 +413,8 @@ export function defaultSiteConfig(): SiteConfig {
       referidos: {
         oa: {
           titulo: "Bienvenido, cliente de Osorio & Asociados.",
-          texto: "Tu contador nos recomendó porque ayudamos a empresas como la tuya a ordenarse y crecer.",
+          texto:
+            "Osorio & Asociados nos recomendó porque resolvemos problemas concretos de empresas como la tuya, con soluciones a su medida y datos claros para decidir.",
         },
       },
     },

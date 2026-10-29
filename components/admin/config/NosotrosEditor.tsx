@@ -5,8 +5,9 @@ import { ListField } from "./ListField";
 import { SectionCard } from "./SectionCard";
 import type { EditorProps } from "./types";
 
-// Misión y visión (página /mision-vision). Sin "Usar los textos recomendados": no es parte de este cambio.
-export function NosotrosEditor({ value, onChange }: EditorProps<"nosotros">) {
+// Misión y visión (página /mision-vision). Con "Usar los textos recomendados" desde enfoque-soluciones-a-medida
+// (design.md decisión 8), para cargar los textos nuevos en producción sin pegarlos a mano.
+export function NosotrosEditor({ value, onChange, defaults }: EditorProps<"nosotros">) {
   const set = (patch: Partial<typeof value>) => onChange({ ...value, ...patch });
   return (
     <SectionCard
@@ -16,6 +17,7 @@ export function NosotrosEditor({ value, onChange }: EditorProps<"nosotros">) {
           Se muestra en la página <b>/mision-vision</b> (menú “Nosotros”).
         </>
       }
+      onReset={() => onChange(defaults)}
     >
       <FieldRow>
         <Field label="Etiqueta" value={value.eyebrow} onChange={(v) => set({ eyebrow: v })} />

@@ -14,16 +14,18 @@ describe("Results", () => {
     expect(container.querySelector("section#resultados")).not.toBeNull();
     expect(screen.getByRole("heading", { level: 2, name: c.title })).toBeInTheDocument();
     const titles = screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent);
-    expect(titles).toEqual(["Vendes más", "Tienes el control", "Nada se olvida", "Creces sin desordenarte"]);
+    expect(titles).toEqual(["Vendes más", "Decides con datos", "Nada se olvida", "Creces sin desordenarte"]);
     for (const item of c.items) expect(screen.getByText(item.body)).toBeInTheDocument();
     expect(screen.getByText(c.cierre)).toBeInTheDocument();
   });
 
-  it("cada resultado tiene su ilustración oculta para lectores de pantalla", () => {
+  it("cada resultado tiene su ilustración oculta para lectores de pantalla; la primera es el seguimiento de una venta, no un chat", () => {
     const { container } = render(<Results />);
     const visuals = container.querySelectorAll("[data-viz]");
     expect(visuals).toHaveLength(4);
     visuals.forEach((v) => expect(v).toHaveAttribute("aria-hidden", "true"));
+    expect(visuals[0].textContent).toContain("Cotización enviada");
+    expect(container.textContent).not.toMatch(/respuesta automática|WhatsApp|Declaración mensual/);
   });
 
   it("con textos propios del CMS los muestra", () => {

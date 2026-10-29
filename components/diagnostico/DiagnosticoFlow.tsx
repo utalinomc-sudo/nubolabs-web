@@ -5,7 +5,7 @@ import Link from "next/link";
 import { LogoMark } from "@/components/Logo";
 import { AREAS, ESCALA, ABIERTAS, TOTAL_Q, nivelFriccion } from "./cuestionario";
 import { OPPORTUNITY_LABELS, areaScore, buildOpportunityMap, dimensionName, type AreaId } from "./oportunidades";
-import { contactSection } from "@/lib/content";
+import { contactSection, siteSlogan } from "@/lib/content";
 import { CONSENT_TEXTS, INDUSTRIES, isIndustryKey, type IndustryKey } from "@/lib/leadOptions";
 import { leadIndustryText } from "@/lib/leadSummary";
 import { LEAD_MAX, isValidEmail, isValidPhone } from "@/lib/leads";
@@ -451,7 +451,7 @@ export function DiagnosticoFlow() {
         <div style={wrap} className="flex items-center justify-between">
           <span style={{ fontSize: 14, fontWeight: 800 }}>
             Nubo<b style={{ color: C.blue }}>labs</b>
-            <span style={{ fontSize: 12, fontWeight: 500, color: C.faint, marginLeft: 8 }}>Tu operación, en piloto automático.</span>
+            <span style={{ fontSize: 12, fontWeight: 500, color: C.faint, marginLeft: 8 }}>{siteSlogan}</span>
           </span>
           <span style={{ fontSize: 12.5, color: C.faint }}>
             <Link href="/privacidad" style={{ color: C.muted, textDecoration: "underline" }}>

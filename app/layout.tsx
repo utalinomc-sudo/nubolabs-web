@@ -18,13 +18,14 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: "Nubolabs — AI & Automation Agency",
-  // Promesa orientada a resultados de negocio (cambio mensaje-principal-pyme, decisión 7). El título mantiene la marca.
+  // Promesa del enfoque de soluciones a medida (cambio enfoque-soluciones-a-medida, spec landing/hero "Metadatos para
+  // compartir"). El título mantiene la marca.
   description:
-    "Ordenamos cómo funciona tu empresa y dejamos funcionando solas las tareas que hoy te frenan. Vende más, ten el control y crece sin desordenarte.",
+    "Resolvemos los problemas concretos de tu negocio con soluciones a tu medida y datos claros para decidir. Diagnóstico gratis de 30 minutos.",
   metadataBase: new URL("https://www.nubolabs.cl"),
   openGraph: {
     title: "Nubolabs — AI & Automation Agency",
-    description: "Que tu negocio trabaje para ti, no al revés. Diagnóstico gratis de 30 minutos.",
+    description: "Soluciones hechas para tu negocio, con datos para decidir mejor. Diagnóstico gratis de 30 minutos.",
     type: "website",
     locale: "es_CL",
   },

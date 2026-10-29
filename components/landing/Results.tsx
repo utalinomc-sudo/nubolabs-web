@@ -1,6 +1,8 @@
 // "Lo que ganas": 4 resultados en grilla bento 7/5/5/7, cada uno con una ilustración decorativa según su posición
-// (cambio lenguaje-sin-jerga, design.md decisión 3). Los textos vienen del CMS; las ilustraciones, de lib/content.ts.
-import { IconBell, IconChart, IconCheck, IconLayers, IconTrend, IconUsers, IconZap } from "@/components/icons";
+// (cambio lenguaje-sin-jerga, design.md decisión 3): seguimiento de una venta (sin chat, cambio
+// enfoque-soluciones-a-medida, decisión 4), barras, avisos y ecuación. Los textos vienen del CMS; las ilustraciones,
+// de lib/content.ts.
+import { IconBell, IconChart, IconCheck, IconClock, IconLayers, IconTrend, IconUsers, IconZap } from "@/components/icons";
 import { SectionHead } from "@/components/landing/SectionHead";
 import { resultsVisuals as v } from "@/lib/content";
 import { defaultSiteConfig, type SiteContent } from "@/lib/siteConfig";
@@ -21,18 +23,32 @@ const CARDS = [
   { Icon: IconLayers, tile: "bg-success-50 text-success", card: "border-line bg-white md:col-span-7" },
 ];
 
-function ChatVisual() {
+// Seguimiento de una venta: lo que ya pasó (marcado) y lo que queda programado (punteado). Si el texto y la hora no
+// caben en una línea (375 px), la hora baja a una segunda línea alineada a la derecha en vez de partir el texto.
+function FollowUpVisual() {
   return (
-    <div data-viz aria-hidden="true" className="mt-auto flex max-w-[360px] flex-col gap-2 pt-3.5">
-      <div className="max-w-[80%] rounded-2xl rounded-bl-md border border-line bg-white px-3.5 py-2.5 text-sm leading-[1.4] shadow-card">
-        {v.chat.incoming.text}
-        <small className="mt-0.5 block text-[11px] text-ink-muted">{v.chat.incoming.time}</small>
-      </div>
-      <div className="max-w-[80%] self-end rounded-2xl rounded-br-md bg-brand px-3.5 py-2.5 text-sm leading-[1.4] text-white shadow-card">
-        {v.chat.outgoing.text}
-        <small className="mt-0.5 block text-[11px] text-white">{v.chat.outgoing.time}</small>
-      </div>
-    </div>
+    <ol data-viz aria-hidden="true" className="mt-auto flex max-w-[360px] flex-col gap-2 pt-3.5">
+      {v.followup.map((row) => (
+        <li
+          key={row.text}
+          className={`flex flex-wrap items-center gap-x-2.5 gap-y-0.5 rounded-xl border px-3.5 py-2.5 text-sm leading-[1.4] ${
+            row.done ? "border-line bg-white shadow-card" : "border-dashed border-brand-100 bg-brand-50"
+          }`}
+        >
+          {row.done ? (
+            <span className="grid h-[22px] w-[22px] flex-none place-items-center rounded-full bg-success text-white">
+              <IconCheck className="h-3 w-3" />
+            </span>
+          ) : (
+            <span className="grid h-[22px] w-[22px] flex-none place-items-center rounded-full border-2 border-dashed border-brand text-brand">
+              <IconClock className="h-3 w-3" />
+            </span>
+          )}
+          <span className="min-w-0 flex-auto font-semibold">{row.text}</span>
+          <small className="ml-auto flex-none text-[11px] text-ink-muted">{row.meta}</small>
+        </li>
+      ))}
+    </ol>
   );
 }
 
@@ -101,7 +117,7 @@ function GrowVisual() {
   );
 }
 
-const VISUALS = [ChatVisual, BarsVisual, ChecksVisual, GrowVisual];
+const VISUALS = [FollowUpVisual, BarsVisual, ChecksVisual, GrowVisual];
 
 export function Results({ content }: { content?: SiteContent["resultados"] }) {
   const c = content ?? defaultSiteConfig().content.resultados;

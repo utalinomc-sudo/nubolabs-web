@@ -1,5 +1,6 @@
-// Enfoque "Primero ordenamos, después automatizamos": sección navy con 3 pasos y un ejemplo antes/después de una
-// cotización (cambio lenguaje-sin-jerga, design.md decisión 3). Textos del CMS (content.enfoque); el ejemplo, fijo.
+// Enfoque "Primero entendemos tu problema, después construimos la solución": sección navy con 3 pasos y un ejemplo
+// antes/después del informe del mes (cambio lenguaje-sin-jerga, design.md decisión 3; textos del cambio
+// enfoque-soluciones-a-medida). Textos del CMS (content.enfoque); el ejemplo, fijo en lib/content.ts.
 import { IconArrowRight, IconCheck } from "@/components/icons";
 import { SectionHead } from "@/components/landing/SectionHead";
 import { approachExample as ex, sectionLabels } from "@/lib/content";

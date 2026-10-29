@@ -1,4 +1,5 @@
 import "server-only";
+import { siteSlogan } from "@/lib/content";
 import { leadOriginText, leadSummaryRows } from "@/lib/leadSummary";
 
 interface LeadEmail {
@@ -169,7 +170,7 @@ export function buildClientReportHtml(input: ClientReportInput, scheduleUrl: str
         </p>
       </div>
       <div style="border-top:1px solid #EEF2F8;padding:16px 4px;color:#93A5C4;font-size:12px">
-        Nubolabs · <a href="https://www.nubolabs.cl" style="color:#1565FF;text-decoration:none">nubolabs.cl</a> · Tu operación, en piloto automático.
+        Nubolabs · <a href="https://www.nubolabs.cl" style="color:#1565FF;text-decoration:none">nubolabs.cl</a> · ${siteSlogan}
       </div>
     </div>`;
 }

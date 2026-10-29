@@ -5,6 +5,7 @@
 > Skills de diseño usadas: `frontend-design`, `ui-ux-pro-max` (bases de estilos, landing, tipografía y reglas UX), `design-system` (tokens en 3 capas), `brand` (voz y mensajes), `design` (brochure y pieza para correo).
 > Entregables de diseño (fuera del repo, en el Escritorio de Mauro: `Nubolabs - Brochure y Propuesta Web (2026-10-21)/`): brochure PDF de 4 páginas, imagen para el correo de O&A y capturas. **Referencia visual para implementar, dentro del repo:** `docs/design/propuesta-web-hdu-08.html` (HTML/CSS/JS sin dependencias, mismos tokens de §7).
 > **Estado:** aprobada por Mauro el 2026-10-21. Se implementa repartida en los cambios OpenSpec de §9 (ver también `docs/backlog/prospectos-oa.md`).
+> **Superada en los textos el 2026-10-29 por la HDU-11 `enfoque-soluciones-a-medida`** (`docs/backlog/prospectos-oa.md`): el eje pasa a soluciones a medida para el problema de cada cliente y datos para decidir; sin automatizar WhatsApp, sin soluciones contables y sin herramientas nombradas. Los textos de §2, §3, §4 y §8 de este documento quedan como historia; mandan las specs de `openspec/specs/`.
 
 ---
 

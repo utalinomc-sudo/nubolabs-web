@@ -179,8 +179,11 @@ export const IconTrend = ({ className }: P) => (
 );
 
 // Ícono por posición. Si el CMS trae más ítems que íconos, se repiten en ciclo.
-export const problemIcons = [IconMoon, IconClock, IconWallet, IconHelp, IconNote, IconUserX];
-export const serviceIcons = [IconZap, IconChat, IconChart, IconWrench];
+// Íconos por posición de los dolores y los servicios por defecto (cambio enfoque-soluciones-a-medida, design.md
+// decisión 5): números tarde, cotización lenta, pagos, información repartida, depende de alguien, solución genérica;
+// soluciones a medida, tareas que avanzan solas, datos y reportes, información conectada.
+export const problemIcons = [IconChart, IconClock, IconWallet, IconLayers, IconNote, IconWrench];
+export const serviceIcons = [IconWrench, IconZap, IconChart, IconLayers];
 export const includeIcons = [IconCalendar, IconSearch, IconFile];
 
 // ── Íconos del cierre (cambio cierre-landing-faq-cta) ──

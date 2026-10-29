@@ -72,13 +72,28 @@ afterEach(() => {
 });
 
 describe("HeroPanel", () => {
-  it("muestra las 5 tareas iniciales con su título y la etiqueta Piloto automático", () => {
+  it("muestra las 5 tareas iniciales con su título y la etiqueta Todo al día (cambio enfoque-soluciones-a-medida)", () => {
     mockReducedMotion(false);
     render(<HeroPanel />);
-    expect(screen.getByRole("figure", { name: /tareas que avanzan solas/i })).toBeInTheDocument();
+    expect(screen.getByRole("figure", { name: /solución a tu medida/i })).toBeInTheDocument();
     expect(screen.getByText("Tu negocio hoy")).toBeInTheDocument();
-    expect(screen.getByText("Piloto automático")).toBeInTheDocument();
+    expect(screen.getByText("Todo al día")).toBeInTheDocument();
+    expect(screen.queryByText("Piloto automático")).toBeNull();
     expect(taskTitles()).toEqual(heroFeed.map((t) => t.title));
+    // Tareas de ejemplo sin WhatsApp, planillas ni contador, y con al menos una de reportes para decidir (spec landing/hero).
+    const all = [...heroFeed, ...heroFeedMore].map((t) => `${t.title} ${t.detail}`).join(" ");
+    expect(all).not.toMatch(/WhatsApp|planilla|contador/i);
+    expect(all).toMatch(/[Rr]eporte|[Dd]ecisiones/);
+  });
+
+  // Largos máximos medidos en la revisión adversarial y en el E2E (spec landing/hero, "Tareas que rotan sin cortes"):
+  // el título cabe en una línea a 1093 px con letra base de 20 px y en dos líneas a 375 px; el detalle en una línea
+  // a 375 px con letra de 16 px.
+  it("ningún título pasa de 29 caracteres ni ningún detalle de 29", () => {
+    for (const t of [...heroFeed, ...heroFeedMore]) {
+      expect(t.title.length, t.title).toBeLessThanOrEqual(29);
+      expect(t.detail.length, t.detail).toBeLessThanOrEqual(29);
+    }
   });
 
   it("con 'reducir movimiento' no rota aunque el panel esté a la vista", () => {

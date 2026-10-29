@@ -17,11 +17,15 @@ La sección `#contacto` de la portada SHALL mostrar un formulario de 2 pasos con
 - **THEN** "Vender más" sigue marcado y, al avanzar de nuevo, su nombre sigue escrito
 
 ### Requirement: Objetivos y rubro
-El paso 1 SHALL ofrecer como opciones de selección múltiple los objetivos "Vender más", "Responder más rápido a mis clientes", "Tener mis números claros", "Cobrar a tiempo", "Ordenar el trabajo del equipo", "Dejar atrás las planillas", "Crecer sin desordenarme" y "Otra cosa", y como opciones de selección única los rubros "Gastronomía", "Automotriz", "Construcción", "Servicios profesionales", "Comercio" y "Otro". Cada opción SHALL comunicar su estado seleccionado a tecnologías de asistencia. Elegir un rubro distinto SHALL reemplazar el anterior y volver a pulsar el elegido SHALL deseleccionarlo. El formulario MUST NOT preguntar "¿Qué tarea te gustaría dejar de hacer a mano?".
+El paso 1 SHALL ofrecer como opciones de selección múltiple los objetivos "Vender más", "Responder más rápido a mis clientes", "Tener mis números claros", "Cobrar a tiempo", "Ordenar el trabajo del equipo", "Resolver un problema puntual de mi operación", "Crecer sin desordenarme" y "Otra cosa", y como opciones de selección única los rubros "Gastronomía", "Automotriz", "Construcción", "Servicios profesionales", "Comercio" y "Otro". La opción "Resolver un problema puntual de mi operación" conserva la clave persistida `drop_spreadsheets` (antes "Dejar atrás las planillas"): los leads guardados con esa clave SHALL mostrarse al equipo con la etiqueta vigente. Cada opción SHALL comunicar su estado seleccionado a tecnologías de asistencia. Elegir un rubro distinto SHALL reemplazar el anterior y volver a pulsar el elegido SHALL deseleccionarlo. El formulario MUST NOT preguntar "¿Qué tarea te gustaría dejar de hacer a mano?" ni nombrar herramientas concretas en sus opciones.
 
 #### Scenario: Varios objetivos, un rubro
 - **WHEN** el visitante pulsa "Vender más", "Cobrar a tiempo", "Automotriz" y luego "Construcción"
 - **THEN** quedan seleccionados los dos objetivos y solo el rubro "Construcción"
+
+#### Scenario: Objetivo de un problema puntual
+- **WHEN** el visitante elige "Resolver un problema puntual de mi operación" y envía
+- **THEN** el lead se guarda con `goals` que incluye `drop_spreadsheets`, el equipo lo ve como "Resolver un problema puntual de mi operación" y la pantalla de éxito dice "Conversamos 30 minutos sobre cómo resolver un problema puntual de tu operación."
 
 ### Requirement: Detalle de "Otra cosa" y "Otro"
 Cuando el objetivo "Otra cosa" está seleccionado, el paso 1 SHALL mostrar un campo de una línea, opcional y con etiqueta visible, para escribir qué otra cosa quiere lograr; cuando el rubro "Otro" está seleccionado, SHALL mostrar un campo de una línea, opcional y con etiqueta visible, para escribir su rubro. Ambos campos MUST aceptar como máximo 70 caracteres. Si la opción se deselecciona, el campo SHALL ocultarse y su texto MUST NOT enviarse. El servidor SHALL guardar esos textos (recortados de espacios y limitados a 70 caracteres) como `goalOther` solo si `goals` incluye `other`, y como `industryOther` solo si `industry` es `otro`; en otro caso MUST descartarlos. El paso de contacto de `/diagnostico` SHALL ofrecer el mismo campo cuando el rubro elegido es "Otro".

@@ -12,11 +12,12 @@ describe("Footer", () => {
   it("muestra las 4 columnas, privacidad y el año actual, sin hola@nubolabs.ai ni WhatsApp", () => {
     render(<Footer />);
     const f = footer();
-    expect(f).toHaveTextContent("Ordenamos tu negocio y dejamos funcionando solo lo repetitivo.");
+    expect(f).toHaveTextContent("Resolvemos los problemas concretos de cada negocio con soluciones a su medida y datos claros para decidir.");
+    expect(f.textContent).not.toContain("piloto automático");
     for (const h of ["Servicios", "Nubolabs", "Contacto"]) {
       expect(within(f).getByRole("heading", { level: 2, name: h })).toBeInTheDocument();
     }
-    expect(within(f).getAllByRole("link", { name: /Diagnóstico y plan|Tareas que avanzan solas|Clientes atendidos al instante|Tus números claros/ })).toHaveLength(4);
+    expect(within(f).getAllByRole("link", { name: /Diagnóstico y plan|Soluciones a tu medida|Tareas que avanzan solas|Datos y reportes para decidir/ })).toHaveLength(4);
     expect(within(f).getByRole("link", { name: "Misión y visión" })).toHaveAttribute("href", "/mision-vision");
     expect(within(f).getByRole("link", { name: "Equipo" })).toHaveAttribute("href", "/equipo");
     expect(within(f).getByRole("link", { name: "Cómo trabajamos" })).toHaveAttribute("href", "/#modelo");

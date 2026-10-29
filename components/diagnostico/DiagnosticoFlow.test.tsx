@@ -120,6 +120,9 @@ describe("DiagnosticoFlow: encabezado", () => {
     expect(header).toHaveTextContent("18 preguntas, 5 minutos.");
     expect(header.textContent ?? "").not.toMatch(/automatizaci[oó]n|fricci[oó]n operativa|ahorrar automatizando/i);
     expect(screen.getAllByText("Seguido")).toHaveLength(18);
+    // Pie con el lema del sitio (cambio enfoque-soluciones-a-medida).
+    expect(document.body.textContent ?? "").toContain("Soluciones a tu medida, decisiones con datos.");
+    expect(document.body.textContent ?? "").not.toContain("piloto automático");
   });
 });
 

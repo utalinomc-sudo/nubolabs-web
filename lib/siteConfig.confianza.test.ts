@@ -19,11 +19,11 @@ describe("defaults de confianza", () => {
   it("texto puente, sin testimonios y con los 3 compromisos de la referencia", () => {
     const c = base.content.confianza;
     expect(c.eyebrow).toBe("Nos recomiendan");
-    expect(c.textoPuente).toBe("Trabajamos con estudios contables y empresas que nos recomiendan a sus clientes.");
+    expect(c.textoPuente).toBe("Trabajamos con empresas y asesores que nos recomiendan a sus clientes.");
     expect(c.testimonios).toEqual([]);
     expect(c.compromisos).toEqual([
       { titulo: "Primera sesión gratis", texto: "30 minutos por videollamada, sin compromiso." },
-      { titulo: "Con lo que ya usas", texto: "WhatsApp, correo, planillas y tu sistema de facturación." },
+      { titulo: "Hecho para tu negocio", texto: "Partimos de tu problema y trabajamos con lo que ya usas, sin cambiar tus sistemas." },
       { titulo: "Sin letra chica", texto: "Plan por etapas y costos claros antes de partir." },
     ]);
   });

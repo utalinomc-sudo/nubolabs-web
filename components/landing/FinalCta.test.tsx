@@ -9,11 +9,11 @@ afterEach(cleanup);
 describe("FinalCta", () => {
   it("muestra los textos por defecto, la nota y lleva a #contacto", () => {
     render(<FinalCta />);
-    expect(screen.getByText("Tu operación, en piloto automático")).toBeInTheDocument();
+    expect(screen.getByText("Soluciones a tu medida, decisiones con datos")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 2, name: "Tu negocio puede trabajar para ti. Empecemos por una conversación." }),
+      screen.getByRole("heading", { level: 2, name: "Tu negocio tiene su propio problema. Empecemos por entenderlo." }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Cuéntanos qué quieres lograr y te mostramos por dónde partir.")).toBeInTheDocument();
+    expect(screen.getByText("Cuéntanos qué te frena y te mostramos por dónde partir.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Agendar mi diagnóstico gratis" })).toHaveAttribute("href", "#contacto");
     expect(screen.getByText("30 minutos · por videollamada · sin compromiso")).toBeInTheDocument();
   });

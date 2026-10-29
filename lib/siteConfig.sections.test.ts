@@ -1,6 +1,6 @@
 // Tests del modelo de las secciones de contenido de la portada (cambio lenguaje-sin-jerga, design.md decisiones 1, 2, 4 y 7).
 import { describe, expect, it } from "vitest";
-import { approachExample, nav, resultsVisuals } from "@/lib/content";
+import { approachExample, footerLinks, heroFeed, heroFeedMore, nav, resultsVisuals, siteSlogan } from "@/lib/content";
 import { SECTIONS, defaultSiteConfig, mergeConfig, mergeFixedList, mergeList } from "@/lib/siteConfig";
 
 type Item = { title: string; body: string };
@@ -127,37 +127,50 @@ describe("mergeConfig: secciones nuevas", () => {
   });
 });
 
-describe("defaults de la HDU-08", () => {
+describe("defaults del enfoque de soluciones a medida (cambio enfoque-soluciones-a-medida)", () => {
   const c = defaultSiteConfig().content;
 
   it("tienen los textos aprobados", () => {
     expect(c.problema.title).toBe("¿Te suena?");
     expect(c.problema.items.map((i) => i.title)).toEqual([
-      "Respondes WhatsApp a las 11 de la noche.",
+      "Decides a ojo porque los números llegan tarde o no cuadran.",
       "Una cotización tarda días y el cliente se va con otro.",
-      "Fin de mes es perseguir pagos y juntar papeles para el contador.",
-      "No sabes cuánto ganaste hasta que alguien arma la planilla.",
+      "Fin de mes es perseguir pagos y armar informes a mano.",
+      "La información está repartida en varios lugares y nadie tiene la foto completa.",
       "Todo depende de que alguien se acuerde.",
-      "Si alguien falta, nadie sabe en qué estaba.",
+      "Te ofrecen la misma solución que a todos, y tu negocio no funciona como todos.",
     ]);
-    expect(c.resultados.items.map((i) => i.title)).toEqual(["Vendes más", "Tienes el control", "Nada se olvida", "Creces sin desordenarte"]);
-    expect(c.enfoque.title).toBe("Primero ordenamos, después automatizamos.");
+    expect(c.resultados.items.map((i) => i.title)).toEqual(["Vendes más", "Decides con datos", "Nada se olvida", "Creces sin desordenarte"]);
+    expect(c.enfoque.title).toBe("Primero entendemos tu problema, después construimos la solución.");
+    expect(c.enfoque.items.map((i) => i.title)).toEqual(["Entendemos tu problema", "Diseñamos a tu medida", "Te dejamos datos para decidir"]);
     expect(c.servicios.destacado.title).toBe("Diagnóstico y plan de mejora");
     expect(c.servicios.items.map((i) => i.title)).toEqual([
+      "Soluciones a tu medida",
       "Tareas que avanzan solas",
-      "Clientes atendidos al instante",
-      "Tus números claros, siempre",
-      "Herramientas a tu medida",
+      "Datos y reportes para decidir",
+      "Información ordenada y conectada",
     ]);
-    expect(c.proceso.items.map((i) => i.title)).toEqual(["Conversamos", "Ordenamos y proponemos", "Lo dejamos funcionando", "Medimos y mejoramos"]);
+    expect(c.proceso.items.map((i) => i.title)).toEqual([
+      "Conversamos",
+      "Entendemos y proponemos",
+      "Lo construimos y lo dejamos funcionando",
+      "Medimos y mejoramos",
+    ]);
+    expect(c.proceso.exito.items).toEqual(["Más ventas", "Cobros al día", "Decisiones con datos", "Menos errores", "Más control"]);
     expect(c.proceso.items[3].body + c.proceso.items[3].recibes).not.toMatch(/horas/i);
     // Cambio casos-por-rubro (delta MODIFIED de contenido-pyme): encabezado por rubro, sin bajada.
-    expect(c.casos.title).toBe("Esto es lo que dejamos funcionando en negocios como el tuyo");
+    expect(c.casos.title).toBe("Problemas concretos que resolvemos en negocios como el tuyo");
     expect(c.casos.subtitle).toBe("");
+    // Lema del sitio en la CTA final (spec contenido-pyme, "Enfoque del mensaje en todo el sitio público").
+    expect(c.cierre.eyebrow).toBe("Soluciones a tu medida, decisiones con datos");
   });
 
-  // Decisión 7 (+ "pyme(s)", 2026-10-22). "Make" e "IA" se buscan con mayúsculas exactas.
-  const FORBIDDEN_CI = /\bn8n\b|\bAPIs?\b|\bCRM\b|\bERP\b|\bagentes?\b|\bROI\b|horas ahorradas|pymes?/i;
+  // Decisión 7 de lenguaje-sin-jerga (+ "pyme(s)", 2026-10-22) más herramientas, canales y contabilidad
+  // (enfoque-soluciones-a-medida, 2026-10-29). "Make" e "IA" se buscan con mayúsculas exactas.
+  // Con límites de palabra donde hace falta: "excelente" e "incontables" no son herramientas ni contabilidad
+  // (revisión adversarial, hallazgo 4).
+  const FORBIDDEN_CI =
+    /\bn8n\b|\bAPIs?\b|\bCRM\b|\bERP\b|\bagentes?\b|\bROI\b|horas ahorradas|pymes?|\bnube\b|WhatsApp|\bExcel\b|Sheets|Google|planillas?|\bcontador(es|a|as)?\b|\bcontables?\b|contabilidad|piloto autom/i;
   const FORBIDDEN_CS = /\bMake\b|\bIA\b/;
   function strings(value: unknown, path = ""): [string, string][] {
     if (typeof value === "string") return [[path, value]];
@@ -166,17 +179,31 @@ describe("defaults de la HDU-08", () => {
     return [];
   }
 
-  it("ningún texto por defecto de la portada usa jerga ni 'pyme' (salvo la nota técnica)", () => {
-    const { hero, confianza, problema, resultados, enfoque, servicios, casos, cifras, proceso, faq, cierre } = c;
-    const { notaTecnica, ...serviciosSinNota } = servicios;
-    void notaTecnica;
-    const all = strings({ hero, confianza, problema, resultados, enfoque, servicios: serviciosSinNota, casos, cifras, proceso, faq, cierre, nav, resultsVisuals, approachExample });
+  it("ningún texto por defecto del sitio público usa jerga, 'pyme', herramientas, canales ni contabilidad (incluida la nota técnica)", () => {
+    // Fuera del barrido solo quedan `privacidad` (nombra a los proveedores que tratan los datos y el campo WhatsApp
+    // como dato guardado) y `contact` (el número de contacto): ver la excepción de la spec.
+    const { hero, confianza, problema, resultados, enfoque, servicios, casos, cifras, proceso, autodiagnostico, faq, cierre, nosotros, equipo, referidos } = c;
+    // Del pie entran la frase y los enlaces; `whatsappSr` es el prefijo del número de contacto para lectores de pantalla.
+    const footer = { tagline: footerLinks.tagline, servicios: footerLinks.servicios.links.map((l) => l.label), nubolabs: footerLinks.nubolabs.links.map((l) => l.label) };
+    const all = strings({ hero, confianza, problema, resultados, enfoque, servicios, casos, cifras, proceso, autodiagnostico, faq, cierre, nosotros, equipo, referidos, nav, footer, heroFeed, heroFeedMore, resultsVisuals, approachExample, siteSlogan });
     const bad = all.filter(([, s]) => FORBIDDEN_CI.test(s) || FORBIDDEN_CS.test(s));
     expect(bad).toEqual([]);
   });
 
-  it("la nota técnica existe y es el lugar de n8n", () => {
-    expect(c.servicios.notaTecnica).toContain("n8n");
+  it("la regla no rechaza palabras legítimas parecidas", () => {
+    for (const s of ["Un servicio excelente", "incontables pedidos", "la nubecita del logo"]) expect(FORBIDDEN_CI.test(s)).toBe(false);
+    for (const s of ["usa Excel", "tu contador", "estudios contables", "en la nube"]) expect(FORBIDDEN_CI.test(s)).toBe(true);
+  });
+
+  it("la nota técnica existe, explica cómo trabajamos y no nombra herramientas", () => {
+    expect(c.servicios.notaTecnica).toMatch(/^\*\*Cómo lo hacemos:\*\*/);
+    expect(c.servicios.notaTecnica).not.toMatch(/n8n|Make|WhatsApp|Excel|Sheets|Google/);
+  });
+
+  it("el lema del sitio es uno solo y está en el pie y en la CTA final", () => {
+    expect(siteSlogan).toBe("Soluciones a tu medida, decisiones con datos.");
+    expect(c.cierre.eyebrow).toBe(siteSlogan.replace(/\.$/, ""));
+    expect(footerLinks.tagline).not.toMatch(/piloto automático/);
   });
 });
 

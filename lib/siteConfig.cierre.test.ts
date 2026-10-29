@@ -6,26 +6,29 @@ import { SECTIONS, defaultSiteConfig, formatWhatsapp, mergeConfig, normalizeCont
 const base = defaultSiteConfig();
 
 describe("defaults del cierre", () => {
-  it("preguntas frecuentes: 6 preguntas de la referencia y la de datos enlaza a /privacidad", () => {
+  it("preguntas frecuentes: 7 preguntas (cambio enfoque-soluciones-a-medida) y la de datos enlaza a /privacidad", () => {
     const { faq } = base.content;
     expect(faq.eyebrow).toBe("Preguntas frecuentes");
     expect(faq.title).toBe("Lo que nos preguntan antes de partir");
     expect(faq.items.map((i) => i.pregunta)).toEqual([
       "¿Necesito saber de tecnología?",
+      "¿Es una solución estándar o hecha para mi negocio?",
       "¿Tengo que cambiar mis sistemas?",
       "¿Cuánto cuesta?",
       "¿Qué pasa en la sesión gratuita?",
       "¿Cuándo voy a ver resultados?",
       "¿Qué hacen con mis datos?",
     ]);
-    expect(faq.items[5].respuesta).toMatch(/\[[^\]]+\]\(\/privacidad\)/);
+    expect(faq.items[6].respuesta).toMatch(/\[[^\]]+\]\(\/privacidad\)/);
+    // Sin herramientas ni canales en ninguna respuesta (spec landing/cierre, "Preguntas frecuentes").
+    expect(faq.items.map((i) => i.respuesta).join(" ")).not.toMatch(/WhatsApp|Excel|Sheets|Google|n8n|Make|planilla/);
   });
 
   it("CTA final con los textos de la spec", () => {
     expect(base.content.cierre).toEqual({
-      eyebrow: "Tu operación, en piloto automático",
-      title: "Tu negocio puede trabajar para ti. Empecemos por una conversación.",
-      body: "Cuéntanos qué quieres lograr y te mostramos por dónde partir.",
+      eyebrow: "Soluciones a tu medida, decisiones con datos",
+      title: "Tu negocio tiene su propio problema. Empecemos por entenderlo.",
+      body: "Cuéntanos qué te frena y te mostramos por dónde partir.",
       cta: "Agendar mi diagnóstico gratis",
     });
   });

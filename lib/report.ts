@@ -1,4 +1,5 @@
 import "server-only";
+import { siteSlogan } from "@/lib/content";
 import { winAnsiDeep } from "@/lib/pdfText";
 import {
   DIMENSIONS,
@@ -144,7 +145,7 @@ export async function buildReportPdf(rawData: ReportData): Promise<Uint8Array> {
     drawLogo(p, M, H - 34, 0.3);
     text(p, "Nubolabs", M + 46, H - 52, 20, bold, C.white);
     text(p, "TU MAPA DE OPORTUNIDADES", M, H - 84, 10, bold, C.cyan);
-    text(p, "Tu operación, en piloto automático.", M, H - 100, 9.5, font, C.navySoft);
+    text(p, siteSlogan, M, H - 100, 9.5, font, C.navySoft); // lema del sitio (cambio enfoque-soluciones-a-medida)
     const dw = bold.widthOfTextAtSize(data.fecha, 9.5);
     text(p, data.fecha, W - M - dw, H - 100, 9.5, font, C.navySoft);
   };

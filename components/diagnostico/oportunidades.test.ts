@@ -39,6 +39,9 @@ describe("dimensiones", () => {
   it("textos de la spec, sin horas ni montos", () => {
     expect(DIMENSIONS[0].logro).toBe("Vendes más: respondes antes y ningún cliente queda sin seguimiento.");
     expect(DIMENSIONS[0].proximoPaso).toBe("Responder consultas y cotizaciones el mismo día, con seguimiento automático.");
+    // Cambio enfoque-soluciones-a-medida: "Control y números" habla de decidir con datos y de un reporte claro.
+    expect(DIMENSIONS[1].logro).toBe("Decides con datos: ventas, costos y pendientes al día, sin pedir informes.");
+    expect(DIMENSIONS[1].proximoPaso).toBe("Tener ventas, costos y cobranzas al día en un reporte claro.");
     expect(DIMENSIONS[3].proximoPaso).toBe("Liberar al equipo de la pega repetitiva y dejar escrito cómo se hacen las cosas.");
     expect(OPPORTUNITY_LABELS).toEqual({ alta: "Oportunidad alta", media: "Oportunidad media", baja: "Oportunidad baja" });
     const all = DIMENSIONS.flatMap((d) => [d.nombre, d.logro, d.proximoPaso]).join(" ");

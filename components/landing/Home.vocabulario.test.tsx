@@ -22,8 +22,12 @@ import { ReferralBanner } from "@/components/landing/ReferralBanner";
 import { SelfDiagnosis } from "@/components/landing/SelfDiagnosis";
 import { defaultSiteConfig } from "@/lib/siteConfig";
 
-// Regex de la decisión 7 de design.md más "nube" (propuesta). "Make" e "IA" con mayúsculas exactas.
-const FORBIDDEN_CI = /\bn8n\b|\bAPIs?\b|\bCRM\b|\bERP\b|\bagentes?\b|\bROI\b|horas ahorradas|pymes?|\bnube\b/gi;
+// Regex de la decisión 7 de lenguaje-sin-jerga más "nube" (propuesta) y, desde enfoque-soluciones-a-medida, las
+// herramientas y canales (WhatsApp, Excel, Sheets, Google, planillas), la contabilidad y el lema viejo. Con los
+// defaults el formulario está en el paso 1 y el WhatsApp de contacto apagado, así que el canal de contacto no entra.
+// "Make" e "IA" con mayúsculas exactas.
+const FORBIDDEN_CI =
+  /\bn8n\b|\bAPIs?\b|\bCRM\b|\bERP\b|\bagentes?\b|\bROI\b|horas ahorradas|pymes?|\bnube\b|WhatsApp|\bExcel\b|Sheets|Google|planillas?|\bcontador(es|a|as)?\b|\bcontables?\b|contabilidad|piloto autom/gi;
 const FORBIDDEN_CS = /\bMake\b|\bIA\b/g;
 
 function renderHome(): HTMLElement {
@@ -64,12 +68,11 @@ function visibleText(root: HTMLElement): string {
 }
 
 describe("portada: vocabulario", () => {
-  it("fuera de la nota técnica no hay jerga técnica, 'pyme' ni 'nube'", () => {
+  it("en toda la portada (incluida la nota técnica) no hay jerga, 'pyme', 'nube', herramientas, canales ni contabilidad", () => {
     const root = renderHome();
-    root.querySelectorAll("[data-nota-tecnica]").forEach((n) => n.remove());
     const text = visibleText(root);
     // El barrido no es vacío: incluye menú, panel del hero, secciones, rótulos fijos, formulario y pie.
-    for (const s of ["Lo que ganas", "Cotización enviada al cliente", "Nuestro compromiso contigo", "Medimos cada proyecto", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por una conversación", "Hecho en Chile", "Para todos", "Servicios profesionales", "Bienvenido, cliente de Osorio", "Hacer el autodiagnóstico", "Tu mapa de oportunidades"]) {
+    for (const s of ["Lo que ganas", "Cotización lista y enviada", "Nuestro compromiso contigo", "Medimos cada proyecto", "¿Te suena?", "Recibes", "¿Qué te gustaría lograr?", "¿Cuánto cuesta?", "Empecemos por entenderlo", "Hecho en Chile", "Para todos", "Servicios profesionales", "Bienvenido, cliente de Osorio", "Hacer el autodiagnóstico", "Tu mapa de oportunidades", "Cómo lo hacemos:"]) {
       expect(text).toContain(s);
     }
     expect([...(text.match(FORBIDDEN_CI) ?? []), ...(text.match(FORBIDDEN_CS) ?? [])]).toEqual([]);
@@ -77,11 +80,17 @@ describe("portada: vocabulario", () => {
     expect(text).not.toMatch(/\+120 h|−90%|minutos donde antes había días|referenciales/);
   });
 
-  it("hay una sola nota técnica y es el único lugar con n8n", () => {
+  it("hay una sola nota técnica, explica cómo trabajamos y no nombra herramientas", () => {
     const root = renderHome();
     const notas = root.querySelectorAll("[data-nota-tecnica]");
     expect(notas).toHaveLength(1);
-    expect(visibleText(root).match(/\bn8n\b/g)).toHaveLength(1);
-    expect(notas[0].textContent).toContain("n8n");
+    expect(notas[0].textContent).toMatch(/^Cómo lo hacemos:/);
+    expect(notas[0].textContent).not.toMatch(/n8n|Make|WhatsApp|Excel|Sheets|Google/);
+  });
+
+  it("el lema del sitio aparece en la CTA final y el pie no repite el lema viejo", () => {
+    const text = visibleText(renderHome());
+    expect(text).toContain("Soluciones a tu medida, decisiones con datos");
+    expect(text).not.toMatch(/piloto automático/i);
   });
 });

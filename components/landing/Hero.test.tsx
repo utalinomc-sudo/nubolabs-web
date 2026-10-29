@@ -30,8 +30,8 @@ describe("Hero", () => {
   it("muestra el título con el resalte de marca y las etiquetas", () => {
     render(<Hero content={hero} />);
     const h1 = screen.getByRole("heading", { level: 1 });
-    expect(h1).toHaveTextContent("Que tu negocio trabaje para ti, no al revés.");
-    expect(h1.querySelector(".text-gradient-brand")).toHaveTextContent("trabaje para ti");
+    expect(h1).toHaveTextContent("Soluciones hechas para tu negocio, con datos para decidir mejor.");
+    expect(h1.querySelector(".text-gradient-brand")).toHaveTextContent("tu negocio");
     for (const tag of hero.tags) expect(screen.getByText(tag)).toBeInTheDocument();
   });
 

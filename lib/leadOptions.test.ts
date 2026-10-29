@@ -20,7 +20,7 @@ describe("GOALS e INDUSTRIES", () => {
       ["clear_numbers", "Tener mis números claros"],
       ["collect_on_time", "Cobrar a tiempo"],
       ["organize_team", "Ordenar el trabajo del equipo"],
-      ["drop_spreadsheets", "Dejar atrás las planillas"],
+      ["drop_spreadsheets", "Resolver un problema puntual de mi operación"], // clave persistida; etiqueta del cambio enfoque-soluciones-a-medida
       ["grow_orderly", "Crecer sin desordenarme"],
       ["other", "Otra cosa"],
     ]);
@@ -59,6 +59,7 @@ describe("describeGoals", () => {
       "vender más, responder más rápido a tus clientes y cobrar a tiempo",
     );
     expect(describeGoals(["other", "grow_orderly"])).toBe("crecer sin desordenarte");
+    expect(describeGoals(["drop_spreadsheets"])).toBe("resolver un problema puntual de tu operación");
   });
 });
 

@@ -4,12 +4,25 @@ import { defaultSiteConfig, mergeConfig, normalizeTags } from "@/lib/siteConfig"
 
 const DEFAULT_TAGS = [
   "30 minutos, gratis y sin compromiso",
-  "Sin cambiar tus sistemas",
+  "A la medida de tu negocio",
   "Respuesta en menos de 24 horas",
 ];
 
-// Palabras que el mensaje principal no puede usar (spec landing/hero, "Vocabulario prohibido").
-const FORBIDDEN = new Set(["horas", "ia", "nube", "automatización", "automatizaciones"]);
+// Palabras que el mensaje principal no puede usar (spec landing/hero, "Vocabulario prohibido"): jerga y, desde el
+// cambio enfoque-soluciones-a-medida, herramientas, canales y el contador.
+const FORBIDDEN = new Set([
+  "horas",
+  "ia",
+  "nube",
+  "automatización",
+  "automatizaciones",
+  "whatsapp",
+  "excel",
+  "sheets",
+  "n8n",
+  "make",
+  "contador",
+]);
 function forbiddenWordsIn(text: string): string[] {
   return (text.match(/\p{L}+/gu) ?? []).map((w) => w.toLowerCase()).filter((w) => FORBIDDEN.has(w));
 }
@@ -99,9 +112,10 @@ describe("mergeConfig — hero", () => {
 describe("defaults del hero", () => {
   const hero = defaultSiteConfig().content.hero;
 
-  it("tienen el mensaje de la HDU-08", () => {
+  it("tienen el mensaje del enfoque de soluciones a medida (cambio enfoque-soluciones-a-medida)", () => {
     expect(hero.eyebrow).toBe(""); // sin etiqueta superior por defecto (design.md decisión 5b)
-    expect(hero.title).toBe("Que tu negocio **trabaje para ti**, no al revés.");
+    expect(hero.title).toBe("Soluciones hechas para **tu negocio**, con datos para decidir mejor.");
+    expect(hero.subtitle).toContain("solución que calza con tu forma de trabajar");
     expect(hero.ctaPrimary).toBe("Quiero mi diagnóstico gratis");
     expect(hero.ctaSecondary).toBe("Ver cómo trabajamos");
     expect(hero.tags).toEqual(DEFAULT_TAGS);
@@ -112,7 +126,7 @@ describe("defaults del hero", () => {
     for (const text of texts) expect(text.toLowerCase()).not.toContain("pyme");
   });
 
-  it("título y bajada no usan horas, IA, nube ni automatización", () => {
+  it("título y bajada no usan horas, IA, nube, automatización, herramientas ni el contador", () => {
     expect(forbiddenWordsIn(hero.title)).toEqual([]);
     expect(forbiddenWordsIn(hero.subtitle)).toEqual([]);
   });
